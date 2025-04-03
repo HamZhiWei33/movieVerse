@@ -1,0 +1,7 @@
+/* for signup, login, forgot password styling */
+main.signup-page,
+main.login-page,
+main.forgot-password-page,
+main.reset-password-page {
+  height: 100%;
+}

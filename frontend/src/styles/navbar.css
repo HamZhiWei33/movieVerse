@@ -1,0 +1,19 @@
+header {
+  max-width: 100%;
+}
+header #navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem;
+  background-color: #000;
+  color: #ffffff;
+  height: 5rem;
+}
+header #navbar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  gap: 1rem;
+}

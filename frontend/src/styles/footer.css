@@ -1,0 +1,22 @@
+#footer {
+  min-width: 100%;
+  min-height: fit-content;
+  background-color: black;
+  padding: 2rem;
+}
+#footer ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  gap: 1rem;
+}
+#footer p {
+  text-align: center;
+  margin: 1rem;
+}
+
+#footer div a {
+  display: flex;
+  justify-content: center;
+}
