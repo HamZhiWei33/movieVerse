@@ -1,3 +1,13 @@
 main.home-page {
   height: 100%;
 }
+/* tablet/ipad */
+@media screen and (max-width: 1200px) {
+  main.home-page {
+  }
+}
+/* phone */
+@media screen and (max-width: 768px) {
+  main.home-page {
+  }
+}
