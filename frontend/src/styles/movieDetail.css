@@ -1,0 +1,219 @@
+.movie-detail-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem 5rem;
+    background-color: #141414;
+}
+
+.detail-content-container {
+    width: 100%;
+    margin-bottom:1rem;
+}
+
+.movie-card-list {
+    width: 100%;
+}
+
+.rating-container {
+    width: 100%;
+    background-color: #1a1a1a;
+    border: 0.1rem solid #262626;
+    border-radius: 0.7rem;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.review-subheader {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center; 
+    width: 100%;
+    margin: 0 4rem;
+}
+
+
+.review-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: fit-content;
+    background-color: #0F0F0F;
+    border: 0.1rem solid #262626;
+    border-radius: 0.7rem;
+    color: #ffffff;
+    font-weight: 400;
+    font-size: 0.8rem;
+}
+
+.review-button .add-icon {
+    margin-right: 0.4rem;
+    display: flex;
+    align-items: center;
+    font-size: 1.5rem;
+}
+
+.review-list {
+    display: grid;
+    margin-top: 1rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.review-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+    margin-top: 2rem;
+    width: 100%;
+}
+
+.review-pagination .review-previous-next-icon {
+    background-color: #141414;
+    border: 1px solid #262626;
+    border-radius: 50%; 
+    color: #ffffff;
+    padding: 0; 
+    width: 3rem; 
+    height: 3rem; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin: 0;
+    line-height: 1; 
+}
+
+.review-pagination button:hover:not(:disabled) {
+    background-color: #1a1a1a;
+    color: #ccff00;
+    transform: translateY(-1px);
+}
+
+.review-pagination button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.review-pagination span {
+    color: #ffffff;
+    font-size: 0.9rem;
+    min-width: 80px;
+    text-align: center;
+}
+
+.back-button-container{
+    display: flex;
+    align-items: flex-start;
+    width: 100%; 
+    margin: 1rem;
+}
+
+.back-button {
+    display: flex;
+    align-items: center; 
+    background: none;
+    border: none;
+    color: #bfbfbf;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0.2rem;
+}
+
+.back-button .back-icon{
+    font-size: 2.5rem;
+}
+
+.back-button:hover {
+    color: #ffffff;
+    text-decoration: underline;
+}
+
+.back-button:focus {
+    outline: none;
+    box-shadow: none;
+  }
+
+.movie-detail-page .movie-card-list {
+    color: #ffffff;
+}
+
+.movie-detail-page .movie-card-list:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.movie-detail-page .clamp-text {
+    display: block;
+    -webkit-line-clamp: unset;
+    line-clamp: unset;
+    overflow: visible;
+    white-space: normal;
+}
+
+.movie-detail-page .movie-card-list img {
+    max-width: 16rem;
+    height: 24rem;
+}
+
+.movie-detail-page .poster-container-list {
+    flex: 0 0 16rem;
+}
+
+.movie-detail-page .movie-details-container-list {
+    margin-left: 2rem;
+    margin-top: 0;
+}
+
+.movie-detail-page .movie-details-container-list h3 {
+    font-size: 1.6rem;
+}
+
+@media (max-width: 768px) {
+    .movie-detail-page .movie-card-list {
+        flex-direction: column;
+    }
+
+    .movie-detail-page .poster-container-list {
+        flex: 0 0 auto; 
+        margin-bottom: 1rem;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+      }
+
+    .movie-detail-page .movie-details-container-list {
+        text-align: center;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        margin: 1rem;
+    }
+
+    .movie-detail-page .genre-tags {
+        justify-content: center;
+        align-items: center;
+    }
+
+    .movie-detail-page .duration-and-icons-container {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .movie-detail-page .iteractive-icon-container,
+    .bottom-iteractive-icon-container {
+        justify-content: center;
+    }
+
+    .review-list {
+        grid-template-columns: repeat(1, 1fr);
+      }
+}

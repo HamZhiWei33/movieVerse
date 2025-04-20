@@ -1,0 +1,22 @@
+.review-stars-wrapper {
+    display: inline-flex;
+    align-items: center;
+    background-color: #141414;
+    color: #BFBFBF;
+    border: 0.1rem solid #262626;
+    border-radius: 10rem;
+    padding: 0.2rem 0.7rem;
+    width: fit-content;
+}
+
+.rating-number {
+    color: #CCFF00;
+    font-weight: 500;
+    font-size: 0.9rem;
+    margin-left: 0.5rem;
+    width: 1.5rem; 
+    display: inline-block;
+    text-align: center;
+    font-feature-settings: "tnum";
+    font-variant-numeric: tabular-nums;
+}

@@ -1,0 +1,18 @@
+.icon {
+  font-size: 1.7rem;
+  cursor: pointer;
+  color: #ffffff;
+  transition: color 0.2s ease;
+}
+
+.icon:hover {
+  color: #ccff00;
+}
+
+.icon.liked {
+  color: #ccff00;
+}
+
+.icon.addedToWatchlist {
+  color: #ccff00;
+}
