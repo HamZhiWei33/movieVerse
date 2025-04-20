@@ -1,5 +1,5 @@
 import "./App.css";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import HomePage from "./pages/HomePage";
 import SignupPage from "./pages/SignUpPage";
@@ -10,9 +10,12 @@ import DirectoryPage from "./pages/DirectoryPage";
 import RankingPage from "./pages/RankingPage";
 import ProfilePage from "./pages/ProfilePage";
 import Footer from "./components/Footer";
+import MovieDetailPage from "./pages/MovieDetailPage";
+import { useEffect } from "react";
 function App() {
   return (
     <>
+      <ScrollToTopOnNavigate />
       <Navbar />
       <Routes>
         <Route path="/" element={<HomePage />} />
@@ -23,10 +26,21 @@ function App() {
         <Route path="/directory" element={<DirectoryPage />} />
         <Route path="/ranking" element={<RankingPage />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/movie/:movieTitle" element={<MovieDetailPage />} />
       </Routes>
       <Footer />
     </>
   );
+}
+
+function ScrollToTopOnNavigate() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
 }
 
 export default App;

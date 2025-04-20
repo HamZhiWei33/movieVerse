@@ -1,32 +1,33 @@
 import "../styles/navbar.css";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { FaAngleDown } from "react-icons/fa";
+
 const Navbar = () => {
   return (
     <header>
       <div id="navbar">
         <div className="logo">
-          <Link to="/">
+          <NavLink to="/">
             <img src="Logo.svg" alt="logo" />
-          </Link>
+          </NavLink>
         </div>
         <nav className="nav-links">
           <ul>
             <li>
-              <Link to="/">Home</Link>
+              <NavLink to="/" end>Home</NavLink>
             </li>
             <li>
-              <Link to="/directory">Directory</Link>
+              <NavLink to="/directory">Directory</NavLink>
             </li>
             <li>
-              <Link to="/ranking">Ranking</Link>
+              <NavLink to="/ranking">Ranking</NavLink>
             </li>
             <li>
-              <Link to="/profile">Profile</Link>
+              <NavLink to="/profile">Profile</NavLink>
               <FaAngleDown />
             </li>
             <li>
-              <Link to="/login">Logout</Link>
+              <NavLink to="/login">Logout</NavLink>
             </li>
           </ul>
         </nav>
@@ -34,4 +35,5 @@ const Navbar = () => {
     </header>
   );
 };
+
 export default Navbar;
