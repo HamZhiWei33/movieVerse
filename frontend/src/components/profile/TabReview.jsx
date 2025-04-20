@@ -1,5 +1,6 @@
 import React from "react";
 import "../../styles/profile/tab-review.css";
+import { getMovieNameById } from "./review.js";
 
 const TabReview = ({ reviews = [] }) => {
   if (!reviews || reviews.length === 0 || !Array.isArray(reviews)) {
@@ -21,13 +22,13 @@ const TabReview = ({ reviews = [] }) => {
           <React.Fragment key={review.title}>
             <li className="review-item" aria-labelledby={review.title}>
               <h3 className="review-title" id={review.title}>
-                {review.title}
+                {getMovieNameById(review.movieId)}
               </h3>
               <p
                 className="review-rate"
-                aria-label={`Rating: ${review.rate} out of 5`}
+                aria-label={`Rating: ${review.rating} out of 5`}
               >
-                <span aria-hidden="true">Rating: {review.rate}</span>
+                <span aria-hidden="true">Rating: {review.rating}</span>
               </p>
               <p className="review-content">{review.review}</p>
             </li>

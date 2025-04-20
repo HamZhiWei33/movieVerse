@@ -9,6 +9,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { getLikesObject } from "./overview.js";
 
 ChartJS.register(
   CategoryScale,
@@ -63,8 +64,9 @@ const ReviewChart = () => {
 
   return (
     <div style={{ maxWidth: "600px", margin: "auto" }}>
-      <h2>Review Ratings Summary</h2>
+      <h2 style={{ color: "white" }}>Review Ratings Summary</h2>
       <Bar data={chartData} options={{ responsive: true }} />
+      {getLikesObject()}
     </div>
   );
 };

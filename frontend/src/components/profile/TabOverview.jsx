@@ -1,7 +1,9 @@
 import React from "react";
 import ReviewChart from "./ReviewChart";
 import ReviewGenreChart from "./ReviewGenreChart";
-
+import LikesChart from "./LikesChart";
+import RateChart from "./RateChart";
+import WatchlistChart from "./WatchlistChart";
 const mockMovies = [
   {
     id: 1,
@@ -18,9 +20,12 @@ const TabOverview = () => {
 
   return (
     <div>
+      <LikesChart userId="U2" />
+      <RateChart userId="U2" />
+      <WatchlistChart userId="U2" />
       {/* <ReviewChart />
-      <ReviewGenreChart />
-      {firstMovie && firstMovie.poster_path && (
+      <ReviewGenreChart /> */}
+      {/* {firstMovie && firstMovie.poster_path && (
         <img
           src={`https://image.tmdb.org/t/p/w500${firstMovie.poster_path}`}
           alt={firstMovie.title}
