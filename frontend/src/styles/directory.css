@@ -1,3 +1,178 @@
 main.directory-page {
-  height: 100%;
+  background-color: #141414;
+}
+
+.directory-header {
+  margin-left: 3rem;
+  margin-right: 3rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.view-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.view-toggle label {
+  color: #ccc;
+  /* Optional styling */
+  font-weight: 500;
+}
+
+.view-toggle select {
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  border: none;
+  background-color: #3a3a3a;
+  color: #fff;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+section {
+  margin-left: 3rem;
+  margin-right: 3rem;
+}
+
+/* Filter section */
+.filters {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr) auto;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  align-items: start;
+}
+
+fieldset {
+  border: none;
+  padding: 0;
+}
+
+legend {
+  font-weight: 500;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.clear-filters-container {
+  text-align: right;
+  margin-bottom: 1rem;
+  margin-left: 3rem;
+  margin-right: 3rem;
+}
+
+.clear-filters-button {
+  background-color: transparent;
+  color: #bfbfbf;
+  border: none;
+  font-weight: 400;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  outline: none;
+}
+
+.clear-filters-button:hover {
+  color: #ccff00;
+  text-decoration-color: currentColor;
+  text-decoration: underline;
+}
+
+/* Only show when filters are active */
+.clear-filters-button {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.clear-filters-button.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.clear-filters-button:focus {
+  outline: none;
+  /* Ensure no outline on focus */
+  box-shadow: none;
+  /* Remove any box shadow if applied */
+}
+
+.filter-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  row-gap: 1rem;
+  justify-content: space-between;
+}
+
+.filter-button {
+  flex: 1 1 calc(33.333% - 0.5rem);
+  /* 3 per row with spacing */
+  background-color: #3a3a3a;
+  color: #ffffff;
+  border: none;
+  padding: 0.2rem 0.2rem;
+  border-radius: 250px;
+  font-weight: 300;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Active state */
+.filter-button.active,
+.filter-button[aria-pressed="true"] {
+  background-color: #ccff00;
+  color: #000000;
+  font-weight: 400;
+}
+
+.filter-button.active:hover {
+  color: #000000;
+}
+
+.filter-button:hover {
+  color: #ccff00;
+}
+
+/* No results */
+.no-results {
+  font-size: 1rem;
+  margin-top: 1rem;
+  grid-column: 1 / -1;
+  text-align: center;
+  color: #ccc;
+}
+
+/* Grid View */
+.movie-container.grid .movie-grid {
+  display: grid;
+  border: 0.1rem solid #262626;
+  border-radius: 0.7rem;
+  padding: 2.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 1.5rem;
+}
+
+/* List View */
+.movie-container.list .movie-list {
+  display: grid;
+  border: 0.1rem solid #262626;
+  border-radius: 0.7rem;
+  padding: 2.5rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+  .filters {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1024px) {
+  .movie-container.list .movie-list {
+    grid-template-columns: repeat(1, 1fr);
+  }
 }

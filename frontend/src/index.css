@@ -1,7 +1,9 @@
+@import url('https://fonts.cdnfonts.com/css/manrope');
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Manrope', sans-serif;
   line-height: 1.5;
-  font-weight: 400;
+  font-weight: 300;
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
@@ -23,6 +25,7 @@ body {
   /* min-width: 320px;
   min-height: 100vh; */
   font-size: 1rem;
+  background-color: #141414;
 }
 /* lydia */
 a {
@@ -44,9 +47,61 @@ a:visited:hover {
   color: #b3e302;
 }
 
+.nav-links a {
+  position: relative;
+  font-weight: 300;
+  font-size: 1rem;
+  text-decoration: none;
+  color: #bfbfbf;
+  transition: color 0.3s ease;
+}
+
+/* Underline element */
+.nav-links a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -5px;
+  width: 0;
+  height: 3px;
+  background-color: #c6ff00;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+/* Active link */
+.nav-links a.active {
+  color: white;
+  font-weight: 00;
+}
+
+/* Animate underline in */
+.nav-links a.active::after {
+  width: 100%;
+}
+
 h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+  font-weight: 700; /* Extra bold */
+}
+
+h2 {
+  font-weight: 600; /* Bold */
+}
+
+h3 {
+  font-weight: 500; /* SemiBold */
+}
+
+h4 {
+  font-weight: 400; /* Medium */
+}
+
+h5 {
+  font-weight: 300; /* Regular */
+}
+
+h6 {
+  font-weight: 100; /* Light */
 }
 
 button {
