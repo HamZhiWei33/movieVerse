@@ -1,3 +1,5 @@
+// not complete
+// PIC HWJ
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
@@ -20,6 +22,8 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    watchlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Movie" }],
+    likedMovies: [{ type: mongoose.Schema.Types.ObjectId, ref: "Movie" }],
   },
   { timestamps: true }
 );
