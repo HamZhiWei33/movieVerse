@@ -1,19 +1,19 @@
 // components/TopMovieSection.jsx
-import React from "react";
+import React, { useState, useEffect } from "react";
+import ReviewStars from "../components/directory/ReviewStars";
+import LikeIcon from "../components/directory/LikeIcon";
+import AddToWatchlistIcon from "../components/directory/AddToWatchlistIcon";
+
 
 const TopMovieSection = ({ selectedMovie, sideMovies, setSelectedMovie, ratingDistribution }) => {
-  const renderStars = (rating) => {
-    const fullStars = Math.floor(rating);
-    const halfStar = rating % 1 >= 0.5;
-    const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
-    return (
-      <>
-        {"★".repeat(fullStars)}
-        {halfStar && "½"}
-        {"☆".repeat(emptyStars)}
-      </>
-    );
-  };
+  
+   const [liked, setLiked] = useState(false);
+   const [addedToWatchlist, setAddedToWatchlist] = useState(false);
+ 
+   useEffect(() => {
+     setLiked(false);
+     setAddedToWatchlist(false);
+   }, [selectedMovie]);
 
   const allTopMovies = [selectedMovie, ...sideMovies]
   .filter(Boolean)
@@ -55,8 +55,7 @@ const TopMovieSection = ({ selectedMovie, sideMovies, setSelectedMovie, ratingDi
           <div className="left-column">
             <h1>{selectedMovie.title}</h1>
             <div className="rating-bar">
-              <span className="score">{selectedMovie.rating}</span>
-              <div className="stars">{renderStars(selectedMovie.rating)}</div>
+             <ReviewStars rating={selectedMovie.rating} readOnly={true} showNumber={true} size="medium"/>
             </div>
             <div className="tags">
               <span className="badge">Genre</span>
@@ -68,8 +67,12 @@ const TopMovieSection = ({ selectedMovie, sideMovies, setSelectedMovie, ratingDi
             </div>
             <div className="action-buttons">
               <button className="watch-trailer">▶ Watch Trailer</button>
-              <button className="icon-button">❤️</button>
-              <button className="icon-button">📁</button>
+              <div className="iteractive-icon" onClick={() => setLiked(!liked)}>
+                <LikeIcon liked={liked} />
+              </div>
+              <div className="iteractive-icon" onClick={() => setAddedToWatchlist(!addedToWatchlist)}>
+                <AddToWatchlistIcon addedToWatchlist={addedToWatchlist} />
+              </div>
             </div>
           </div>
           <div className="right-column">
