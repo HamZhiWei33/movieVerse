@@ -22,6 +22,10 @@ const ReviewStars = ({
     }
   };
 
+  React.useEffect(() => {
+    setValue(rating);
+  }, [rating]);
+
   return (
     <Box className="review-stars-wrapper">
       <Rating
