@@ -2,6 +2,7 @@ header {
   max-width: 100%;
 }
 header #navbar {
+  position: sticky;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -9,6 +10,7 @@ header #navbar {
   background-color: #0f0f0f;
   color: #ffffff;
   height: 5rem;
+  z-index: 1000;
 }
 header #navbar ul {
   list-style: none;
