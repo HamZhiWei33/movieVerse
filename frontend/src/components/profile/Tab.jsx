@@ -4,7 +4,13 @@ import TabWatchlist from "./TabWatchlist";
 import TabReview from "./TabReview";
 import TabManage from "./TabManage";
 import "../../styles/profile/tab.css";
-import { ReviewList } from "./constant";
+// import { ReviewList } from "./constant";
+// import { movies } from "../../constant.js";
+import { reviews } from "../../constant.js";
+
+const currentUserId = "U2";
+
+const userReviews = reviews.filter((review) => review.userId === currentUserId);
 
 const tabList = ["Overview", "WatchList", "Review", "Manage"];
 const Tab = () => {
@@ -80,7 +86,7 @@ const Tab = () => {
       case "WatchList":
         return <TabWatchlist />;
       case "Review":
-        return <TabReview reviews={ReviewList} />;
+        return <TabReview reviews={userReviews} />;
       case "Manage":
         return <TabManage />;
       default:
