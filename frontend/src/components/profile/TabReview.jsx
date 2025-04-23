@@ -1,7 +1,7 @@
 import React from "react";
 import "../../styles/profile/tab-review.css";
 import { getMovieNameById } from "./review.js";
-
+import ReviewStars from "../directory/ReviewStars.jsx";
 const TabReview = ({ reviews = [] }) => {
   if (!reviews || reviews.length === 0 || !Array.isArray(reviews)) {
     return (
@@ -19,22 +19,25 @@ const TabReview = ({ reviews = [] }) => {
     >
       <ul className="review-container" aria-label="review-lists">
         {reviews.map((review, index) => (
-          <React.Fragment key={review.title}>
+          <React.Fragment key={index}>
             <li className="review-item" aria-labelledby={review.title}>
               <h3 className="review-title" id={review.title}>
                 {getMovieNameById(review.movieId)}
               </h3>
-              <p
+              <div
                 className="review-rate"
                 aria-label={`Rating: ${review.rating} out of 5`}
               >
-                <span aria-hidden="true">Rating: {review.rating}</span>
-              </p>
+                <span aria-hidden="true">
+                  <ReviewStars rating={review.rating} showNumber="false" />
+                </span>
+              </div>
               <p className="review-content">{review.review}</p>
             </li>
             {/* Only render line if not the last item */}
             {index < reviews.length - 1 && (
               <div
+                key={`divider-${index}`}
                 className="review-divider"
                 role="separator"
                 aria-orientation="vertical"
