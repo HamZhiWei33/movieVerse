@@ -139,6 +139,7 @@ export const movies = [
     description: "A thief enters people's dreams to steal secrets.",
     duration: 148,
     releaseDate: "2010-07-16",
+    region: "Hollywood",
   },
   {
     id: "M102",
@@ -157,6 +158,7 @@ export const movies = [
     description: "Astronauts travel through a wormhole to save humanity.",
     duration: 169,
     releaseDate: "2014-11-07",
+    region: "Hollywood",
   },
   {
     id: "M103",
@@ -183,6 +185,7 @@ export const movies = [
       "In space, no one can hear you. While scavenging the deep ends of a derelict space station, a group of young space colonizers come face to face with the most terrifying life form in the universe.",
     duration: 119,
     releaseDate: "2024-12-08",
+    region: "Hollywood",
   },
   {
     id: "M104",
@@ -202,6 +205,7 @@ export const movies = [
       "A deactivated cyborg's revived, but can't remember anything of her past and goes on a quest to find out who she is.",
     duration: 112,
     releaseDate: "2019-01-31",
+    region: "Hollywood",
   },
   {
     id: "M105",
@@ -221,6 +225,7 @@ export const movies = [
       "Jake Sully and Ney'tiri have formed a family and are doing anything they can to stay together.",
     duration: 192,
     releaseDate: "2022-12-16",
+    region: "Hollywood",
   },
   {
     id: "M106",
@@ -240,6 +245,7 @@ export const movies = [
       "Cat is a solitary animal, but as its home is devastated by a great flood, he finds refuge on a boat populated by various species, and will have to team up with them despite their differences.",
     duration: 84,
     releaseDate: "2024-05-22",
+    region: "Europe",
   },
   {
     id: "M107",
@@ -259,6 +265,7 @@ export const movies = [
       "Greed and class discrimination threaten the newly formed symbiotic relationship between the wealthy Park family and the destitute Kim clan.",
     duration: 132,
     releaseDate: "2019-05-30",
+    region: "South Korea",
   },
   {
     id: "M108",
@@ -278,6 +285,7 @@ export const movies = [
       "Trapped on her family's isolated farm, Pearl must tend to her ailing father under the bitter and overbearing watch of her mother.",
     duration: 102,
     releaseDate: "2022-09-16",
+    region: "USA"
   },
   {
     id: "M109",
@@ -297,6 +305,7 @@ export const movies = [
       "Mark leads a team of office workers whose memories have been surgically divided between their work and personal lives.",
     duration: 60,
     releaseDate: "2022-02-18",
+    region: "Hollywood",
   },
   {
     id: "M110",
@@ -315,6 +324,7 @@ export const movies = [
       "A group of kids in a small town uncover a series of supernatural mysteries.",
     duration: 50,
     releaseDate: "2019-07-04",
+    region: "Hollywood",
   },
   {
     id: "M111",
@@ -334,6 +344,7 @@ export const movies = [
       "Two highly-trained operatives are appointed to posts in guard towers on opposite sides of a vast and highly classified gorge, protecting the world from a mysterious evil that lurks within. They work together to keep the secret in the gorge.",
     duration: 127,
     releaseDate: "2025-02-14",
+    region: "Hollywood",
   },
   {
     id: "M112",
@@ -353,6 +364,7 @@ export const movies = [
       "A fading celebrity takes a black-market drug: a cell-replicating substance that temporarily creates a younger, better version of herself.",
     duration: 141,
     releaseDate: "2024-09-20",
+    region: "Hollywood",
   },
   {
     id: "M113",
@@ -372,6 +384,7 @@ export const movies = [
       "Beginning in Jeju in 1951, the spirited Ae-sun and the steadfast Gwan-sik's island story blossoms into a lifelong tale of setbacks and triumphs — proving love endures across time.",
     duration: 60,
     releaseDate: "2025-03-07",
+    region: "South Korea",
   },
   {
     id: "M114",
@@ -397,6 +410,7 @@ export const movies = [
       "Four misfits find themselves struggling with ordinary problems when they are suddenly pulled through a mysterious portal into the Overworld: a bizarre, cubic wonderland that thrives on imagination. To get back home, they'll have to master this world while embarking on a magical quest with an unexpected, expert crafter, Steve.",
     duration: 101,
     releaseDate: "2025-03-31",
+    region: "Hollywood",
   },
   {
     id: "M115",
@@ -416,6 +430,7 @@ export const movies = [
       "When Karen the Computer decides to take over the world, it's up to Plankton to stop her - with a little help from SpongeBob and the Gal Pals (Pearl, Sandy, and Mrs. Puff).",
     duration: 84,
     releaseDate: "2025-03-07",
+    region: "USA",
   },
 ];
 

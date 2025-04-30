@@ -1,11 +1,11 @@
 // components/TopMovieSection.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import ReviewStars from "../components/directory/ReviewStars";
 import LikeIcon from "../components/directory/LikeIcon";
 import AddToWatchlistIcon from "../components/directory/AddToWatchlistIcon";
+import { genres as allGenres, movies as allMovies } from "../constant";
 
-
-const TopMovieSection = ({ selectedMovie, sideMovies, setSelectedMovie, ratingDistribution }) => {
+const TopMovieSection = ({ selectedMovie, setSelectedMovie, ratingDistribution }) => {
   
    const [liked, setLiked] = useState(false);
    const [addedToWatchlist, setAddedToWatchlist] = useState(false);
@@ -15,37 +15,69 @@ const TopMovieSection = ({ selectedMovie, sideMovies, setSelectedMovie, ratingDi
      setAddedToWatchlist(false);
    }, [selectedMovie]);
 
-  const allTopMovies = [selectedMovie, ...sideMovies]
-  .filter(Boolean)
-  .sort((a, b) => b.rating - a.rating)
-  .slice(0, 3);
+  // compute top 3 for display
+  const [first, second, third] = useMemo(() => {
+    return [...allMovies]
+    .map((movie) => ({
+      ...movie,
+      compositeScore: movie.rating * 0.8 + (movie.year - 2000) * 0.02, // 80% rating + 20% recency (year)
+    }))
+    .sort((a, b) => b.compositeScore - a.compositeScore)
+    .slice(0, 3); // Get the top 3 movies
+}, []);
 
-  const top1 = allTopMovies[0]; // center
-  const top2 = allTopMovies[1]; // left
-  const top3 = allTopMovies[2]; // right
+  const top3 = [second, first, third];
+
+  // format duration
+  const durationText = useMemo(() => {
+    if (!selectedMovie?.duration) return "";
+    const hrs = Math.floor(selectedMovie.duration / 60);
+    const mins = selectedMovie.duration % 60;
+    return `⏱ ${hrs}h ${mins}min`;
+  }, [selectedMovie]);
+
+   // Total and percent distribution
+   const { totalRatings, percentDistribution } = useMemo(() => {
+    const total = Object.values(ratingDistribution).reduce((sum, v) => sum + v, 0);
+    const percents = {};
+    Object.entries(ratingDistribution).forEach(([star, count]) => {
+      percents[star] = total > 0 ? Math.round((count / total) * 100) : 0;
+    });
+    return { totalRatings: total, percentDistribution: percents };
+  }, [ratingDistribution]);
+
+// Get the genre names from the genre IDs
+  const genreNames = useMemo(() => {
+    return selectedMovie.genre
+      .map((gid) => {
+        const g = allGenres.find((item) => item.id === gid);
+        return g ? g.name : gid;
+      })
+      .join(", ");
+  }, [selectedMovie]);
 
   return (
     <div className="blurred-banner-wrapper">
       <div
         className="background-blur"
-        style={{ backgroundImage: `url(${selectedMovie?.image})` }}
+        style={{ backgroundImage: `url(${selectedMovie?.posterUrl})` }}
       />
 
       <section className="top-section">
       <section className="ranking-three-columns">
-      {[top2, top1, top3].map((movie, index) => {
-        const isSelected = movie.id === selectedMovie?.id;
-        const isCenter = isSelected; // center = selected
-        const topLabel = index === 0 ? "Top 2" : index === 1 ? "Top 1" : "Top 3";
-
+      {top3.map((movie, idx) => {
+        const label = idx === 0 ? "Top 2" : idx === 1 ? "Top 1" : "Top 3";
+        const isActive = movie.id === selectedMovie.id;
        return (
          <div
           key={movie.id}
-          className={`card ${isCenter ? "main-card active" : "side-card"}`}
+          // className={`card ${isCenter ? "main-card active" : "side-card"}`}
+          className={`card ${isActive ? "main-card active" : "side-card"}`}
           onClick={() => setSelectedMovie(movie)}
         >
-        <h2>{topLabel}</h2>
-        <img src={movie.image} alt={movie.title} />
+
+        <h2>{label}</h2>
+        <img src={movie.posterUrl} alt={movie.title} />
         </div>
     );
   })}
@@ -58,15 +90,15 @@ const TopMovieSection = ({ selectedMovie, sideMovies, setSelectedMovie, ratingDi
              <ReviewStars rating={selectedMovie.rating} readOnly={true} showNumber={true} size="medium"/>
             </div>
             <div className="tags">
-              <span className="badge">Genre</span>
-              <span className="badge">Region</span>
-              <span className="badge">Year</span>
+              <span className="badge">{genreNames}</span>
+              <span className="badge">{selectedMovie.region}</span>
+              <span className="badge">{selectedMovie.year}</span>
             </div>
             <div className="duration-like">
-              <span className="badge-duration">⏱ 8h 20min</span>
+              <span className="badge-duration">{durationText}</span>
             </div>
             <div className="action-buttons">
-              <button className="watch-trailer">▶ Watch Trailer</button>
+              <button className="watch-trailer" onClick={() => window.open(selectedMovie.trailerUrl, "_blank")}>▶ Watch Trailer</button>
               <div className="iteractive-icon" onClick={() => setLiked(!liked)}>
                 <LikeIcon liked={liked} />
               </div>
@@ -91,12 +123,12 @@ const TopMovieSection = ({ selectedMovie, sideMovies, setSelectedMovie, ratingDi
                 <div className="bar-background">
                   <div
                     className="bar-fill"
-                    style={{ width: `${ratingDistribution[star] || 0}%` }}
+                    style={{ width: `${percentDistribution[star] || 0}%`}}
                   ></div>
                 </div>
               </div>
             ))}
-            <div className="total-ratings">999 Ratings</div>
+            <div className="total-ratings">{totalRatings} Ratings</div>
           </div>
         </section>
       </section>

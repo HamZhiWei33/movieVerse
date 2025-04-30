@@ -11,6 +11,7 @@ import RankingPage from "./pages/RankingPage";
 import ProfilePage from "./pages/ProfilePage";
 import Footer from "./components/Footer";
 import MovieDetailPage from "./pages/MovieDetailPage";
+import NewReleasedPage from "./pages/NewReleasedPage";
 import { useEffect } from "react";
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
         <Route path="/ranking" element={<RankingPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/movie/:movieTitle" element={<MovieDetailPage />} />
+        <Route path="/new-released" element={<NewReleasedPage />} />
       </Routes>
       <Footer />
     </>

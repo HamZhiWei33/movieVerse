@@ -1,14 +1,20 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import LikeIcon from "./LikeIcon";
 import AddToWatchlistIcon from "./AddToWatchlistIcon";
 import "../../styles/directory/MovieCard.css";
 
-const MovieCard = ({ movie, liked, addedToWatchlist, onLike, onAddToWatchlist }) => {
+const MovieCard = ({
+  movie,
+  liked,
+  addedToWatchlist,
+  onLike,
+  onAddToWatchlist,
+}) => {
   const navigate = useNavigate();
 
   const handleCardClick = () => {
     navigate(`/movie/${encodeURIComponent(movie.title)}`, {
-      state: { movieData: movie }
+      state: { movieData: movie },
     });
   };
 
@@ -23,28 +29,23 @@ const MovieCard = ({ movie, liked, addedToWatchlist, onLike, onAddToWatchlist })
   };
 
   return (
-    <article className="movie-card"
+    <article
+      className="movie-card"
       onClick={handleCardClick}
-      style={{ cursor: 'pointer' }}
+      style={{ cursor: "pointer" }}
     >
       <div className="poster-container">
-        <img 
-          src={movie.img} 
-          alt={`Poster of ${movie.title}`} 
-          className="poster-img" 
+        <img
+          src={movie.posterUrl}
+          alt={`Poster of ${movie.title}`}
+          className="poster-img"
         />
         <div className="hover-overlay">
           <div className="top-right">
             <span className="rating">{movie.rating}</span>
           </div>
-          <div 
-            className="bottom-icons"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <LikeIcon
-              liked={liked}
-              onClick={handleLikeClick}
-            />
+          <div className="bottom-icons" onClick={(e) => e.stopPropagation()}>
+            <LikeIcon liked={liked} onClick={handleLikeClick} />
             <AddToWatchlistIcon
               addedToWatchlist={addedToWatchlist}
               onClick={handleAddToWatchlistClick}

@@ -4,7 +4,7 @@ import ReviewStars from "../components/directory/ReviewStars";
 import LikeIcon from "../components/directory/LikeIcon";
 import AddToWatchlistIcon from "../components/directory/AddToWatchlistIcon";
 
-const GenreCard = ({ rank, image, title, rating }) => {
+const GenreCard = ({ rank, image, title, rating, genre, region, year, duration }) => {
 
   const [liked, setLiked] = useState(false);
      const [addedToWatchlist, setAddedToWatchlist] = useState(false);
@@ -25,12 +25,12 @@ const GenreCard = ({ rank, image, title, rating }) => {
              <ReviewStars rating={rating} readOnly={true} showNumber={true} />
             </div>
             <div className="tags">
-              <span className="badge">Genre</span>
-              <span className="badge">Region</span>
-              <span className="badge">Year</span>
+              <span className="badge">{genre}</span>
+              <span className="badge">{region}</span>
+              <span className="badge">{year}</span>
             </div>
             <div className="duration-like">
-              <span className="badge-duration">⏱ 8h 20min</span>
+              <span className="badge-duration">{duration}</span>
               <div className="iteractive-icon" onClick={() => setLiked(!liked)}>
                 <LikeIcon liked={liked} />
               </div>
