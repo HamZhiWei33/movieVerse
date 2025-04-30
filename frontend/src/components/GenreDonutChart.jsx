@@ -2,16 +2,16 @@
 import { PieChart, Pie, Cell, Legend, Tooltip } from 'recharts';
 
 const COLORS = [
-  "#F4FFCD", "#E3FF80", "#cc65fe", "#ffce56",
-  "#00c49f", "#ff8042", "#8884d8", "#a4de6c",
-  "#d0ed57", "#ffc658", "#ff6666", "#66b3ff"
+  "#E3F9E5", "#C6F7C1", "#A9F295", "#8BE76A", "#74E13B", 
+  "#66D934", "#59CC2F", "#4DAD29", "#429B23", "#3B8A1F", 
+  "#34781A", "#2F6615"
 ];
 
 const GenreDonutChart = ({ data }) => {
   return (
     <div className="chart-container">
       <h3 className="chart-title">Chart</h3>
-      <PieChart width={400} height={400}>
+      <PieChart width={500} height={400}>
         <Pie
           data={data}
           cx="50%"
@@ -30,7 +30,7 @@ const GenreDonutChart = ({ data }) => {
         </Pie>
         <Tooltip
           contentStyle={{ backgroundColor: "#222", border: "none", color: "#fff" }}
-          formatter={(value) => [`${value} movies`, 'Genre']}
+          formatter={(value, name) => [`${value} movies`, name]} 
         />
         <Legend layout="vertical" align="right" verticalAlign="middle" />
       </PieChart>
