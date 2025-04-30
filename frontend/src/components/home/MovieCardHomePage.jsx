@@ -1,13 +1,14 @@
 // components/home/MovieCardHomePage.jsx
 import { useNavigate } from "react-router-dom";
-import "./directory/MovieCard";"../components/styles/MovieCardHomePage.css";
+import "../directory/MovieCard";
+("../components/styles/MovieCardHomePage.css");
 
 function MovieCardHomePage({ movie }) {
   const navigate = useNavigate();
 
   const handleClick = () => {
     navigate(`/movie/${encodeURIComponent(movie.title)}`, {
-      state: { movieData: movie }
+      state: { movieData: movie },
     });
   };
 
