@@ -1,28 +1,54 @@
 // components/GenreRankingSection.jsx
 import GenreCard from "./GenreCard";
 import Top1Card from "./Top1Card";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
-const genres = ["All", "Action", "Adventure", "Comedy", "Drama", "Horror", "Thriller", "Sci-Fi", "Fantasy", "Romance", "Mystery", "Crime", "Animation"];
-
-const GenreRankingSection = ({ movies }) => {
+const GenreRankingSection = ({ movies, allGenres  }) => {
   const [selectedGenre, setSelectedGenre] = useState("All");
 
-  const filtered = selectedGenre === "All"
-    ? movies
-    : movies.filter((m) => m.genre === selectedGenre);
+  const genreOptions = useMemo(() => ["All", ...allGenres.map((g) => g.name)], [allGenres]);
 
-  const sorted = [...filtered].sort((a, b) => b.rating - a.rating);
+  const filtered = useMemo(() => {
+    if (selectedGenre === "All") return movies;
+    const genreId = allGenres.find((g) => g.name === selectedGenre)?.id;
+    return genreId
+      ? movies.filter((m) => m.genre.includes(genreId))
+      : [];
+  }, [selectedGenre, movies, allGenres]);
+
+  const sorted = [...filtered].map((movie) => ({
+    ...movie,
+    compositeScore: movie.rating * 0.8 + (movie.year - 2000) * 0.02,
+  }))
+  .sort((a, b) => b.compositeScore - a.compositeScore);
 
   const top1 = sorted[0];  
   const otherMovies = sorted.slice(1);
+  
+  // Format duration for Top 1 movie
+  const durationText = useMemo(() => {
+    if (!top1?.duration) return "";
+    const hrs = Math.floor(top1.duration / 60);
+    const mins = top1.duration % 60;
+    return `⏱ ${hrs}h ${mins}min`;
+  }, [top1]);
+
+  // Get genre names for Top 1 movie
+  const genreNames = useMemo(() => {
+    return top1?.genre
+      .map((gid) => {
+        const g = allGenres.find((item) => item.id === gid);
+        return g ? g.name : gid;
+      })
+      .join(", ");
+  }, [top1, allGenres]);
 
   return (
     <section className="genre-ranking-section">
       <h2 className="genre-title">Order by Genre</h2>
 
       <nav className="genre-nav">
-        {genres.map((g) => (
+        {genreOptions.map((g) => (
           <button
             key={g}
             className={`genre-tab ${selectedGenre === g ? "active" : ""}`}
@@ -41,10 +67,14 @@ const GenreRankingSection = ({ movies }) => {
               <Top1Card
                 key={top1.id}
                 rank={1}
-                image={top1.image}
+                image={top1.posterUrl}
                 title={top1.title}
                 rating={top1.rating}
                 description={top1.description}
+                genre={genreNames}
+                region={top1.region}  
+                year={top1.year}       
+                duration={durationText}
               />
             </div>
           )}
@@ -54,22 +84,35 @@ const GenreRankingSection = ({ movies }) => {
             {otherMovies.length === 0 ? (
               <p style={{ color: "#888", padding: "1rem" }}>No movies in this genre.</p>
             ) : (
-              otherMovies.map((movie, index) => (
+              otherMovies.map((movie, index) => {const movieGenreNames = movie.genre
+              .map((gid) => {
+                const g = allGenres.find((item) => item.id === gid);
+                return g ? g.name : gid;
+              })
+              .join(", ");
+
+            const movieDurationText = `⏱ ${Math.floor(movie.duration / 60)}h ${movie.duration % 60}min`; // Calculate duration text for each movie
+            return (
                 <GenreCard
                   key={movie.id}
                   rank={index + 2}
-                  image={movie.image}
+                  image={movie.posterUrl}
                   title={movie.title}
                   rating={movie.rating}
-                />
-              ))
-            )}
+                  genre={movieGenreNames} 
+                    region={movie.region} 
+                    year={movie.year} 
+                    duration={movieDurationText} 
+                    />
+                  );
+                })
+              )}
+            </div>
           </div>
         </div>
-      </div>
-    </section>
-  );
-};
+      </section>
+    );
+  };
 
 export default GenreRankingSection;
 
