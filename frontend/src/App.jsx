@@ -13,24 +13,28 @@ import Footer from "./components/Footer";
 import MovieDetailPage from "./pages/MovieDetailPage";
 import NewReleasedPage from "./pages/NewReleasedPage";
 import { useEffect } from "react";
+import { UserValidationProvider } from "./context/UserValidationProvider ";
+
 function App() {
   return (
     <>
-      <ScrollToTopOnNavigate />
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/signup" element={<SignupPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/forgot_password" element={<ForgotPasswordPage />} />
-        <Route path="/reset_password" element={<ResetPasswordPage />} />
-        <Route path="/directory" element={<DirectoryPage />} />
-        <Route path="/ranking" element={<RankingPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/movie/:movieTitle" element={<MovieDetailPage />} />
-        <Route path="/new-released" element={<NewReleasedPage />} />
-      </Routes>
-      <Footer />
+      <UserValidationProvider>
+        <ScrollToTopOnNavigate />
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/forgot_password" element={<ForgotPasswordPage />} />
+          <Route path="/reset_password" element={<ResetPasswordPage />} />
+          <Route path="/directory" element={<DirectoryPage />} />
+          <Route path="/ranking" element={<RankingPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/movie/:movieTitle" element={<MovieDetailPage />} />
+          <Route path="/new-released" element={<NewReleasedPage />} />
+        </Routes>
+        <Footer />
+      </UserValidationProvider>
     </>
   );
 }
