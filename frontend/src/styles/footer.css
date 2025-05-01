@@ -36,6 +36,7 @@
 
 .footer-grid li {
   margin: 0.4rem 0;
+  
 }
 
 .footer-grid a {
@@ -45,7 +46,8 @@
 }
 
 .footer-grid a:hover {
-  text-decoration: underline;
+  color:  #c6ff00; 
+  text-decoration: none;
 }
 
 .social-icons {
