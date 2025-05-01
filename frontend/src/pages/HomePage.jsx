@@ -1,9 +1,13 @@
 import HeroBanner from "../components/home/HeroBanner";
-import MovieSectionHomePage from "../components/home/MovieSectionHomePage";
+// import MovieSectionHomePage from "../components/home/MovieSectionHomePage";
 import "../styles/home.css";
 import "swiper/css";
 import "swiper/css/navigation";
-
+import HeroSection from "../components/home/HeroSection";
+import { getMovieObject } from "../components/home/watchlist.js";
+import { recentMovies } from "../components/home/newReleased.js";
+import { genres } from "../constant";
+import { useMemo } from "react";
 const watchlistMovies = [
   {
     id: 1,
@@ -37,9 +41,24 @@ const recommendationMovies = [
 ];
 
 const HomePage = () => {
+  const userId = "U1";
+  const watchlist = getMovieObject(userId);
+
   return (
     <div className="homePageWrapper">
       <HeroBanner />
+      <HeroSection
+        title="Watchlist"
+        moviesType={"watchlist"}
+        items={watchlist}
+      />
+
+      <HeroSection title="Ranking" moviesType={"ranking"} items={genres} />
+      <HeroSection
+        title="New Released"
+        moviesType={"newReleased"}
+        items={recentMovies}
+      />
       {/* <MovieSectionHomePage
         title="Watchlist"
         movies={watchlistMovies}

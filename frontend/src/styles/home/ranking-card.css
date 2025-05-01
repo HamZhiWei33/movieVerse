@@ -1,0 +1,121 @@
+.home-movie-card {
+  display: flex;
+  width: 16rem;
+  height: 22rem;
+  background-color: #1a1a1a;
+  border: 0.1rem solid #262626;
+  border-radius: 0.7rem;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease-in-out;
+  text-align: center;
+  padding: 0.8rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.home-movie-card:hover {
+  color: #ffffff;
+  transform: translateY(-0.5rem);
+  box-shadow: 0 0.4rem 2rem rgba(204, 255, 0, 0.15);
+}
+.home-poster-img {
+  width: 100%;
+  /* Fill container width */
+  height: 16rem;
+  /* Fixed height */
+  object-fit: cover;
+  /* Crop to fit */
+  object-position: center;
+  /* Center the crop */
+  border-radius: 0.7rem;
+  margin-bottom: 0.5rem;
+}
+
+.home-poster-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.hover-overlay {
+  position: absolute;
+  height: 21.25rem;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    #141414 0%,
+    rgba(20, 20, 20, 0) 50%,
+    #141414 100%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  display: flex;
+  flex-direction: column;
+
+  justify-content: end;
+  padding: 0.5rem;
+  border-radius: 0.7rem;
+}
+
+.home-movie-card:hover .hover-overlay {
+  opacity: 1;
+}
+
+/* Responsive grid container */
+.genre-selection-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 columns on mobile */
+  gap: 16px;
+}
+.home-hover-bottom {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.4rem;
+}
+.hover-left,
+.hover-right {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: auto;
+}
+.home-hover-left {
+  background-color: var(--color-primary);
+  border-radius: 1rem;
+  color: black;
+  font-weight: bold;
+  padding: 0 0.5rem;
+  margin-bottom: 0.2rem;
+}
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+  .genre-selection-grid {
+    grid-template-columns: repeat(4, 1fr); /* 4 columns on tablets */
+  }
+}
+
+@media (min-width: 1024px) {
+  .genre-selection-grid {
+    grid-template-columns: repeat(5, 1fr); /* 5 columns on laptops */
+  }
+}
+
+@media (min-width: 1280px) {
+  .genre-selection-grid {
+    grid-template-columns: repeat(6, 1fr); /* 6 columns on xl screens */
+  }
+
+  .home-movie-card {
+    padding-bottom: 120%; /* Slightly different aspect ratio for xl */
+  }
+
+  .genre-name-overlay h3 {
+    font-size: 1.1rem;
+  }
+}

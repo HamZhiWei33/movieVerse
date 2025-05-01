@@ -1,0 +1,33 @@
+.hero-section {
+}
+.home-section-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: start;
+}
+.home-newReleased {
+  display: flex;
+  flex-direction: row;
+  cursor: pointer;
+}
+.home-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-left: 2rem;
+}
+.home-icon {
+  margin-left: 1rem;
+}
+.home-card-section {
+  width: 100%;
+}
+.home-card-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  align-items: center;
+  margin: 1rem 2rem;
+  margin-bottom: 3rem;
+  gap: 1rem;
+}
