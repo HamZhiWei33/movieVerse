@@ -8,14 +8,38 @@ import { getMovieObject } from "../components/home/watchlist.js";
 import { recentMovies } from "../components/home/newReleased.js";
 import { genres, movies } from "../constant";
 import { useMemo } from "react";
-
+import HomeRanking from "../components/home/HomeRanking.jsx";
+import { UserValidationContext } from "../context/UserValidationProvider .jsx";
+import { useContext, useEffect } from "react";
+import RecommendationSection from "../components/home/RecommendationSection.jsx";
 const HomePage = () => {
   const userId = "U1";
+  const { isValidateUser } = useContext(UserValidationContext);
   const watchlist = getMovieObject(userId);
 
+  useEffect(() => {
+    if (!isValidateUser) {
+      const handleClick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        alert("Please log in to have a better experience.");
+      };
+
+      const wrapper = document.querySelector(".homePageWrapper");
+      if (wrapper) {
+        wrapper.addEventListener("click", handleClick, true); // Capture phase
+      }
+
+      return () => {
+        if (wrapper) {
+          wrapper.removeEventListener("click", handleClick, true);
+        }
+      };
+    }
+  }, [isValidateUser]);
   return (
     <div className="homePageWrapper">
-      <HeroBanner />
+      {isValidateUser ? <HeroBanner /> : <HomeRanking />}
       <HeroSection
         title="Watchlist"
         moviesType={"watchlist"}
@@ -28,20 +52,11 @@ const HomePage = () => {
         moviesType={"newReleased"}
         items={recentMovies}
       />
-      <HeroSection
+      <RecommendationSection
         title="Recommendation"
         moviesType={"recommendation"}
         items={movies}
       />
-      {/* <MovieSectionHomePage
-        title="Watchlist"
-        movies={watchlistMovies}
-        link="/watchlist"
-      /> */}
-
-      {/* <MovieSectionHomePage title="Ranking" movies={rankingMovies} link="/ranking" />
-      <MovieSectionHomePage title="New Released" movies={newReleasedMovies} link="/directory/new" />
-      <MovieSectionHomePage title="Recommendation" movies={recommendationMovies} link="/recommendation" /> */}
     </div>
   );
 };

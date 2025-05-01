@@ -1,5 +1,6 @@
 main.home-page {
   height: 100%;
+  overflow: hidden;
 }
 .hero-banner {
   width: 100%;
