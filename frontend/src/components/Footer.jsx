@@ -12,7 +12,7 @@ const Footer = () => {
             <ul>
               <li><Link to="/watchlist">Watchlist</Link></li>
               <li><Link to="/ranking">Ranking</Link></li>
-              <li><Link to="/directory/new">New Released</Link></li>
+              <li><Link to="/directory">New Released</Link></li>
               <li><Link to="/recommendation">Recommendation</Link></li>
             </ul>
           </div>
@@ -20,20 +20,14 @@ const Footer = () => {
           <div>
             <h4>Directory</h4>
             <ul>
-              <li><Link to="/directory/genre">Genres</Link></li>
-              <li><Link to="/directory/trending">Trending</Link></li>
-              <li><Link to="/directory/new">New Release</Link></li>
-              <li><Link to="/directory/popular">Popular</Link></li>
+              <li><Link to="/directory">Directory</Link></li>
             </ul>
           </div>
 
           <div>
             <h4>Ranking</h4>
             <ul>
-              <li><Link to="/ranking/genre">Genres</Link></li>
-              <li><Link to="/ranking/trending">Trending</Link></li>
-              <li><Link to="/ranking/new">New Release</Link></li>
-              <li><Link to="/ranking/popular">Popular</Link></li>
+              <li><Link to="/ranking">Ranking</Link></li>
             </ul>
           </div>
 
