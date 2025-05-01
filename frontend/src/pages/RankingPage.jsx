@@ -1,9 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
-import GenreRankingSection from "../components/GenreRankingSection";
-import GenreDonutChart from "../components/GenreDonutChart";
+import GenreRankingSection from "../components/ranking/GenreRankingSection";
+import GenreDonutChart from "../components/ranking/GenreDonutChart";
 import "../styles/ranking.css";
 import { movies as importedMovies, reviews as importedReviews, genres as allGenres  } from "../constant";
-import TopMovieSection from "../components/TopMovieSection";
+import TopMovieSection from "../components/ranking/TopMovieSection";
 
   const RankingPage = () => {
     const [movies, setMovies] = useState([]);

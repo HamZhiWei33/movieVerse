@@ -100,6 +100,7 @@ const GenreRankingSection = ({ movies, allGenres }) => {
             <div className="top1-card">
               <Top1Card
                 key={top1.id}
+                movie={top1}
                 rank={1}
                 image={top1.posterUrl}
                 title={top1.title}
@@ -134,6 +135,7 @@ const GenreRankingSection = ({ movies, allGenres }) => {
                 return (
                   <GenreCard
                     key={movie.id}
+                    movie={movie}
                     rank={index + 2}
                     image={movie.posterUrl}
                     title={movie.title}

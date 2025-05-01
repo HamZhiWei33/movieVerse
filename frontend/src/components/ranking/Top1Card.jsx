@@ -1,16 +1,25 @@
 // components/Top1Card.jsx
 import React, { useState} from "react";
-import ReviewStars from "../components/directory/ReviewStars";
-import LikeIcon from "../components/directory/LikeIcon";
-import AddToWatchlistIcon from "../components/directory/AddToWatchlistIcon";
+import ReviewStars from "../directory/ReviewStars";
+import LikeIcon from "../directory/LikeIcon";
+import AddToWatchlistIcon from "../directory/AddToWatchlistIcon";
+import { useNavigate } from "react-router-dom";
+import "../directory/MovieCard";
 
-const Top1Card = ({ rank, image, title, rating, description, genre, region, year, duration}) => {
+const Top1Card = ({movie, rank, image, title, rating, description, genre, region, year, duration}) => {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate(`/movie/${encodeURIComponent(title)}`, {
+      state: {movieData: movie},
+    });
+  };
 
   const [liked, setLiked] = useState(false);
   const [addedToWatchlist, setAddedToWatchlist] = useState(false);
 
   return (
-    <div className="top1-card">
+    <div className="top1-card" onClick={handleClick}>
       <div className="genre-card-header">
         <h3>Top {rank}</h3>
         <div className="genre-rating-value">{rating.toFixed(1)}</div>
