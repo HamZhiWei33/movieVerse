@@ -1,54 +1,29 @@
 import "../styles/general.css";
+import React, { useState } from "react";
+import FormField from "../components/general/FormField";
+
 const SignupPage = () => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  
+
   return (
     <main className="signup-page">
-      <h1>Signup Page</h1>
-      <form>
-        <div>
-          <label htmlFor="username">Username:</label>
-          <input
-            type="text"
-            id="username"
-            name="username"
-            placeholder="Username"
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="email">Email:</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            placeholder="Email"
-            equired
-          />
-        </div>
-        <div>
-          <label htmlFor="password">Password:</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            placeholder="Password"
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="confirm_password">Confirmed Password:</label>
-          <input
-            type="password"
-            id="confirm_password"
-            name="confirm_password"
-            placeholder="Password"
-            required
-          />
-        </div>
-        <button type="submit">Login</button>
+      <div className="form-group" align="center">
+        <h1>Sign Up</h1>
+        <form className="form">
+          <FormField type="text" name="name" label="Your Name" onChange={(e) => setName(e.target.value)} />
+          <FormField type="email" name="email" label="Email" onChange={(e) => setEmail(e.target.value)} />
+          <FormField type="password" name="password" label="Password" onChange={(e) => setPassword(e.target.value)} />
+          <FormField type="password" name="confirm_password" label="Confirm Password" onChange={(e) => setConfirmPassword(e.target.value)} />
+          <button id="submitButton" type="submit">Sign Up</button>
+        </form>
         <p>
-          Already have an account? <a href="/login">Login</a>
+          Already has an account? <a href="/login">Login</a>
         </p>
-      </form>
+      </div>
     </main>
   );
 };
