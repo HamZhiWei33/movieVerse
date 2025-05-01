@@ -4,6 +4,7 @@ import TabWatchlist from "./TabWatchlist";
 import TabReview from "./TabReview";
 import TabManage from "./TabManage";
 import "../../styles/profile/tab.css";
+import { useLocation } from "react-router-dom";
 // import { ReviewList } from "./constant";
 // import { movies } from "../../constant.js";
 import { reviews } from "../../constant.js";
@@ -14,9 +15,12 @@ const userReviews = reviews.filter((review) => review.userId === currentUserId);
 
 const tabList = ["Overview", "WatchList", "Review", "Manage"];
 const Tab = () => {
-  const [activeTab, setActiveTab] = useState(() => {
-    return localStorage.getItem("activeTab") || "Overview";
-  });
+  const location = useLocation();
+  const initialTab =
+    location.state?.targetTab ||
+    localStorage.getItem("activeTab") ||
+    "Overview";
+  const [activeTab, setActiveTab] = useState(initialTab);
   const lineRef = useRef(null);
   const tabRefs = useRef({});
 
@@ -39,6 +43,14 @@ const Tab = () => {
       lineRef.current.style.left = `${tabElement.offsetLeft + padding}px`;
       // Sets the underline width to the tab's content width minus padding on both sides.
       lineRef.current.style.width = `${tabElement.scrollWidth - padding * 2}px`;
+
+      // Scroll and focus the tab
+      tabElement.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+        inline: "center",
+      });
+      tabElement.focus();
     }
 
     // Save to localStorage
@@ -105,7 +117,10 @@ const Tab = () => {
             <button
               ref={tabRefs.current[tab]}
               className={`tab_btn ${activeTab === tab ? "active" : ""}`}
-              onClick={() => setActiveTab(tab)}
+              onClick={() => {
+                setActiveTab(tab);
+                tabRefs.current[tab]?.current?.focus();
+              }}
               onKeyDown={(e) => handleKeyDown(e, index)}
               role="tab"
               aria-selected={activeTab === tab}

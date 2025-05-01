@@ -1,14 +1,15 @@
 import React from "react";
 import MovieCard from "../directory/MovieCard";
-import "../../styles/home/home-newReleased.css";
+import "../../styles/home/hero-section.css";
 import "../../styles/home/ranking-card.css";
 import { FaAngleRight } from "react-icons/fa6";
 import { TfiReload } from "react-icons/tfi";
 import { getTopMoviesByGenre } from "./ranking";
 import RankingCard from "./RankingCard";
 import { movies } from "../../constant";
-import { useMemo } from "react";
+import { useMemo, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import useHorizontalScroll from "../../store/useHorizontalScroll";
 const HeroSection = ({ title, moviesType, items }) => {
   //items=allGenres
   const topMoviesByGenre = useMemo(
@@ -16,18 +17,19 @@ const HeroSection = ({ title, moviesType, items }) => {
     [movies, items]
   );
   const navigate = useNavigate();
+  const containerRef = useRef(null);
 
   const handleWatchlistClick = () => {
-    navigate("/profile");
+    navigate("/profile", { state: { targetTab: "WatchList" } });
   };
-  // const handleWatchlistClick = () => {
-  //   navigate("/profile?tab=watchlist");
-  // };
 
   const handleRankingClick = () => {
     console.log("ranking click");
     navigate("/ranking");
   };
+
+  useHorizontalScroll(containerRef);
+
   return (
     <div className="hero-section">
       <div className="home-section-container">
@@ -54,7 +56,7 @@ const HeroSection = ({ title, moviesType, items }) => {
             )}
           </h2>
         </div>
-        <div className="home-card-section">
+        <div id="watchlist" className="home-card-section">
           {moviesType === "watchlist" && (
             <div className="home-card-container">
               {items.map((movie) => (
@@ -74,7 +76,7 @@ const HeroSection = ({ title, moviesType, items }) => {
         </div>
         <div className="home-card-section">
           {moviesType === "ranking" && (
-            <div className="home-card-container">
+            <div className="home-card-container" ref={containerRef}>
               <div className="genre-selection-grid">
                 {/* "All" genre card */}
                 {/* <RankingCard isAllGenre /> */}
@@ -94,15 +96,15 @@ const HeroSection = ({ title, moviesType, items }) => {
             </div>
           )}
         </div>
-        <div className="home-card-section">
+        {/* <div className="home-card-section">
           {moviesType === "recommendation" && (
-            <div className="home-card-container">
+            <div id="recommendation" className="home-card-container">
               {items.map((movie) => (
                 <MovieCard key={movie.id} movie={movie} />
               ))}
             </div>
           )}
-        </div>
+        </div> */}
       </div>
     </div>
   );

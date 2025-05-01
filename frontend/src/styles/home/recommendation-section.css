@@ -1,0 +1,84 @@
+.recommendation-section {
+  overflow: hidden;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  cursor: pointer;
+}
+
+.recommendation-section-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: start;
+}
+
+.recommendation-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-left: 2rem;
+}
+
+.recommendation-icon {
+  display: flex;
+  margin-left: 1rem;
+}
+
+.recommendation-card-section {
+  width: 100%;
+}
+
+.recommendation-card-container {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr); /* Default for large screens */
+  gap: 1.5rem;
+  padding: 1rem 1.5rem;
+  box-sizing: border-box;
+}
+
+/* Medium screens (e.g. tablets) */
+@media (max-width: 1200px) {
+  .recommendation-card-container {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+/* Small screens */
+@media (max-width: 992px) {
+  .recommendation-card-container {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Extra small screens (phones) */
+@media (max-width: 768px) {
+  .recommendation-card-container {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 1rem;
+    gap: 1rem;
+    justify-content: center;
+    justify-items: center;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+  .recommendation-title {
+    font-size: 1.2rem;
+  }
+}
+
+.reload-icon {
+  margin-left: auto;
+  justify-content: end;
+  padding: 1rem;
+  background-color: rgb(88, 88, 88);
+  border-radius: 100%;
+  margin-right: 2rem;
+}
+.reload-icon:hover {
+  background-color: rgba(88, 88, 88, 0.5);
+  color: var(--color-primary);
+}

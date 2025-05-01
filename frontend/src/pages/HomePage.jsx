@@ -7,15 +7,23 @@ import HeroSection from "../components/home/HeroSection";
 import { getMovieObject } from "../components/home/watchlist.js";
 import { recentMovies } from "../components/home/newReleased.js";
 import { genres, movies } from "../constant";
-import { useMemo } from "react";
-
+import HomeRanking from "../components/home/HomeRanking.jsx";
+import { UserValidationContext } from "../context/UserValidationProvider .jsx";
+import { useContext, useEffect } from "react";
+import RecommendationSection from "../components/home/RecommendationSection.jsx";
+import useScrollToHash from "../store/useScrollToHash.js";
+import useGuestUser from "../store/useGuestUser.js";
 const HomePage = () => {
   const userId = "U1";
+  const { isValidateUser } = useContext(UserValidationContext);
   const watchlist = getMovieObject(userId);
+
+  useScrollToHash();
+  useGuestUser(isValidateUser);
 
   return (
     <div className="homePageWrapper">
-      <HeroBanner />
+      {isValidateUser ? <HeroBanner /> : <HomeRanking />}
       <HeroSection
         title="Watchlist"
         moviesType={"watchlist"}
@@ -28,20 +36,11 @@ const HomePage = () => {
         moviesType={"newReleased"}
         items={recentMovies}
       />
-      <HeroSection
+      <RecommendationSection
         title="Recommendation"
         moviesType={"recommendation"}
         items={movies}
       />
-      {/* <MovieSectionHomePage
-        title="Watchlist"
-        movies={watchlistMovies}
-        link="/watchlist"
-      /> */}
-
-      {/* <MovieSectionHomePage title="Ranking" movies={rankingMovies} link="/ranking" />
-      <MovieSectionHomePage title="New Released" movies={newReleasedMovies} link="/directory/new" />
-      <MovieSectionHomePage title="Recommendation" movies={recommendationMovies} link="/recommendation" /> */}
     </div>
   );
 };
