@@ -36,7 +36,6 @@
 
 .footer-grid li {
   margin: 0.4rem 0;
-  
 }
 
 .footer-grid a {
@@ -100,3 +99,15 @@
   text-decoration: none;
 }
 
+.footer-grid.guest {
+  justify-content: space-between;
+  text-align: center;
+}
+
+.footer-grid.guest > div {
+  flex: 1 1 150px;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 👈 center all content horizontally */
+  text-align: center;
+}
