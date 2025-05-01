@@ -285,7 +285,7 @@ export const movies = [
       "Trapped on her family's isolated farm, Pearl must tend to her ailing father under the bitter and overbearing watch of her mother.",
     duration: 102,
     releaseDate: "2022-09-16",
-    region: "USA"
+    region: "USA",
   },
   {
     id: "M109",
@@ -317,7 +317,8 @@ export const movies = [
     rating: 4.7,
     reviewCount: 2000,
     likes: 3000,
-    posterUrl: "https://example.com/stranger-things.jpg",
+    posterUrl:
+      "https://upload.wikimedia.org/wikipedia/en/d/d4/Stranger_Things_season_3.png",
     trailerUrl:
       "https://www.youtube.com/watch?v=6Am4v0C_z8c&pp=ygUYc3RyYW5nZXIgdGhpbmdzIHNlYXNvbiAz",
     description:

@@ -12,7 +12,8 @@
 .custom-next {
   user-select: none;
   position: absolute;
-  bottom: 20px;
+  top: 50%; /* center vertically */
+  transform: translateY(-50%); /* adjust for exact center */
   z-index: 20;
   background-color: rgba(0, 0, 0, 0.6);
   color: white;

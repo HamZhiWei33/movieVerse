@@ -8,14 +8,12 @@ const RankingCard = ({ genre, isAllGenre = false, topMovies = [] }) => {
     if (isAllGenre) {
       navigate("/ranking#genre-ranking");
     } else {
-      navigate(
-        `/ranking?genre=${encodeURIComponent(genre.name)}#genre-ranking`
-      );
+      navigate(`/ranking?genre=${encodeURIComponent(genre)}#genre-ranking`);
     }
   };
 
   const previewMovie = topMovies[0];
-  const genreName = isAllGenre ? "All Genres" : genre.name;
+  const genreName = isAllGenre ? "All Genres" : genre;
 
   return (
     <article className="home-movie-card" onClick={handleCardClick}>
@@ -27,7 +25,11 @@ const RankingCard = ({ genre, isAllGenre = false, topMovies = [] }) => {
             className="home-poster-img"
           />
         ) : (
-          <div className="genre-placeholder">{genreName}</div>
+          <img
+            src="/profile/default-movie.png"
+            alt="default movie poster"
+            className="home-poster-img"
+          />
         )}
 
         {/* Default movie title overlay (always visible) */}
