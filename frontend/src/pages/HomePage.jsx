@@ -7,36 +7,20 @@ import HeroSection from "../components/home/HeroSection";
 import { getMovieObject } from "../components/home/watchlist.js";
 import { recentMovies } from "../components/home/newReleased.js";
 import { genres, movies } from "../constant";
-import { useMemo } from "react";
 import HomeRanking from "../components/home/HomeRanking.jsx";
 import { UserValidationContext } from "../context/UserValidationProvider .jsx";
 import { useContext, useEffect } from "react";
 import RecommendationSection from "../components/home/RecommendationSection.jsx";
+import useScrollToHash from "../store/useScrollToHash.js";
+import useGuestUser from "../store/useGuestUser.js";
 const HomePage = () => {
   const userId = "U1";
   const { isValidateUser } = useContext(UserValidationContext);
   const watchlist = getMovieObject(userId);
 
-  useEffect(() => {
-    if (!isValidateUser) {
-      const handleClick = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        alert("Please log in to have a better experience.");
-      };
+  useScrollToHash();
+  useGuestUser(isValidateUser);
 
-      const wrapper = document.querySelector(".homePageWrapper");
-      if (wrapper) {
-        wrapper.addEventListener("click", handleClick, true); // Capture phase
-      }
-
-      return () => {
-        if (wrapper) {
-          wrapper.removeEventListener("click", handleClick, true);
-        }
-      };
-    }
-  }, [isValidateUser]);
   return (
     <div className="homePageWrapper">
       {isValidateUser ? <HeroBanner /> : <HomeRanking />}

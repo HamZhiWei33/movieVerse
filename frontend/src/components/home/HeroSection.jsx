@@ -9,7 +9,7 @@ import RankingCard from "./RankingCard";
 import { movies } from "../../constant";
 import { useMemo, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
+import useHorizontalScroll from "../../store/useHorizontalScroll";
 const HeroSection = ({ title, moviesType, items }) => {
   //items=allGenres
   const topMoviesByGenre = useMemo(
@@ -22,32 +22,14 @@ const HeroSection = ({ title, moviesType, items }) => {
   const handleWatchlistClick = () => {
     navigate("/profile", { state: { targetTab: "WatchList" } });
   };
-  // const handleWatchlistClick = () => {
-  //   navigate("/profile?tab=watchlist");
-  // };
 
   const handleRankingClick = () => {
     console.log("ranking click");
     navigate("/ranking");
   };
 
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-    const isOverflowing = container.scrollWidth > container.clientWidth;
+  useHorizontalScroll(containerRef);
 
-    const onWheel = (e) => {
-      if (isOverflowing && Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-        e.preventDefault();
-        container.scrollLeft += e.deltaY;
-      }
-    };
-    if (isOverflowing) {
-      container.addEventListener("wheel", onWheel, { passive: false });
-    }
-
-    return () => container.removeEventListener("wheel", onWheel);
-  }, []);
   return (
     <div className="hero-section">
       <div className="home-section-container">
@@ -74,7 +56,7 @@ const HeroSection = ({ title, moviesType, items }) => {
             )}
           </h2>
         </div>
-        <div className="home-card-section">
+        <div id="watchlist" className="home-card-section">
           {moviesType === "watchlist" && (
             <div className="home-card-container">
               {items.map((movie) => (
@@ -114,7 +96,7 @@ const HeroSection = ({ title, moviesType, items }) => {
             </div>
           )}
         </div>
-        <div className="home-card-section">
+        {/* <div className="home-card-section">
           {moviesType === "recommendation" && (
             <div id="recommendation" className="home-card-container">
               {items.map((movie) => (
@@ -122,7 +104,7 @@ const HeroSection = ({ title, moviesType, items }) => {
               ))}
             </div>
           )}
-        </div>
+        </div> */}
       </div>
     </div>
   );
