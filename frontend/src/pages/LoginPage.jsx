@@ -1,34 +1,24 @@
 import "../styles/general.css";
+import React, { useState } from "react";
+import FormField from "../components/general/FormField";
 const LoginPage = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
   return (
     <main className="login-page">
-      <h1>Login</h1>
-      <form>
-        <div>
-          <label htmlFor="email">Email:</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            placeholder="Email"
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="password">Password:</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            placeholder="Password"
-            required
-          />
-        </div>
-        <button type="submit">Login</button>
-      </form>
-      <p>
-        Don't have an account? <a href="/signup">Create one</a>
-      </p>
+      <div className="form-group" align="center">
+        <h1>Login</h1>
+        <form className="form">
+          <FormField type="email" name="email" label="Email" onChange={(e) => setEmail(e.target.value)} />
+          <FormField type="password" name="password" label="Password" onChange={(e) => setPassword(e.target.value)} />
+          <a id="forgotPwLink" href="/forgot_password">Forgot Password?</a>
+          <button id="submitButton" type="submit">Login</button>
+        </form>
+        <p>
+          Don't have an account? <a href="/signup">Create one</a>
+        </p>
+      </div>
     </main>
   );
 };
