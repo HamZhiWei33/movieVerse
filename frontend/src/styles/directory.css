@@ -1,14 +1,65 @@
-main.directory-page {
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.directory-page {
   background-color: #141414;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.layout-container {
+  display: flex;
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  margin-left: 3rem;
+  margin-right: 3rem;
+}
+
+.content-area {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 2rem;
 }
 
 .directory-header {
-  margin-left: 3rem;
-  margin-right: 3rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
+}
+
+.sidebar-container {
+  overflow-y: auto;
+}
+
+#toggle-sidebar-container button {
+  outline: none;
+  border: none;
+  background: transparent;
+}
+
+#toggle-sidebar-container button:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+#sidebar-icon {
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+#toggle-sidebar-container {
+  padding: 1rem 0 0 3rem;
+  margin-bottom: -1rem;
+  /* Adjust as needed */
 }
 
 .view-toggle {
@@ -33,16 +84,12 @@ main.directory-page {
   cursor: pointer;
 }
 
-section {
-  margin-left: 3rem;
-  margin-right: 3rem;
-}
-
 /* Filter section */
 .filters {
   display: grid;
   grid-template-columns: repeat(3, 1fr) auto;
   gap: 2rem;
+  margin: 0;
   margin-bottom: 2rem;
   align-items: start;
 }
@@ -50,6 +97,7 @@ section {
 fieldset {
   border: none;
   padding: 0;
+  margin: 0;
 }
 
 legend {
@@ -103,13 +151,17 @@ legend {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  row-gap: 1rem;
+  row-gap: 1.5rem;
   justify-content: space-between;
 }
 
 .filter-button {
-  flex: 1 1 calc(33.333% - 0.5rem);
-  /* 3 per row with spacing */
+  flex: 0 1 calc(33.333% - 0.34rem);
+  /* Won't grow, can shrink */
+  min-width: 120px;
+  /* Set a minimum width */
+  max-width: calc(33.333% - 0.34rem);
+  /* Maximum width */
   background-color: #3a3a3a;
   color: #ffffff;
   border: none;
@@ -136,11 +188,13 @@ legend {
   color: #ccff00;
 }
 
-/* No results */
 .no-results {
+  border: 0.1rem solid #262626;
+  border-radius: 0.7rem;
   font-size: 1rem;
   margin-top: 1rem;
   grid-column: 1 / -1;
+  padding: 3rem;
   text-align: center;
   color: #ccc;
 }
@@ -165,14 +219,38 @@ legend {
   gap: 1.5rem;
 }
 
+.movie-container.list .movie-list .movie-card-list {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 1.5rem;
+}
+
 @media (max-width: 1024px) {
   .filters {
     grid-template-columns: 1fr;
   }
-}
 
-@media (max-width: 1024px) {
   .movie-container.list .movie-list {
-    grid-template-columns: repeat(1, 1fr);
+    grid-template-columns: 1fr;
+  }
+
+  .movie-container.list .movie-list .movie-card-list {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .movie-card-list .movie-details-container-list {
+    align-items: flex-start;
+    text-align: left;
+    margin-left: 0;
+  }
+
+  .genre-tags,
+  .duration-and-icons-container,
+  .iteractive-icon-container {
+    justify-content: flex-start !important;
+    text-align: left;
+    width: 100%;
   }
 }
