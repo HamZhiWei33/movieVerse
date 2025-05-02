@@ -31,7 +31,11 @@ const HeroSection = ({ title, moviesType, items }) => {
   useHorizontalScroll(containerRef);
 
   return (
-    <div className="hero-section">
+    <section
+      className="hero-section"
+      role="region"
+      aria-label={`Home section: ${title}`}
+    >
       <div className="home-section-container">
         <div className="home-section">
           <h2 className="home-title">
@@ -44,19 +48,39 @@ const HeroSection = ({ title, moviesType, items }) => {
                     ? handleWatchlistClick
                     : handleRankingClick
                 }
+                role="button"
+                tabIndex={0}
+                aria-label={`Go to full ${moviesType} view`}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    moviesType === "watchlist"
+                      ? handleWatchlistClick()
+                      : handleRankingClick();
+                  }
+                }}
               >
-                <FaAngleRight />
+                <FaAngleRight aria-hidden="true"/>
               </span>
             )}
 
             {moviesType === "recommendation" && (
-              <span className="home-icon reload-icon">
-                <TfiReload />
+              <span 
+                className="home-icon reload-icon"
+                role="button"
+                tabIndex={0}
+                aria-label="Refresh recommendations"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    console.log("refresh recommendations");
+                  }
+                }}
+              >
+                <TfiReload aria-hidden="true"/>
               </span>
             )}
           </h2>
         </div>
-        <div id="watchlist" className="home-card-section">
+        <div id="watchlist" className="home-card-section" role="region" aria-label="Your watchlist movies">
           {moviesType === "watchlist" && (
             <div className="home-card-container">
               {items.map((movie) => (
@@ -65,7 +89,7 @@ const HeroSection = ({ title, moviesType, items }) => {
             </div>
           )}
         </div>
-        <div className="home-card-section">
+        <div className="home-card-section" role="region" aria-label="Newly released movies">
           {moviesType === "newReleased" && (
             <div className="home-card-container">
               {items.map((movie) => (
@@ -74,7 +98,7 @@ const HeroSection = ({ title, moviesType, items }) => {
             </div>
           )}
         </div>
-        <div className="home-card-section">
+        <div className="home-card-section" role="region" aria-label="Top ranked movies by genre">
           {moviesType === "ranking" && (
             <div className="home-card-container" ref={containerRef}>
               <div className="genre-selection-grid">
@@ -106,7 +130,7 @@ const HeroSection = ({ title, moviesType, items }) => {
           )}
         </div> */}
       </div>
-    </div>
+      </section>
   );
 };
 

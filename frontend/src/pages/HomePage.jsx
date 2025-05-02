@@ -22,7 +22,7 @@ const HomePage = () => {
   useGuestUser(isValidateUser);
 
   return (
-    <div className="homePageWrapper">
+    <div className="homePageWrapper" role="main" aria-label="MovieVerse home page">
       {isValidateUser ? <HeroBanner /> : <HomeRanking />}
       <HeroSection
         title="Watchlist"
