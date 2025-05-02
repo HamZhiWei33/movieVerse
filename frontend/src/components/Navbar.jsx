@@ -1,6 +1,8 @@
 import "../styles/navbar.css";
 import { NavLink } from "react-router-dom";
 import { FaAngleDown } from "react-icons/fa";
+import SearchIcon from '@mui/icons-material/Search';
+import MenuIcon from '@mui/icons-material/Menu';
 
 const Navbar = () => {
   return (
@@ -11,6 +13,14 @@ const Navbar = () => {
             <img src="Logo.svg" alt="logo" />
           </NavLink>
         </div>
+        <button id="menu-button">
+          <MenuIcon />
+        </button>
+        <div className="search-bar">
+          <input id="searchInput" type="text" placeholder="Search"/>
+          <SearchIcon size={20}/>
+        </div>
+        
         <nav className="nav-links">
           <ul>
             <li>
@@ -22,9 +32,9 @@ const Navbar = () => {
             <li>
               <NavLink to="/ranking">Ranking</NavLink>
             </li>
-            <li>
+            <li style={{display:"flex",flexDirection:"row"}}>
               <NavLink to="/profile">Profile</NavLink>
-              <FaAngleDown />
+              <FaAngleDown style={{alignSelf:"center"}}/>
             </li>
             <li>
               <NavLink to="/login">Logout</NavLink>

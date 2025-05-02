@@ -1,31 +1,24 @@
 import "../styles/general.css";
+import React, { useState } from "react";
+import FormField from "../components/general/FormField";
+
 const ResetPasswordPage = () => {
+  const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+
   return (
     <main className="reset-password-page">
-      <h1>Reset Password</h1>
-      <form>
-        <label htmlFor="new_password">
-          New Password:
-          <input
-            type="password"
-            id="new_password"
-            name="new_password"
-            placeholder="Password"
-            required
-          />
-        </label>
-        <label htmlFor="confirmed_new_password">
-          Confirmed New Password:
-          <input
-            type="password"
-            id="confirmed_new_password"
-            name="confirmed_new_password"
-            placeholder="Password"
-            required
-          />
-        </label>
-        <button type="submit">Reset Password</button>
-      </form>
+      <div className="form-group" align="center">
+        <h1>Reset Password</h1>
+        <form className="form">
+          <FormField type="password" name="password" label="New Password" onChange={(e) => setPassword(e.target.value)} />
+          <FormField type="password" name="confirm_password" label="Confirm New Password" onChange={(e) => setConfirmPassword(e.target.value)} />
+          <button id="submitButton" type="submit">Confirm</button>
+        </form>
+        <p>
+          Return to <a href="/login">Login</a>
+        </p>
+      </div>
     </main>
   );
 };

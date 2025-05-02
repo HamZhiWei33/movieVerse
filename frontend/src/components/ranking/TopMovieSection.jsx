@@ -1,9 +1,9 @@
 // components/TopMovieSection.jsx
 import React, { useState, useEffect, useMemo } from "react";
-import ReviewStars from "../components/directory/ReviewStars";
-import LikeIcon from "../components/directory/LikeIcon";
-import AddToWatchlistIcon from "../components/directory/AddToWatchlistIcon";
-import { genres as allGenres, movies as allMovies } from "../constant";
+import ReviewStars from "../directory/ReviewStars";
+import LikeIcon from "../directory/LikeIcon";
+import AddToWatchlistIcon from "../directory/AddToWatchlistIcon";
+import { genres as allGenres, movies as allMovies } from "../../constant.js";
 
 const TopMovieSection = ({ selectedMovie, setSelectedMovie, ratingDistribution }) => {
   

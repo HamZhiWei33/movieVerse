@@ -11,8 +11,22 @@ import RankingPage from "./pages/RankingPage";
 import ProfilePage from "./pages/ProfilePage";
 import Footer from "./components/Footer";
 import MovieDetailPage from "./pages/MovieDetailPage";
-import { useEffect } from "react";
-function App() {
+import NewReleasedPage from "./pages/NewReleasedPage";
+import { useEffect, useContext } from "react";
+import {
+  UserValidationProvider,
+  UserValidationContext,
+} from "../src/context/UserValidationProvider "; // Fixed space and added provider import
+import FooterGuest from "./components/FooterGuest";
+
+// Define FooterSelector first since it's used in App
+function FooterSelector() {
+  const { isValidateUser } = useContext(UserValidationContext);
+  return isValidateUser ? <Footer /> : <FooterGuest />;
+}
+
+function AppContent() {
+  const { isValidatedUser } = useContext(UserValidationContext);
   return (
     <>
       <ScrollToTopOnNavigate />
@@ -27,12 +41,19 @@ function App() {
         <Route path="/ranking" element={<RankingPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/movie/:movieTitle" element={<MovieDetailPage />} />
+        <Route path="/new-released" element={<NewReleasedPage />} />
       </Routes>
-      <Footer />
+      <FooterSelector />
     </>
   );
 }
-
+function App() {
+  return (
+    <UserValidationProvider>
+      <AppContent />
+    </UserValidationProvider>
+  );
+}
 function ScrollToTopOnNavigate() {
   const { pathname } = useLocation();
 
