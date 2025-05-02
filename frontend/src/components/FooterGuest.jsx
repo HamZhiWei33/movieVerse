@@ -6,22 +6,26 @@ import { FaLinkedin } from "react-icons/fa";
 
 const FooterGuest = () => {
   return (
-    <footer id="footer">
+    <footer id="footer" role="contentinfo" aria-label="Guest footer">
       <div className="footer-container">
         <div className="footer-grid guest">
           <div>
-            <ul>
-              <li>
-                <Link to="/login">Login</Link>
-              </li>
-            </ul>
+            <nav aria-label="Login navigation">
+              <ul>
+                <li>
+                  <Link to="/login">Login</Link>
+                </li>
+              </ul>
+            </nav>
           </div>
           <div>
-            <ul>
-              <li>
-                <Link to="/signup">Sign Up</Link>
-              </li>
-            </ul>
+            <nav aria-label="Signup navigation">
+              <ul>
+                <li>
+                  <Link to="/signup">Sign Up</Link>
+                </li>
+              </ul>
+            </nav>
           </div>
           <div>
             <h4>Connect With Us</h4>
@@ -32,7 +36,7 @@ const FooterGuest = () => {
                 rel="noopener noreferrer"
               >
                 {/* <i className="fab fa-facebook-f"></i> */}
-                <FaFacebook />
+                <FaFacebook aria-hidden="true"/>
               </a>
               <a
                 href="https://www.twitter.com"
@@ -40,7 +44,7 @@ const FooterGuest = () => {
                 rel="noopener noreferrer"
               >
                 {/* <i className="fab fa-twitter"></i> */}
-                <FaXTwitter />
+                <FaXTwitter aria-hidden="true"/>
               </a>
               <a
                 href="https://www.linkedin.com"
@@ -48,7 +52,7 @@ const FooterGuest = () => {
                 rel="noopener noreferrer"
               >
                 {/* <i className="fab fa-linkedin-in"></i> */}
-                <FaLinkedin />
+                <FaLinkedin aria-hidden="true"/>
               </a>
             </div>
           </div>
