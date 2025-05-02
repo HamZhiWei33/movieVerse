@@ -1,43 +1,65 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import MovieCard from "../directory/MovieCard";
 import "../../styles/home/recommendation-section.css";
-import "../../styles/home/ranking-card.css";
 import { TfiReload } from "react-icons/tfi";
-import { useRef } from "react";
+
 const RecommendationSection = ({ title, moviesType, items }) => {
-  const recommendationRef = useRef();
+  const [displayed, setDisplayed] = useState([]);
+
+  const handleReload = () => {
+    const shuffled = [...items].sort(() => 0.5 - Math.random());
+    setDisplayed(shuffled.slice(0, 10));
+  };
+
+  useEffect(() => {
+    if (moviesType === "recommendation") {
+      handleReload();
+    }
+  }, [items]);
+
   return (
-    <div className="recommendation-section">
+    <section
+      className="recommendation-section"
+      role="region"
+      aria-label="Recommended movies section"
+    >
       <div className="recommendation-section-container">
-        <div className="recommendation-section">
-          <h2 className="recommendation-title">
-            {title}
-            {moviesType === "recommendation" && (
-              <span className="recommendation-icon reload-icon">
-                <TfiReload />
-              </span>
-            )}
-          </h2>
+        {/* Title and Reload Icon Row */}
+        <div className="recommendation-title-row">
+          <h2 className="recommendation-title">{title}</h2>
+          {moviesType === "recommendation" && (
+            <span
+              className="recommendation-icon reload-icon"
+              role="button"
+              tabIndex={0}
+              aria-label="Reload recommended movies"
+              onClick={handleReload}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleReload();
+              }}
+            >
+              <TfiReload aria-hidden="true" />
+            </span>
+          )}
         </div>
 
+        {/* Movie Card Grid */}
         <div
           id="recommendation"
-          ref={recommendationRef}
-          className="recommendation-card-section"
+          className="recommendation-card-container"
+          role="list"
+          aria-label="List of recommended movies"
         >
-          {moviesType === "recommendation" && (
-            <div
-              id="recommendation-wrapper"
-              className="recommendation-card-container"
-            >
-              {items.map((movie) => (
-                <MovieCard key={movie.id} movie={movie} />
-              ))}
-            </div>
+          {displayed.map((movie, index) =>
+            movie ? (
+              <MovieCard key={index} movie={movie} role="listitem" />
+            ) : (
+              <div key={index} className="movie-card-placeholder" />
+            )
           )}
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 
