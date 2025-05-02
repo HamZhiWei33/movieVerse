@@ -226,6 +226,10 @@ legend {
   gap: 1.5rem;
 }
 
+.movie-card-list .movie-details-container-list {
+  margin-left: 0;
+}
+
 @media (max-width: 1024px) {
   .filters {
     grid-template-columns: 1fr;
@@ -243,7 +247,6 @@ legend {
   .movie-card-list .movie-details-container-list {
     align-items: flex-start;
     text-align: left;
-    margin-left: 0;
   }
 
   .genre-tags,

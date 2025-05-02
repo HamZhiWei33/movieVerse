@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import { IoAdd } from "react-icons/io5";
 import { IoIosArrowBack } from "react-icons/io";
@@ -75,6 +75,8 @@ const MovieDetailPage = () => {
         return (sum / movieReviews.length).toFixed(1);
     };
 
+    const reviewFormRef = useRef(null);
+
     const totalPages = Math.ceil(movieReviews.length / reviewsPerPage);
     const start = currentPage * reviewsPerPage;
     const currentReviews = movieReviews.slice(start, start + reviewsPerPage);
@@ -101,12 +103,16 @@ const MovieDetailPage = () => {
                     onAddToWatchlist={() => setWatchlisted(prev => !prev)}
                     showRatingNumber={true}
                     showBottomInteractiveIcon={true}
+                    showCastInfo={true}
                 />
 
                 <div className="rating-container">
                     <div className="review-subheader">
                         <h3>Reviews</h3>
-                        <button className="review-button"><IoAdd className="add-icon" />Add Your Review</button>
+                        <button
+                            className="review-button"
+                            onClick={() => reviewFormRef.current?.scrollIntoView({ behavior: 'smooth' })}
+                        ><IoAdd className="add-icon" />Add Your Review</button>
                     </div>
                     <RatingBarChart
                         average={parseFloat(calculateAverageRating())}
@@ -116,7 +122,9 @@ const MovieDetailPage = () => {
                     <div className="review-list">
                         {currentReviews.length > 0 ? (
                             currentReviews.map((review) => {
-                                const user = reviewUsers[review.userId];
+                                // Find the user who wrote this review
+                                const user = users.find(u => u.id === review.userId);
+
                                 return (
                                     <ReviewCard
                                         key={review.id}
@@ -152,16 +160,18 @@ const MovieDetailPage = () => {
                         </div>
                     )}
                 </div>
-                <UserReviewForm
-                    movie={movie}
-                    existingReview={"I loved the visuals!"} // Load user's review if exists
-                    existingRating={4.5} // Load user's rating if exists
-                    onSubmit={(data) => {
-                        console.log("Review submitted:", data);
-                        // Save to backend here
-                        // Refresh the reviews
-                    }}
-                />
+                <div ref={reviewFormRef}>
+                    <UserReviewForm
+                        movie={movie}
+                        existingReview={"I loved the visuals!"} // Load user's review if exists
+                        existingRating={0} // Load user's rating if exists
+                        onSubmit={(data) => {
+                            console.log("Review submitted:", data);
+                            // Save to backend here
+                            // Refresh the reviews
+                        }}
+                    />
+                </div>
             </div>
         </main>
     );

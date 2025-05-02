@@ -67,12 +67,12 @@ body {
 .review-list {
     display: grid;
     margin-top: 1rem;
-    grid-template-columns: repeat(2, 1fr); 
+    grid-template-columns: repeat(2, 1fr);
     width: 100%;
 }
 
-.review-list > * {
-    grid-column: auto; 
+.review-list>* {
+    grid-column: auto;
 }
 
 .review-pagination {
@@ -196,63 +196,76 @@ body {
     padding: 3rem;
     text-align: center;
     color: #ccc;
-  }
+}
 
 @media (max-width: 1024px) {
     .detail-content-container {
-      width: calc(100% - 2rem);
-      margin: 0 1rem;
-      padding: 0;
+        width: calc(100% - 2rem);
+        margin: 0 1rem;
+        padding: 0;
     }
-  
+
     .back-button-container {
-      width: calc(100% - 2rem);
-      margin: 1rem;
+        width: calc(100% - 2rem);
+        margin: 1rem;
     }
-  
+
     .movie-card-list {
-      flex-direction: column;
-      align-items: center;
+        flex-direction: column;
+        align-items: center;
     }
-  
+
     .poster-container-list {
-      width: 100%;
-      display: flex;
-      justify-content: center;
+        width: 100%;
+        display: flex;
+        justify-content: center;
     }
-  
+
     .poster-img-list {
-      border-radius: 0.7rem 0.7rem 0 0;
+        border-radius: 0.7rem 0.7rem 0 0;
     }
-  
+
     .detail-content-container .movie-details-container-list {
-      text-align: center;
-      padding: 1.5rem;
-      margin-left: 0 !important;
-      align-items: center;
+        text-align: center;
+        padding: 1.5rem;
+        margin-left: 0 !important;
+        align-items: center;
     }
-  
+
     .detail-content-container .movie-details-container-list .genre-tags {
-      justify-content: center !important;
+        justify-content: center !important;
     }
-  
+
     .duration-and-icons-container {
-      flex-direction: column;
-      align-items: center;
-      gap: 1rem;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
     }
-  
+
+    .cast-info {
+        align-items: center;
+        text-align: center;
+    }
+
+    .cast-row {
+        justify-content: center;
+    }
+
+    .actors-list {
+        justify-content: center;
+    }
+
     .review-list {
         grid-template-columns: 1fr;
         justify-items: center;
         gap: 1rem;
     }
 
-    .review-list > * {
-        width: 100%; 
+    .review-list>* {
+        width: 100%;
     }
-  
+
     .rating-container {
-      padding: 1rem;
+        padding: 1rem;
     }
 }
