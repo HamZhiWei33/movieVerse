@@ -56,10 +56,10 @@ export default function HeroBanner() {
 
         {/* Custom arrows */}
         <div ref={prevRef} className="custom-prev select-none">
-          ←
+        <span className="arrow">←</span>
         </div>
         <div ref={nextRef} className="custom-next select-none">
-          →
+        <span className="arrow">→</span>
         </div>
       </Swiper>
     </div>
