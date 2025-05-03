@@ -32,10 +32,14 @@ header {
   text-decoration: none;
 }
 
+.logo img {
+  display: block;
+  width: 100%;
+}
 /* Search bar */
 .search-bar {
   display: flex;
-  background-color: #3F3F3F;
+  background-color: #3f3f3f;
   position: relative;
   margin-right: auto;
   width: 25rem;
