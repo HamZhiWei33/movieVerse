@@ -1,94 +1,5 @@
-/* #footer {
-  min-width: 100%;
-  min-height: fit-content;
-  background-color: #0f0f0f;
-  padding: 2rem 1rem;
-  color: #fff;
-}
+/* ------------------ General Footer Styling ------------------ */
 
-.footer-container {
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.footer-grid {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 2rem;
-  margin-bottom: 2rem;
-}
-
-.footer-grid > div {
-  flex: 1 1 180px;
-  max-width: 200px;
-}
-
-.footer-grid h4 {
-  margin-bottom: 0.5rem;
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-.footer-grid ul {
-  list-style: none;
-  padding: 0;
-}
-
-.footer-grid li {
-  margin: 0.4rem 0;
-}
-
-.footer-grid a {
-  color: #ccc;
-  text-decoration: none;
-  font-size: 0.95rem;
-}
-
-.footer-grid a:hover {
-  color:  #c6ff00; 
-  text-decoration: none;
-}
-
-.social-icons {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-}
-
-.social-icons a {
-  display: inline-flex;
-  width: 30px;
-  height: 30px;
-  align-items: center;
-  justify-content: center;
-  background-color: #1f1f1f;
-  border-radius: 5px;
-  color: white;
-  font-size: 14px;
-  text-decoration: none;
-}
-
-.footer-bottom {
-  text-align: center;
-  font-size: 0.85rem;
-  color: #aaa;
-  line-height: 1.6;
-  max-width: 900px;
-  margin: 0 auto;
-}
-
-.footer-bottom p {
-  margin: 0.5rem 0;
-}
-
-.social-icons a {
-  display: inline-flex;
-  width: 30px;
-  height: 30px;
-  align-items: center;
-  justify-content: center;
-} */
 #footer {
   width: 100%;
   background-color: #0f0f0f;
@@ -111,18 +22,21 @@
 
 .footer-grid > div {
   flex: 1 1 180px;
-  max-width: 200px;
+  max-width: 220px;
+  text-align: left;
 }
 
 .footer-grid h4 {
   margin-bottom: 0.5rem;
   font-size: 1rem;
   font-weight: 600;
+  text-align: left;
 }
 
 .footer-grid ul {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
 .footer-grid li {
@@ -133,31 +47,55 @@
   color: #ccc;
   text-decoration: none;
   font-size: 0.95rem;
+  transition: color 0.2s;
 }
 
 .footer-grid a:hover {
-  color: #c6ff00;
+  color: #c6ff00; 
   text-decoration: none;
 }
+
+
+/* ------------------ Social Media Icons ------------------ */
 
 .social-icons {
   display: flex;
   gap: 0.5rem;
   margin-top: 0.5rem;
+  justify-content: flex-start;
 }
 
 .social-icons a {
   display: inline-flex;
-  width: 30px;
-  height: 30px;
   align-items: center;
   justify-content: center;
+  width: 32px;
+  height: 32px;
   background-color: #1f1f1f;
-  border-radius: 5px;
-  color: white;
-  font-size: 14px;
+  border-radius: 6px;
   text-decoration: none;
+  color: white;
+  transition: background-color 0.2s, color 0.2s;
 }
+
+.social-icons a i {
+  font-size: 16px;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+.social-icons a:hover {
+  background-color: #333;
+  color: #c6ff00;
+}
+
+.social-icons .fa-x-twitter {
+  font-size: 15px;
+  padding-top: 1px;
+}
+
+
+/* ------------------ Footer Bottom Section ------------------ */
 
 .footer-bottom {
   text-align: center;
@@ -172,33 +110,52 @@
   margin: 0.5rem 0;
 }
 
-.social-icons a {
-  display: inline-flex;
-  width: 30px;
-  height: 30px;
-  align-items: center;
-  justify-content: center;
-  background-color: #1f1f1f;
-  border-radius: 5px;
-  color: white;
-  font-size: 14px;
-  text-decoration: none;
-}
 
-.social-icons a:hover {
-  background-color: #333;
-  text-decoration: none;
-}
-
-.footer-grid.guest {
-  justify-content: space-between;
-  text-align: center;
-}
+/* ------------------ Guest Footer Specific ------------------ */
 
 .footer-grid.guest > div {
-  flex: 1 1 150px;
   display: flex;
   flex-direction: column;
-  align-items: center; /* 👈 center all content horizontally */
-  text-align: center;
+  align-items: flex-start;
+  text-align: left;
+}
+
+
+/* ------------------ Responsive: ≤ 1200px ------------------ */
+
+@media screen and (max-width: 1200px) {
+  .footer-grid {
+    justify-content: center;
+    gap: 2rem;
+  }
+
+  .footer-grid > div {
+    max-width: 180px;
+    flex: 1 1 150px;
+  }
+}
+
+
+/* ------------------ Responsive: ≤ 768px ------------------ */
+
+@media screen and (max-width: 768px) {
+  .footer-grid {
+    flex-direction: column;
+    align-items: center;
+    text-align: center; 
+  }
+
+  .footer-grid > div {
+    max-width: 100%;
+    flex: none;
+  }
+
+  .footer-grid h4,
+  .footer-grid li {
+    text-align: center; 
+  }
+
+  .social-icons {
+    justify-content: center; 
+  }
 }

@@ -55,7 +55,7 @@ const HomeRanking = () => {
   }, [movies]);
 
   return (
-    <div className="page-wrapper">
+    <div className="page-wrapper" role="region" aria-label="Top rated movie ranking section">
       {selectedMovie && (
         <TopMovieSection
           selectedMovie={selectedMovie}

@@ -49,52 +49,60 @@ const Footer = () => {
     navigate("/recommendation", { state: { targetTab: "Recommendation" } });
   };
   return (
-    <footer id="footer">
+    <footer id="footer" role="contentinfo" aria-label="Main footer">
       <div className="footer-container">
         <div className="footer-grid">
           <div>
             <h4>Home</h4>
-            <ul>
-              <li>
-                <Link to="/#watchlist">Watchlist</Link>
-              </li>
-              <li>
-                <Link to="/ranking">Ranking</Link>
-              </li>
-              <li>
-                <Link to="/directory">New Released</Link>
-              </li>
-              <li>
-                <Link to="/#recommendation">Recommendation</Link>
-              </li>
-            </ul>
+            <nav aria-label="Home navigation">
+              <ul>
+                <li>
+                  <Link to="/watchlist">Watchlist</Link>
+                </li>
+                <li>
+                  <Link to="/ranking">Ranking</Link>
+                </li>
+                <li>
+                  <Link to="/directory/new">New Released</Link>
+                </li>
+                <li>
+                  <Link to="/recommendation">Recommendation</Link>
+                </li>
+              </ul>
+            </nav>
           </div>
 
           <div>
             <h4>Directory</h4>
-            <ul>
-              <li>
-                <Link to="/directory">Directory</Link>
-              </li>
-            </ul>
+            <nav aria-label="Directory navigation">
+              <ul>
+                <li>
+                  <Link to="/directory">Directory</Link>
+                </li>
+              </ul>
+            </nav>
           </div>
 
           <div>
             <h4>Ranking</h4>
-            <ul>
-              <li>
-                <Link to="/ranking">Ranking</Link>
-              </li>
-            </ul>
+            <nav aria-label="Ranking navigation">
+              <ul>
+                <li>
+                  <Link to="/ranking">Ranking</Link>
+                </li>
+              </ul>
+            </nav>
           </div>
 
           <div>
             <h4>Profile</h4>
-            <ul>
-              <li>
-                <Link to="/contact">Contact Us</Link>
-              </li>
-            </ul>
+            <nav aria-label="Profile navigation">
+              <ul>
+                <li>
+                  <Link to="/contact">Contact Us</Link>
+                </li>
+              </ul>
+            </nav>
           </div>
 
           <div>
@@ -106,7 +114,7 @@ const Footer = () => {
                 rel="noopener noreferrer"
               >
                 {/* <i className="fab fa-facebook-f"></i> */}
-                <FaFacebook />
+                <FaFacebook aria-hidden="true"/>
               </a>
               <a
                 href="https://www.twitter.com"
@@ -114,7 +122,7 @@ const Footer = () => {
                 rel="noopener noreferrer"
               >
                 {/* <i className="fab fa-twitter"></i> */}
-                <FaXTwitter />
+                <FaXTwitter aria-hidden="true"/>
               </a>
               <a
                 href="https://www.linkedin.com"
@@ -122,7 +130,7 @@ const Footer = () => {
                 rel="noopener noreferrer"
               >
                 {/* <i className="fab fa-linkedin-in"></i> */}
-                <FaLinkedin />
+                <FaLinkedin aria-hidden="true"/>
               </a>
             </div>
           </div>

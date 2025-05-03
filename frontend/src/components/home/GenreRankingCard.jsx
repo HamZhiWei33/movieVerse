@@ -9,7 +9,7 @@ const GenreRankingCard = ({ genre, movies }) => {
   };
 
   return (
-    <div className="genre-card" onClick={handleClick}>
+    <div className="genre-card" onClick={handleClick} role="button" tabIndex={0} aria-label={`View top 10 ${genre} movies`}>
       <div className="poster-grid">
         {movies.slice(0, 4).map((movie) => (
           <img
@@ -23,7 +23,7 @@ const GenreRankingCard = ({ genre, movies }) => {
       <div className="genre-card-footer">
         <span className="badge">Top 10 In</span>
         <span className="genre-name">{genre}</span>
-        <span className="arrow">→</span>
+        <span className="arrow" aria-hidden="true">→</span>
       </div>
     </div>
   );
