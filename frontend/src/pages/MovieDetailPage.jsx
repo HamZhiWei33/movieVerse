@@ -46,13 +46,10 @@ const MovieDetailPage = () => {
         setReviewUsers(usersMap);
 
         // Get like count for this movie
-        const movieLikes = likes.filter(like => like.movieId === movie.id);
-        setLikeCount(movieLikes.length);
+        setLikeCount(movie.likes || 0);
 
-        // Check if current user has liked this movie
-        // Replace 'currentUserId' with actual current user ID
-        const currentUserId = "U1"; // Example user ID
-        const userLiked = movieLikes.some(like => like.userId === currentUserId);
+        const currentUserId = "U1";
+        const userLiked = likes.some(like => like.movieId === movie.id && like.userId === currentUserId);
         setLiked(userLiked);
     }, [movie]);
 
@@ -99,7 +96,10 @@ const MovieDetailPage = () => {
                     }}
                     liked={liked}
                     addedToWatchlist={watchlisted}
-                    onLike={() => setLiked(prev => !prev)}
+                    onLike={() => {
+                        setLikeCount(prevCount => liked ? prevCount - 1 : prevCount + 1);
+                        setLiked(prev => !prev);
+                    }}                    
                     onAddToWatchlist={() => setWatchlisted(prev => !prev)}
                     showRatingNumber={true}
                     showBottomInteractiveIcon={true}
