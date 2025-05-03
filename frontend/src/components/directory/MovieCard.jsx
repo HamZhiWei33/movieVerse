@@ -28,6 +28,11 @@ const MovieCard = ({
     onAddToWatchlist();
   };
 
+  const formatRating = (rating) => {
+    if (rating === 0) return "0";
+    return rating.toFixed(1); 
+  };
+
   return (
     <article
       className="movie-card"
@@ -42,7 +47,7 @@ const MovieCard = ({
         />
         <div className="hover-overlay">
           <div className="top-right">
-            <span className="rating">{movie.rating}</span>
+            <span className="rating">{formatRating(movie.rating)}</span>
           </div>
           <div className="bottom-icons" onClick={(e) => e.stopPropagation()}>
             <LikeIcon liked={liked} onClick={handleLikeClick} />

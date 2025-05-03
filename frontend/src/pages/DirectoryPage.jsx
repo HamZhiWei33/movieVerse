@@ -6,182 +6,22 @@ import ViewDropdown from "../components/directory/ViewDropdown";
 import { FaListUl } from "react-icons/fa";
 import "../styles/sidebar.css";
 import Sidebar from "../components/Sidebar";
-const genres = [
-  "Action",
-  "Adventure",
-  "Comedy",
-  "Drama",
-  "Horror",
-  "Thriller",
-  "Sci-Fi",
-  "Fantasy",
-  "Romance",
-  "Mystery",
-  "Crime",
-  "Animation",
-];
+import { movies as movieData, genres as genreData } from "../constant"
 
-const regions = [
-  "Hollywood",
-  "Bollywood",
-  "Nollywood",
-  "China",
-  "Japan",
-  "South Korea",
-  "Europe",
-  "Latin America",
-  "Middle East",
-];
+// Extract unique regions from movie data
+const regions = [...new Set(movieData.map(movie => movie.region))];
 
-const years = [
-  "2025",
-  "2024",
-  "2023",
-  "2022",
-  "2021",
-  "2020",
-  "2010s",
-  "2000s",
-  "1990s",
-  "1980s",
-  "1970s",
-  "1960s",
-];
+// Extract unique years from movie data
+const years = [...new Set(movieData.map(movie => movie.year.toString()))];
 
-const movies = [
-  {
-    title: "Stranger Things Season 3",
-    posterUrl: "/movie/stranger_things_season_3.png",
-    genre: ["Sci-Fi", "Mystery", "Adventure", "Drama"],
-    region: "Hollywood",
-    year: "2019",
-    rating: 4.5,
-    duration: "8h 30min",
-    description:
-      "Lorem ipsum dolor sit amet. Est deleniti eaque ut dolores culpa et recusandae nulla qui voluptas delectus ab provident voluptas est quibusdam quos. Hic eius animi ut distinctio architecto id neque dolor sit tempore voluptatem. Et cupiditate iure et internos porro est quos amet ut unde odit non aperiam earum. Et sunt nemo non suscipit quaerat et aperiam omnis ut autem excepturi.Lorem ipsum dolor sit amet. Est deleniti eaque ut dolores culpa et recusandae nulla qui voluptas delectus ab provident voluptas est quibusdam quos. ",
-  },
-  {
-    title: "Parasite",
-    posterUrl: "/movie/parasite.png",
-    genre: ["Horror", "Crime"],
-    region: "South Korea",
-    year: "2019",
-    rating: 4.5,
-    duration: "8h 30min",
-    description:
-      "Lorem ipsum dolor sit amet. Est deleniti eaque ut dolores culpa et recusandae nulla qui voluptas delectus ab provident voluptas est quibusdam quos. Hic eius animi ut distinctio architecto id neque dolor sit tempore voluptatem. Et cupiditate iure et internos porro est quos amet ut unde odit non aperiam earum. Et sunt nemo non suscipit quaerat et aperiam omnis ut autem excepturi.Lorem ipsum dolor sit amet. Est deleniti eaque ut dolores culpa et recusandae nulla qui voluptas delectus ab provident voluptas est quibusdam quos. ",
-  },
-  {
-    title: "Avatar: The Way of Water",
-    posterUrl: "/movie/avatar_the_way_of_water.png",
-    genre: ["Action", "Adventure", "Sci-Fi"],
-    region: "Hollywood",
-    year: "2022",
-    rating: 4.5,
-    duration: "8h 30min",
-    description:
-      "Lorem ipsum dolor sit amet. Est deleniti eaque ut dolores culpa et recusandae nulla qui voluptas delectus ab provident voluptas est quibusdam quos. Hic eius animi ut distinctio architecto id neque dolor sit tempore voluptatem. Et cupiditate iure et internos porro est quos amet ut unde odit non aperiam earum. Et sunt nemo non suscipit quaerat et aperiam omnis ut autem excepturi.Lorem ipsum dolor sit amet. Est deleniti eaque ut dolores culpa et recusandae nulla qui voluptas delectus ab provident voluptas est quibusdam quos. ",
-  },
-  {
-    title: "Alita: Battle Angel",
-    posterUrl: "/movie/alita_battle_angel.png",
-    genre: ["Action", "Sci-Fi", "Adventure"],
-    region: "Hollywood",
-    year: "2019",
-    rating: 4.5,
-    duration: "8h 30min",
-    description:
-      "Lorem ipsum dolor sit amet. Est deleniti eaque ut dolores culpa et recusandae nulla qui voluptas delectus ab provident voluptas est quibusdam quos. Hic eius animi ut distinctio architecto id neque dolor sit tempore voluptatem. Et cupiditate iure et internos porro est quos amet ut unde odit non aperiam earum. Et sunt nemo non suscipit quaerat et aperiam omnis ut autem excepturi.Lorem ipsum dolor sit amet. Est deleniti eaque ut dolores culpa et recusandae nulla qui voluptas delectus ab provident voluptas est quibusdam quos. ",
-  },
-  {
-    title: "Alien",
-    posterUrl: "/movie/alien.png",
-    genre: ["Horror", "Sci-Fi", "Thriller"],
-    region: "Hollywood",
-    year: "1979",
-    rating: 4.5,
-    duration: "8h 30min",
-    description:
-      "Lorem ipsum dolor sit amet. Est deleniti eaque ut dolores culpa et recusandae nulla qui voluptas delectus ab provident voluptas est quibusdam quos. Hic eius animi ut distinctio architecto id neque dolor sit tempore voluptatem. Et cupiditate iure et internos porro est quos amet ut unde odit non aperiam earum. Et sunt nemo non suscipit quaerat et aperiam omnis ut autem excepturi.Lorem ipsum dolor sit amet. Est deleniti eaque ut dolores culpa et recusandae nulla qui voluptas delectus ab provident voluptas est quibusdam quos. ",
-  },
-  {
-    title: "The Gorge",
-    posterUrl: "/movie/the_gorge.png",
-    genre: ["Thriller", "Romance", "Action"],
-    region: "Hollywood",
-    year: "2024",
-    rating: 4.5,
-    duration: "8h 30min",
-    description:
-      "Lorem ipsum dolor sit amet. Est deleniti eaque ut dolores culpa et recusandae nulla qui voluptas delectus ab provident voluptas est quibusdam quos. Hic eius animi ut distinctio architecto id neque dolor sit tempore voluptatem. Et cupiditate iure et internos porro est quos amet ut unde odit non aperiam earum. Et sunt nemo non suscipit quaerat et aperiam omnis ut autem excepturi.Lorem ipsum dolor sit amet. Est deleniti eaque ut dolores culpa et recusandae nulla qui voluptas delectus ab provident voluptas est quibusdam quos. ",
-  },
-  {
-    title: "Severance",
-    posterUrl: "/movie/severance.png",
-    genre: ["Mystery", "Drama", "Sci-Fi"],
-    region: "Hollywood",
-    year: "2022",
-    rating: 4.5,
-    duration: "8h 30min",
-    description:
-      "Lorem ipsum dolor sit amet. Est deleniti eaque ut dolores culpa et recusandae nulla qui voluptas delectus ab provident voluptas est quibusdam quos. Hic eius animi ut distinctio architecto id neque dolor sit tempore voluptatem. Et cupiditate iure et internos porro est quos amet ut unde odit non aperiam earum. Et sunt nemo non suscipit quaerat et aperiam omnis ut autem excepturi.Lorem ipsum dolor sit amet. Est deleniti eaque ut dolores culpa et recusandae nulla qui voluptas delectus ab provident voluptas est quibusdam quos. ",
-  },
-  {
-    title: "When Life Gives You Tangerines",
-    posterUrl: "/movie/when_life_gives_you_tangerines.png",
-    genre: ["Romance", "Drama"],
-    region: "South Korea",
-    year: "2025",
-    rating: 4.5,
-    duration: "8h 30min",
-    description:
-      "Lorem ipsum dolor sit amet. Est deleniti eaque ut dolores culpa et recusandae nulla qui voluptas delectus ab provident voluptas est quibusdam quos. Hic eius animi ut distinctio architecto id neque dolor sit tempore voluptatem. Et cupiditate iure et internos porro est quos amet ut unde odit non aperiam earum. Et sunt nemo non suscipit quaerat et aperiam omnis ut autem excepturi.Lorem ipsum dolor sit amet. Est deleniti eaque ut dolores culpa et recusandae nulla qui voluptas delectus ab provident voluptas est quibusdam quos. ",
-  },
-  {
-    title: "Flow",
-    posterUrl: "/movie/flow.png",
-    genre: ["Fantasy", "Adventure", "Animation"],
-    region: "Europe",
-    year: "2024",
-    rating: 4.5,
-    duration: "8h 30min",
-    description:
-      "Lorem ipsum dolor sit amet. Est deleniti eaque ut dolores culpa et recusandae nulla qui voluptas delectus ab provident voluptas est quibusdam quos. Hic eius animi ut distinctio architecto id neque dolor sit tempore voluptatem. Et cupiditate iure et internos porro est quos amet ut unde odit non aperiam earum. Et sunt nemo non suscipit quaerat et aperiam omnis ut autem excepturi.Lorem ipsum dolor sit amet. Est deleniti eaque ut dolores culpa et recusandae nulla qui voluptas delectus ab provident voluptas est quibusdam quos. ",
-  },
-  {
-    title: "The Substance",
-    posterUrl: "/movie/the_substance.png",
-    genre: ["Horror", "Drama", "Mystery"],
-    region: "Europe",
-    year: "2024",
-    rating: 4.5,
-    duration: "8h 30min",
-    description:
-      "Lorem ipsum dolor sit amet. Est deleniti eaque ut dolores culpa et recusandae nulla qui voluptas delectus ab provident voluptas est quibusdam quos. Hic eius animi ut distinctio architecto id neque dolor sit tempore voluptatem. Et cupiditate iure et internos porro est quos amet ut unde odit non aperiam earum. Et sunt nemo non suscipit quaerat et aperiam omnis ut autem excepturi.Lorem ipsum dolor sit amet. Est deleniti eaque ut dolores culpa et recusandae nulla qui voluptas delectus ab provident voluptas est quibusdam quos. ",
-  },
-  {
-    title: "Pearl",
-    posterUrl: "/movie/pearl.png",
-    genre: ["Horror", "Drama", "Thriller"],
-    region: "Hollywood",
-    year: "2022",
-    rating: 4.5,
-    duration: "8h 30min",
-    description:
-      "Lorem ipsum dolor sit amet. Est deleniti eaque ut dolores culpa et recusandae nulla qui voluptas delectus ab provident voluptas est quibusdam quos. Hic eius animi ut distinctio architecto id neque dolor sit tempore voluptatem. Et cupiditate iure et internos porro est quos amet ut unde odit non aperiam earum. Et sunt nemo non suscipit quaerat et aperiam omnis ut autem excepturi.Lorem ipsum dolor sit amet. Est deleniti eaque ut dolores culpa et recusandae nulla qui voluptas delectus ab provident voluptas est quibusdam quos. ",
-  },
-  {
-    title: "Stranger Things Season 4",
-    posterUrl: "/movie/stranger_things_season_4.png",
-    genre: ["Sci-Fi", "Mystery", "Thriller", "Romance", "Horror", "Drama"],
-    region: "Hollywood",
-    year: "2023",
-    rating: 4.5,
-    duration: "8h 30min",
-    description:
-      "Lorem ipsum dolor sit amet. Est deleniti eaque ut dolores culpa et recusandae nulla qui voluptas delectus ab provident voluptas est quibusdam quos. Hic eius animi ut distinctio architecto id neque dolor sit tempore voluptatem. Et cupiditate iure et internos porro est quos amet ut unde odit non aperiam earum. Et sunt nemo non suscipit quaerat et aperiam omnis ut autem excepturi.Lorem ipsum dolor sit amet. Est deleniti eaque ut dolores culpa et recusandae nulla qui voluptas delectus ab provident voluptas est quibusdam quos. ",
-  },
-];
+// Map genre IDs to names
+const genreMap = genreData.reduce((map, genre) => {
+  map[genre.id] = genre.name;
+  return map;
+}, {});
+
+// Get genre names for display
+const genres = genreData.map(genre => genre.name);
 
 const DirectoryPage = () => {
   const [selectedGenres, setSelectedGenres] = useState([]);
@@ -210,14 +50,17 @@ const DirectoryPage = () => {
   };
 
   const filteredMovies = useMemo(() => {
-    return movies.filter((movie) => {
+    return movieData.filter((movie) => {
+      // Convert genre IDs to names for filtering
+      const movieGenreNames = movie.genre.map(id => genreMap[id]);
+
       const genreMatch =
         selectedGenres.length === 0 ||
-        selectedGenres.some((g) => movie.genre.includes(g));
+        selectedGenres.some((g) => movieGenreNames.includes(g));
       const regionMatch =
         selectedRegions.length === 0 || selectedRegions.includes(movie.region);
       const yearMatch =
-        selectedYears.length === 0 || selectedYears.includes(movie.year);
+        selectedYears.length === 0 || selectedYears.includes(movie.year.toString());
       return genreMatch && regionMatch && yearMatch;
     });
   }, [selectedGenres, selectedRegions, selectedYears]);
@@ -314,26 +157,25 @@ const DirectoryPage = () => {
             {(selectedGenres.length > 0 ||
               selectedRegions.length > 0 ||
               selectedYears.length > 0) && (
-              <div className="clear-filters-container">
-                <button
-                  className={`clear-filters-button ${
-                    selectedGenres.length ||
-                    selectedRegions.length ||
-                    selectedYears.length
-                      ? "active"
-                      : ""
-                  }`}
-                  onClick={() => {
-                    setSelectedGenres([]);
-                    setSelectedRegions([]);
-                    setSelectedYears([]);
-                  }}
-                  aria-label="Clear all filters"
-                >
-                  Clear all
-                </button>
-              </div>
-            )}
+                <div className="clear-filters-container">
+                  <button
+                    className={`clear-filters-button ${selectedGenres.length ||
+                        selectedRegions.length ||
+                        selectedYears.length
+                        ? "active"
+                        : ""
+                      }`}
+                    onClick={() => {
+                      setSelectedGenres([]);
+                      setSelectedRegions([]);
+                      setSelectedYears([]);
+                    }}
+                    aria-label="Clear all filters"
+                  >
+                    Clear all
+                  </button>
+                </div>
+              )}
           </div>
 
           <section className={`movie-container ${view}`}>
@@ -342,14 +184,16 @@ const DirectoryPage = () => {
                 <div className="movie-grid">
                   {filteredMovies.map((movie) => (
                     <MovieCard
-                      key={movie.title}
-                      movie={movie}
-                      liked={likedMovies.includes(movie.title)}
-                      addedToWatchlist={addToWatchlistMovies.includes(
-                        movie.title
-                      )}
-                      onLike={() => toggleLike(movie.title)}
-                      onAddToWatchlist={() => toggleAddToWatchlist(movie.title)}
+                      key={movie.id}
+                      movie={{
+                        ...movie,
+                        genre: movie.genre.map(id => genreMap[id]), // Convert genre IDs to names
+                        year: movie.year.toString() // Ensure year is string
+                      }}
+                      liked={likedMovies.includes(movie.id)}
+                      addedToWatchlist={addToWatchlistMovies.includes(movie.id)}
+                      onLike={() => toggleLike(movie.id)}
+                      onAddToWatchlist={() => toggleAddToWatchlist(movie.id)}
                     />
                   ))}
                 </div>
@@ -357,14 +201,16 @@ const DirectoryPage = () => {
                 <div className="movie-list">
                   {filteredMovies.map((movie) => (
                     <MovieCardList
-                      key={movie.title}
-                      movie={movie}
-                      liked={likedMovies.includes(movie.title)}
-                      addedToWatchlist={addToWatchlistMovies.includes(
-                        movie.title
-                      )}
-                      onLike={() => toggleLike(movie.title)}
-                      onAddToWatchlist={() => toggleAddToWatchlist(movie.title)}
+                      key={movie.id}
+                      movie={{
+                        ...movie,
+                        genre: movie.genre.map(id => genreMap[id]), // Convert genre IDs to names
+                        year: movie.year.toString() // Ensure year is string
+                      }}
+                      liked={likedMovies.includes(movie.id)}
+                      addedToWatchlist={addToWatchlistMovies.includes(movie.id)}
+                      onLike={() => toggleLike(movie.id)}
+                      onAddToWatchlist={() => toggleAddToWatchlist(movie.id)}
                     />
                   ))}
                 </div>

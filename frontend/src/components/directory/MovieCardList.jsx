@@ -14,6 +14,8 @@ const MovieCardList = ({
   onAddToWatchlist,
   showRatingNumber = false,
   showBottomInteractiveIcon = false,
+  showCastInfo = false,
+  likeCount = 0,
 }) => {
   const navigate = useNavigate();
 
@@ -31,6 +33,24 @@ const MovieCardList = ({
   const handleAddToWatchlistClick = (e) => {
     e.stopPropagation();
     onAddToWatchlist();
+  };
+
+  const handlePlayTrailerClick = (e) => {
+    e.stopPropagation();
+    if (movie.trailerUrl) {
+      window.open(movie.trailerUrl, "_blank"); // Opens in new tab
+    }
+  };
+
+  const formatDuration = (minutes) => {
+    if (!minutes || isNaN(minutes)) return 'N/A';
+
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+
+    return hours > 0
+      ? `${hours}h ${mins > 0 ? `${mins}min` : ''}`.trim()
+      : `${mins}min`;
   };
 
   return (
@@ -65,7 +85,7 @@ const MovieCardList = ({
             <span className="duration-icon">
               <IoTime />
             </span>
-            {movie.duration}
+            {formatDuration(movie.duration)}
           </div>
           {!showBottomInteractiveIcon && (
             <div
@@ -84,13 +104,31 @@ const MovieCardList = ({
             </div>
           )}
         </div>
+        {showCastInfo && (
+          <div className="cast-info">
+            <div className="cast-row">
+              <span className="cast-label">Director</span>
+              <span className="director-item">{movie.director}</span>
+            </div>
+            <div className="cast-row">
+              <span className="cast-label">Cast</span>
+              <div className="actors-list">
+                {movie.actors.map((actor, index) => (
+                  <span key={index} className="actor-item">
+                    {actor}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
         <p className="clamp-text">{movie.description}</p>
         {showBottomInteractiveIcon && (
           <div
             className="bottom-iteractive-icon-container"
             onClick={(e) => e.stopPropagation()}
           >
-            <button className="main-button">
+            <button className="main-button" onClick={handlePlayTrailerClick}>
               <FaPlay className="play-icon" />
               Play Trailer
             </button>
