@@ -16,7 +16,16 @@ const RankingCard = ({ genre, isAllGenre = false, topMovies = [] }) => {
   const genreName = isAllGenre ? "All Genres" : genre;
 
   return (
-    <article className="home-movie-card" onClick={handleCardClick}>
+    <article 
+      className="home-movie-card"
+      onClick={handleCardClick}
+      role="button"
+      tabIndex={0}
+      aria-label={`Explore top 10 ${genreName} movies`}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") handleCardClick();
+      }}
+    >
       <div className="home-poster-container">
         {previewMovie ? (
           <img
@@ -49,7 +58,7 @@ const RankingCard = ({ genre, isAllGenre = false, topMovies = [] }) => {
               <h3>{isAllGenre ? "All Genres" : genre}</h3>
             </div>
             <span className="hover-right home-icon-arrow">
-              <FaArrowRight />
+              <FaArrowRight aria-hidden="true"/>
             </span>
           </div>
         </div>

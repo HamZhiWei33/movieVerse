@@ -31,14 +31,18 @@ const WatchlistSection = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-black text-white p-6">
+    <section
+      className="min-h-screen bg-black text-white p-6"
+      role="region"
+      aria-label="User watchlist section"
+    >
       <h1 className="text-3xl font-bold mb-4">My Watchlist</h1>
-      <div className="flex space-x-4 overflow-x-auto scrollbar-hide">
+      <div className="flex space-x-4 overflow-x-auto scrollbar-hide" role="list" aria-label="List of movies in your watchlist">
         {watchlist.map((movie) => (
           <MovieCardHomePage key={movie.id} movie={movie} />
         ))}
       </div>
-    </div>
+    </section>
 
   );
 };

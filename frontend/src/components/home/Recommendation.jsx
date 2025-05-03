@@ -11,14 +11,20 @@ const RecommendationSection = ({ allRecommendedMovies }) => {
     }, []);
   
     return (
+      <section
+        role="region"
+        aria-label="Recommended movies section"
+        className="recommendation-section"
+      >
       <div>
-        <h2>Recommendation <button onClick={shuffleMovies}>Change</button></h2>
-        <div className="grid grid-cols-3 gap-4">
+        <h2>Recommendation <button onClick={shuffleMovies} aria-label="Shuffle recommended movies">Change</button></h2>
+        <div className="grid grid-cols-3 gap-4" role="list" aria-label="List of recommended movies">
           {displayed.map(movie => (
             <MovieCard key={movie.id} {...movie} />
           ))}
         </div>
       </div>
+      </section>
     );
   };
   

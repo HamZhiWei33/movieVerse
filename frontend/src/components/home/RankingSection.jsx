@@ -2,7 +2,7 @@ import GenreRankingCard from "./GenreRankingCard";
 
 const RankingSection = ({ genres }) => {
   return (
-    <section className="p-6 text-white">
+    <section className="p-6 text-white" role="region" aria-label="Movie genre ranking section">
       <h2 className="text-2xl font-semibold mb-4">Ranking</h2>
       <div className="flex space-x-4 overflow-x-auto scrollbar-hide">
         {genres.map((genre) => (
