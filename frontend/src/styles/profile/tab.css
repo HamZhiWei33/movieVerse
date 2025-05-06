@@ -54,4 +54,8 @@ section.tab-section {
       font-size: 0.8rem;
     }
   }
+  .tab-content {
+    flex: 0;
+    min-height: 0;
+  }
 }

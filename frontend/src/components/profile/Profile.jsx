@@ -2,10 +2,6 @@ import React, { useState } from "react";
 import "../../styles/profile/profile.css";
 import { RiEditLine } from "react-icons/ri";
 import { FaCamera } from "react-icons/fa";
-import { FaUser } from "react-icons/fa";
-import { CgGenderMale } from "react-icons/cg";
-import { CgGenderFemale } from "react-icons/cg";
-import { MdEmail } from "react-icons/md";
 import { FaCheck } from "react-icons/fa";
 import { FaTimes } from "react-icons/fa";
 const Profile = () => {

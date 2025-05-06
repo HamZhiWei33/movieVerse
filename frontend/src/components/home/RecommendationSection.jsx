@@ -2,9 +2,11 @@ import React, { useState, useEffect } from "react";
 import MovieCard from "../directory/MovieCard";
 import "../../styles/home/recommendation-section.css";
 import { TfiReload } from "react-icons/tfi";
-
+import { genres } from "../../constant";
 const RecommendationSection = ({ title, moviesType, items }) => {
   const [displayed, setDisplayed] = useState([]);
+  const [likedMovies, setLikedMovies] = useState([]);
+  const [addToWatchlistMovies, setAddToWatchlistMovies] = useState([]);
 
   const handleReload = () => {
     const shuffled = [...items].sort(() => 0.5 - Math.random());
@@ -17,6 +19,22 @@ const RecommendationSection = ({ title, moviesType, items }) => {
     }
   }, [items]);
 
+  const toggleLike = (title) => {
+    setLikedMovies((prev) =>
+      prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title]
+    );
+  };
+
+  const toggleAddToWatchlist = (title) => {
+    setAddToWatchlistMovies((prev) =>
+      prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title]
+    );
+  };
+
+  const genreMap = genres.reduce((map, genre) => {
+    map[genre.id] = genre.name;
+    return map;
+  }, {});
   return (
     <section
       className="recommendation-section"
@@ -52,7 +70,19 @@ const RecommendationSection = ({ title, moviesType, items }) => {
         >
           {displayed.map((movie, index) =>
             movie ? (
-              <MovieCard key={index} movie={movie} role="listitem" />
+              <MovieCard
+                key={index}
+                role="listitem"
+                movie={{
+                  ...movie,
+                  genre: movie.genre.map((id) => genreMap[id]), // Convert genre IDs to names
+                  year: movie.year.toString(), // Ensure year is string
+                }}
+                liked={likedMovies.includes(movie.id)}
+                addedToWatchlist={addToWatchlistMovies.includes(movie.id)}
+                onLike={() => toggleLike(movie.id)}
+                onAddToWatchlist={() => toggleAddToWatchlist(movie.id)}
+              />
             ) : (
               <div key={index} className="movie-card-placeholder" />
             )

@@ -129,7 +129,7 @@ export const movies = [
     genre: ["G15", "G17"], // Sci-Fi (G15), Thriller (G17)
     director: "Christopher Nolan",
     actors: ["Leonardo DiCaprio", "Joseph Gordon-Levitt"],
-    rating: 3.0,
+    rating: 4.8,
     reviewCount: 1250,
     likes: 2000,
     posterUrl:
@@ -148,7 +148,7 @@ export const movies = [
     genre: ["G15", "G2"], // Science Fiction (G15), Adventure (G2)
     director: "Christopher Nolan",
     actors: ["Matthew McConaughey", "Anne Hathaway"],
-    rating: 0,
+    rating: 4.9,
     reviewCount: 1500,
     likes: 2500,
     posterUrl:
@@ -174,7 +174,7 @@ export const movies = [
       "Spike Fearn",
       "Aileen Wu",
     ],
-    rating: 5,
+    rating: 3.6,
     reviewCount: 1000,
     likes: 2000,
     posterUrl:
@@ -194,7 +194,7 @@ export const movies = [
     genre: ["G1", "G2", "G15"], // Action (G1), Adventure (G2), Science Fiction (G15)
     director: "Robert Rodriguez",
     actors: ["Rosa Salazar", "Christoph Waltz", "Jennifer Connelly"],
-    rating: 0,
+    rating: 4.6,
     reviewCount: 1050,
     likes: 2500,
     posterUrl:
@@ -214,7 +214,7 @@ export const movies = [
     genre: ["G1", "G2", "G9"], // Action (G1), Adventure (G2), Fantasy (G9)
     director: "James Cameron",
     actors: ["Sam Worthington", "Zoe Saldana", "Kate Winslet"],
-    rating: 0,
+    rating: 4.7,
     reviewCount: 2000,
     likes: 3000,
     posterUrl:
@@ -234,7 +234,7 @@ export const movies = [
     genre: ["G3", "G2", "G9", "G8"], // Animation (G3), Adventure (G2), Fantasy (G9), Family (G8)
     director: "Gints Zilbalodis",
     actors: [""],
-    rating: 3,
+    rating: 4.7,
     reviewCount: 992,
     likes: 1500,
     posterUrl:
@@ -254,7 +254,7 @@ export const movies = [
     genre: ["G17", "G7"], // Thriller (G17), Drama (G7)
     director: "Bong Joon-ho",
     actors: ["Song Kang-ho", "Lee Sun-kyun", "Cho Yeo-jeong"],
-    rating: 3,
+    rating: 4.6,
     reviewCount: 1300,
     likes: 1800,
     posterUrl:
@@ -274,7 +274,7 @@ export const movies = [
     genre: ["G11", "G17"], // Horror (G11), Thriller (G17)
     director: "Ti West",
     actors: ["Mia Goth", "David Corenswet"],
-    rating: 0,
+    rating: 4.5,
     reviewCount: 800,
     likes: 1200,
     posterUrl:
@@ -294,7 +294,7 @@ export const movies = [
     genre: ["G7", "G17"], // Drama (G7), Thriller (G17)
     director: "Dan Erickson",
     actors: ["Adam Scott", "Zach Cherry", "Brit Lower"],
-    rating: 4,
+    rating: 4.8,
     reviewCount: 1500,
     likes: 2500,
     posterUrl:
@@ -314,7 +314,7 @@ export const movies = [
     genre: ["G7", "G9", "G11"], // Drama (G7), Fantasy (G9), Horror (G11)
     director: "The Duffer Brothers",
     actors: ["Winona Ryder", "David Harbour", "Finn Wolfhard"],
-    rating: 3,
+    rating: 4.7,
     reviewCount: 2000,
     likes: 3000,
     posterUrl:
@@ -334,7 +334,7 @@ export const movies = [
     genre: ["G1", "G15", "G14"], // Action (G1), Science Fiction (G15), Romance (G14)
     director: "Scott Derrickson",
     actors: ["Miles Teller", "Anya Taylor-Joy", "Sigourney Weaver"],
-    rating: 0,
+    rating: 4.5,
     reviewCount: 900,
     likes: 1300,
     posterUrl:
@@ -354,7 +354,7 @@ export const movies = [
     genre: ["G7", "G15", "G11"], // Drama (G7), Science Fiction (G15), Horror (G11)
     director: "Coralie Fargeat",
     actors: ["Demi Moore", "Margaret Qualley", "Dennis Quaid"],
-    rating: 5,
+    rating: 0,
     reviewCount: 0,
     likes: 0,
     posterUrl:
@@ -374,7 +374,7 @@ export const movies = [
     genre: ["G7", "G14"], // Drama (G7), Romance (G14)
     director: "Kim Woo-seok",
     actors: ["IU", "Park Bo-gum", "Moon So-ri", "Park Hae-joon"],
-    rating: 4,
+    rating: 0,
     reviewCount: 0,
     likes: 0,
     posterUrl:
@@ -400,7 +400,7 @@ export const movies = [
       "Emma Myers",
       "Sebastion Hansen",
     ],
-    rating: 0,
+    rating: 3.9,
     reviewCount: 1500,
     likes: 2100,
     posterUrl:
@@ -420,7 +420,7 @@ export const movies = [
     genre: ["G2", "G3", "G4", "G8", "G9"], // Adventure (G2), Animation (G3), Comedy (G4), Family (G8), Fantasy (G9)
     director: "Dave Needham",
     actors: [""],
-    rating: 4,
+    rating: 3.9,
     reviewCount: 1000,
     likes: 2000,
     posterUrl:
