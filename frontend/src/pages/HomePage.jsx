@@ -30,12 +30,18 @@ const HomePage = () => {
         items={watchlist}
       />
 
-      <HeroSection title="Ranking" moviesType={"ranking"} items={genres} />
+      <HeroSection 
+        title="Ranking" 
+        moviesType={"ranking"} 
+        items={genres} 
+      />
+      
       <HeroSection
         title="New Released"
         moviesType={"newReleased"}
         items={recentMovies}
       />
+      
       <RecommendationSection
         title="Recommendation"
         moviesType={"recommendation"}
