@@ -356,7 +356,7 @@ export const movies = [
     actors: ["Demi Moore", "Margaret Qualley", "Dennis Quaid"],
     rating: 5,
     reviewCount: 0,
-    likes: 0,
+    likes: 10,
     posterUrl:
       "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcR16e_VsO0UR1jEkkDMPLjbOMKApHv-XASUcGLSkIEAUFu6LkvR",
     trailerUrl:
@@ -376,7 +376,7 @@ export const movies = [
     actors: ["IU", "Park Bo-gum", "Moon So-ri", "Park Hae-joon"],
     rating: 4,
     reviewCount: 0,
-    likes: 0,
+    likes: 10,
     posterUrl:
       "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcQbtpIGSyohv9SPRz799TqMvEi1CsmXRwO6Ft6KY0CvDe5doqXD",
     trailerUrl:

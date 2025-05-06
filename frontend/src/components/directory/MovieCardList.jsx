@@ -19,6 +19,14 @@ const MovieCardList = ({
 }) => {
   const navigate = useNavigate();
 
+  // Helper function to check if value exists and is not empty
+  const hasValue = (value) => {
+    if (value === undefined || value === null) return false;
+    if (typeof value === 'string') return value.trim() !== '';
+    if (Array.isArray(value)) return value.length > 0 && value[0] !== '';
+    return true;
+  };
+
   const handleCardClick = () => {
     navigate(`/movie/${encodeURIComponent(movie.title)}`, {
       state: { movieData: movie }, // Pass entire movie object
@@ -67,19 +75,21 @@ const MovieCardList = ({
         />
       </div>
       <div className="movie-details-container-list">
-        <h3>{movie.title}</h3>
+        <h3 style={{paddingInlineStart:7}}>{movie.title}</h3>
         <ReviewStars
           rating={movie.rating}
           readOnly={true}
           showNumber={showRatingNumber}
         />
-        <div className="genre-tags">
-          {movie.genre.map((genre, index) => (
-            <span key={index} className="genre-tag">
-              {genre}
-            </span>
-          ))}
-        </div>
+        {hasValue(movie.genre) && (
+          <div className="genre-tags">
+            {movie.genre.map((genre, index) => (
+              <span key={index} className="genre-tag">
+                {genre}
+              </span>
+            ))}
+          </div>
+        )}
         <div className="duration-and-icons-container">
           <div className="duration-tag">
             <span className="duration-icon">
@@ -104,25 +114,33 @@ const MovieCardList = ({
             </div>
           )}
         </div>
-        {showCastInfo && (
+        {showCastInfo && (hasValue(movie.director) || hasValue(movie.actors)) && (
           <div className="cast-info">
-            <div className="cast-row">
-              <span className="cast-label">Director</span>
-              <span className="director-item">{movie.director}</span>
-            </div>
-            <div className="cast-row">
-              <span className="cast-label">Cast</span>
-              <div className="actors-list">
-                {movie.actors.map((actor, index) => (
-                  <span key={index} className="actor-item">
-                    {actor}
-                  </span>
-                ))}
+            {hasValue(movie.director) && (
+              <div className="cast-row">
+                <span className="cast-label">Director</span>
+                <span className="director-item">{movie.director}</span>
               </div>
-            </div>
+            )}
+
+            {hasValue(movie.actors) && (
+              <div className="cast-row">
+                <span className="cast-label">Cast</span>
+                <div className="actors-list">
+                  {movie.actors.map((actor, index) => (
+                    <span key={index} className="actor-item">
+                      {actor}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
-        <p className="clamp-text">{movie.description}</p>
+
+        {hasValue(movie.description) && (
+          <p className="clamp-text">{movie.description}</p>
+        )}
         {showBottomInteractiveIcon && (
           <div
             className="bottom-iteractive-icon-container"
