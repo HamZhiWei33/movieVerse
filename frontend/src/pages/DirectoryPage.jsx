@@ -6,13 +6,13 @@ import ViewDropdown from "../components/directory/ViewDropdown";
 import { FaListUl } from "react-icons/fa";
 import "../styles/sidebar.css";
 import Sidebar from "../components/Sidebar";
-import { movies as movieData, genres as genreData } from "../constant"
+import { movies as movieData, genres as genreData } from "../constant";
 
 // Extract unique regions from movie data
-const regions = [...new Set(movieData.map(movie => movie.region))];
+const regions = [...new Set(movieData.map((movie) => movie.region))];
 
 // Extract unique years from movie data
-const years = [...new Set(movieData.map(movie => movie.year.toString()))];
+const years = [...new Set(movieData.map((movie) => movie.year.toString()))];
 
 // Map genre IDs to names
 const genreMap = genreData.reduce((map, genre) => {
@@ -21,7 +21,7 @@ const genreMap = genreData.reduce((map, genre) => {
 }, {});
 
 // Get genre names for display
-const genres = genreData.map(genre => genre.name);
+const genres = genreData.map((genre) => genre.name);
 
 const DirectoryPage = () => {
   const [selectedGenres, setSelectedGenres] = useState([]);
@@ -52,7 +52,7 @@ const DirectoryPage = () => {
   const filteredMovies = useMemo(() => {
     return movieData.filter((movie) => {
       // Convert genre IDs to names for filtering
-      const movieGenreNames = movie.genre.map(id => genreMap[id]);
+      const movieGenreNames = movie.genre.map((id) => genreMap[id]);
 
       const genreMatch =
         selectedGenres.length === 0 ||
@@ -60,7 +60,8 @@ const DirectoryPage = () => {
       const regionMatch =
         selectedRegions.length === 0 || selectedRegions.includes(movie.region);
       const yearMatch =
-        selectedYears.length === 0 || selectedYears.includes(movie.year.toString());
+        selectedYears.length === 0 ||
+        selectedYears.includes(movie.year.toString());
       return genreMatch && regionMatch && yearMatch;
     });
   }, [selectedGenres, selectedRegions, selectedYears]);
@@ -157,25 +158,26 @@ const DirectoryPage = () => {
             {(selectedGenres.length > 0 ||
               selectedRegions.length > 0 ||
               selectedYears.length > 0) && (
-                <div className="clear-filters-container">
-                  <button
-                    className={`clear-filters-button ${selectedGenres.length ||
-                        selectedRegions.length ||
-                        selectedYears.length
-                        ? "active"
-                        : ""
-                      }`}
-                    onClick={() => {
-                      setSelectedGenres([]);
-                      setSelectedRegions([]);
-                      setSelectedYears([]);
-                    }}
-                    aria-label="Clear all filters"
-                  >
-                    Clear all
-                  </button>
-                </div>
-              )}
+              <div className="clear-filters-container">
+                <button
+                  className={`clear-filters-button ${
+                    selectedGenres.length ||
+                    selectedRegions.length ||
+                    selectedYears.length
+                      ? "active"
+                      : ""
+                  }`}
+                  onClick={() => {
+                    setSelectedGenres([]);
+                    setSelectedRegions([]);
+                    setSelectedYears([]);
+                  }}
+                  aria-label="Clear all filters"
+                >
+                  Clear all
+                </button>
+              </div>
+            )}
           </div>
 
           <section className={`movie-container ${view}`}>
@@ -187,8 +189,8 @@ const DirectoryPage = () => {
                       key={movie.id}
                       movie={{
                         ...movie,
-                        genre: movie.genre.map(id => genreMap[id]), // Convert genre IDs to names
-                        year: movie.year.toString() // Ensure year is string
+                        genre: movie.genre.map((id) => genreMap[id]), // Convert genre IDs to names
+                        year: movie.year.toString(), // Ensure year is string
                       }}
                       liked={likedMovies.includes(movie.id)}
                       addedToWatchlist={addToWatchlistMovies.includes(movie.id)}
@@ -204,8 +206,8 @@ const DirectoryPage = () => {
                       key={movie.id}
                       movie={{
                         ...movie,
-                        genre: movie.genre.map(id => genreMap[id]), // Convert genre IDs to names
-                        year: movie.year.toString() // Ensure year is string
+                        genre: movie.genre.map((id) => genreMap[id]), // Convert genre IDs to names
+                        year: movie.year.toString(), // Ensure year is string
                       }}
                       liked={likedMovies.includes(movie.id)}
                       addedToWatchlist={addToWatchlistMovies.includes(movie.id)}

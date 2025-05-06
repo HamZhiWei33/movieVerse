@@ -6,11 +6,14 @@ import { FaAngleRight } from "react-icons/fa6";
 import { TfiReload } from "react-icons/tfi";
 import { getTopMoviesByGenre } from "./ranking";
 import RankingCard from "./RankingCard";
-import { movies } from "../../constant";
-import { useMemo, useRef, useEffect } from "react";
+import { movies, genres } from "../../constant";
+import { useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useHorizontalScroll from "../../store/useHorizontalScroll";
 const HeroSection = ({ title, moviesType, items }) => {
+  const [likedMovies, setLikedMovies] = useState([]);
+  const [addToWatchlistMovies, setAddToWatchlistMovies] = useState([]);
+
   //items=allGenres
   const topMoviesByGenre = useMemo(
     () => getTopMoviesByGenre(movies, items, 6),
@@ -28,8 +31,24 @@ const HeroSection = ({ title, moviesType, items }) => {
     navigate("/ranking");
   };
 
+  const toggleLike = (title) => {
+    setLikedMovies((prev) =>
+      prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title]
+    );
+  };
+
+  const toggleAddToWatchlist = (title) => {
+    setAddToWatchlistMovies((prev) =>
+      prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title]
+    );
+  };
+
   useHorizontalScroll(containerRef);
 
+  const genreMap = genres.reduce((map, genre) => {
+    map[genre.id] = genre.name;
+    return map;
+  }, {});
   return (
     <section
       className="hero-section"
@@ -59,12 +78,12 @@ const HeroSection = ({ title, moviesType, items }) => {
                   }
                 }}
               >
-                <FaAngleRight aria-hidden="true"/>
+                <FaAngleRight aria-hidden="true" />
               </span>
             )}
 
             {moviesType === "recommendation" && (
-              <span 
+              <span
                 className="home-icon reload-icon"
                 role="button"
                 tabIndex={0}
@@ -75,30 +94,65 @@ const HeroSection = ({ title, moviesType, items }) => {
                   }
                 }}
               >
-                <TfiReload aria-hidden="true"/>
+                <TfiReload aria-hidden="true" />
               </span>
             )}
           </h2>
         </div>
-        <div id="watchlist" className="home-card-section" role="region" aria-label="Your watchlist movies">
+        <div
+          id="watchlist"
+          className="home-card-section"
+          role="region"
+          aria-label="Your watchlist movies"
+        >
           {moviesType === "watchlist" && (
             <div className="home-card-container">
               {items.map((movie) => (
-                <MovieCard key={movie.id} movie={movie} />
+                <MovieCard
+                  key={movie.id}
+                  movie={{
+                    ...movie,
+                    genre: movie.genre.map((id) => genreMap[id]), // Convert genre IDs to names
+                    year: movie.year.toString(), // Ensure year is string
+                  }}
+                  liked={likedMovies.includes(movie.id)}
+                  addedToWatchlist={addToWatchlistMovies.includes(movie.id)}
+                  onLike={() => toggleLike(movie.id)}
+                  onAddToWatchlist={() => toggleAddToWatchlist(movie.id)}
+                />
               ))}
             </div>
           )}
         </div>
-        <div className="home-card-section" role="region" aria-label="Newly released movies">
+        <div
+          className="home-card-section"
+          role="region"
+          aria-label="Newly released movies"
+        >
           {moviesType === "newReleased" && (
             <div className="home-card-container">
               {items.map((movie) => (
-                <MovieCard key={movie.id} movie={movie} />
+                <MovieCard
+                  key={movie.id}
+                  movie={{
+                    ...movie,
+                    genre: movie.genre.map((id) => genreMap[id]), // Convert genre IDs to names
+                    year: movie.year.toString(), // Ensure year is string
+                  }}
+                  liked={likedMovies.includes(movie.id)}
+                  addedToWatchlist={addToWatchlistMovies.includes(movie.id)}
+                  onLike={() => toggleLike(movie.id)}
+                  onAddToWatchlist={() => toggleAddToWatchlist(movie.id)}
+                />
               ))}
             </div>
           )}
         </div>
-        <div className="home-card-section" role="region" aria-label="Top ranked movies by genre">
+        <div
+          className="home-card-section"
+          role="region"
+          aria-label="Top ranked movies by genre"
+        >
           {moviesType === "ranking" && (
             <div className="home-card-container" ref={containerRef}>
               <div className="genre-selection-grid">
@@ -130,7 +184,7 @@ const HeroSection = ({ title, moviesType, items }) => {
           )}
         </div> */}
       </div>
-      </section>
+    </section>
   );
 };
 
