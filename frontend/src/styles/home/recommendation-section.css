@@ -6,34 +6,25 @@
   margin-bottom: 3rem;
 }
 
-.recommendation-section-container {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+.recommendation-wrapper {
+  position: relative;
   width: 100%;
   padding: 0 2rem;
   box-sizing: border-box;
-}
-
-.recommendation-title-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  max-width: 93%; /* Limits the row width */
-  margin-bottom: 1rem;
-  box-sizing: border-box;
+  max-width: fit-content;
 }
 
 .recommendation-title {
-  width: 100%;
-  display: flex;
   font-size: 1.5rem;
   font-weight: 600;
   color: white;
+  margin-bottom: 1rem;
 }
 
-.recommendation-icon {
+.recommendation-refresh {
+  position: absolute;
+  top: 0;
+  right: 2rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -43,26 +34,21 @@
   cursor: pointer;
   transition: background-color 0.2s, color 0.2s;
   user-select: none;
-  
+  font-size: 1.2rem;
 }
 
-.recommendation-icon:hover {
+.recommendation-refresh:hover {
   background-color: rgba(88, 88, 88, 0.5);
   color: #c6ff00;
-}
-
-.recommendation-card-section {
-  width: 100%;
 }
 
 .recommendation-card-container {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  flex-wrap: wrap;
   gap: 1.5rem;
-  padding-bottom: 1rem 0;
   box-sizing: border-box;
   justify-content: flex-start;
+  max-width: fit-content;
 }
 
 .recommendation-card-container > * {

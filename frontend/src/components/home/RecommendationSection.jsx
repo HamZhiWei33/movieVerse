@@ -41,25 +41,23 @@ const RecommendationSection = ({ title, moviesType, items }) => {
       role="region"
       aria-label="Recommended movies section"
     >
-      <div className="recommendation-section-container">
+      <div className="recommendation-wrapper">
         {/* Title and Reload Icon Row */}
-        <div className="recommendation-title-row">
-          <h2 className="recommendation-title">{title}</h2>
-          {moviesType === "recommendation" && (
-            <span
-              className="recommendation-icon reload-icon"
-              role="button"
-              tabIndex={0}
-              aria-label="Reload recommended movies"
-              onClick={handleReload}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleReload();
-              }}
-            >
-              <TfiReload aria-hidden="true" />
-            </span>
-          )}
-        </div>
+        <h2 className="recommendation-title">{title}</h2>
+        {moviesType === "recommendation" && (
+          <span
+            className="recommendation-refresh"
+            role="button"
+            tabIndex={0}
+            aria-label="Reload recommended movies"
+            onClick={handleReload}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleReload();
+            }}
+          >
+            <TfiReload aria-hidden="true" />
+          </span>
+        )}
 
         {/* Movie Card Grid */}
         <div
