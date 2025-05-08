@@ -1,4 +1,4 @@
-import "../styles/general.css";
+import "../styles/general/general.css";
 import React, { useState } from "react";
 import FormField from "../components/general/FormField";
 
@@ -18,7 +18,7 @@ const SignupPage = () => {
           <FormField type="email" name="email" label="Email" onChange={(e) => setEmail(e.target.value)} />
           <FormField type="password" name="password" label="Password" onChange={(e) => setPassword(e.target.value)} />
           <FormField type="password" name="confirm_password" label="Confirm Password" onChange={(e) => setConfirmPassword(e.target.value)} />
-          <button id="submitButton" type="submit">Sign Up</button>
+          <button className="submitButton" type="submit">Sign Up</button>
         </form>
         <p>
           Already has an account? <a href="/login">Login</a>
