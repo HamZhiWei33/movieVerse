@@ -81,7 +81,7 @@
 
 .genre-tag {
   background-color: #3a3a3a;
-  color: #bfbfbf;
+  color: #dfdfdf !important;
   border: none;
   padding: 0.2rem 0.7rem;
   border-radius: 250px;
@@ -222,7 +222,7 @@
 .director-item,
 .actor-item {
   background-color: #3a3a3a;
-  color: #bfbfbf;
+  color: #dfdfdf;
   border: none;
   padding: 0.2rem 0.7rem;
   border-radius: 250px;
