@@ -1,10 +1,14 @@
 /* for signup, login, forgot password styling */
+main.login-page,
 main.signup-page,
 main.forgot-password-page,
 main.reset-password-page {
-  height: 100%;
+  /* height: 100%; */
   font-family: Manrope;
   display: flex;
+  flex-direction: column;
+  /* background-color: #141414; */
+  background: #141414;
 }
 
 main h1{
@@ -77,7 +81,7 @@ main h1{
 .form-field input:not(:placeholder-shown, :focus)~label{
   top: -0.75rem;
   font-size: 0.9rem;
-  background-color: #323732;
+  background-color: #141414;
 }
 
 .form-field input:not(:placeholder-shown, :focus)~label{
@@ -109,7 +113,7 @@ main h1{
   padding-right: 0.6rem;
 }
 
-#submitButton{
+.submitButton{
   width: 25rem;
   /* margin-bottom: 1rem; */
   background-color: #C6FF00;
@@ -119,12 +123,29 @@ main h1{
   font-family: Manrope;
   font-size: 1.3rem;
   color: black;
+  outline: none ;
+  transition: none;
+}
+
+.submitButton:hover{
+  background-color: transparent;
+  border-color: #C6FF00;
+  color: white;
   outline: none;
 }
 
-#submitButton:hover{
-  background-color: transparent;
-  color: white;
+.submitButton.disabled{
+  width: 25rem;
+  /* border: none; */
+  background-color: #C6FF0080;
+  border-color: transparent;
+  outline: none;
+}
+
+.submitButton.disabled:hover{
+  cursor: default;
+  color: black;
+  outline: none;
 }
 
 #forgotPwLink{
