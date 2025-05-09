@@ -1,0 +1,33 @@
+.genre-selection-section {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1.2rem;
+    padding: 2.5rem;
+    padding-top: 1rem;
+    padding-bottom: 1.5rem;
+    border: 0.1rem solid #262626;
+    border-radius: 0.7rem;
+}
+
+.genre-selection-section .title {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.genre-selection-section .title p{
+    font-size: 1.2rem;
+    color: white;
+}
+
+.genre-grid {
+    display: grid;
+    width: 100%;
+    align-self: center;
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    gap: 1rem;
+    row-gap: 2rem;
+}

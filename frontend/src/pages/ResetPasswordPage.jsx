@@ -1,4 +1,4 @@
-import "../styles/general.css";
+import "../styles/general/general.css";
 import React, { useState } from "react";
 import FormField from "../components/general/FormField";
 
@@ -13,7 +13,7 @@ const ResetPasswordPage = () => {
         <form className="form">
           <FormField type="password" name="password" label="New Password" onChange={(e) => setPassword(e.target.value)} />
           <FormField type="password" name="confirm_password" label="Confirm New Password" onChange={(e) => setConfirmPassword(e.target.value)} />
-          <button id="submitButton" type="submit">Confirm</button>
+          <button className="submitButton" type="submit">Confirm</button>
         </form>
         <p>
           Return to <a href="/login">Login</a>
