@@ -1,6 +1,6 @@
 import "../styles/navbar.css";
 import React, { useState, useEffect } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { FaAngleDown } from "react-icons/fa";
 import SearchIcon from "@mui/icons-material/Search";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -8,6 +8,10 @@ import MenuIcon from "@mui/icons-material/Menu";
 const Navbar = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [menuOpen, setMenuOpen] = useState(false);
+  const location = useLocation();
+
+  const guestRoutes = ["/login", "/signup", "/forgot_password", "/reset_password"];
+  const isGuest = guestRoutes.includes(location.pathname);
 
   useEffect(() => {
     const handleResize = () => {
@@ -41,32 +45,44 @@ const Navbar = () => {
           <SearchIcon size={20} />
         </div>
 
-        <div style={{display:"flex", flexDirection:"row", alignItems:"center", gap: "1rem"}}>
+        <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "1rem" }}>
           <nav className={`nav-links ${menuOpen ? "open" : ""}`}>
-            <ul>
-              <li>
-                <NavLink to="/" end>Home</NavLink>
-              </li>
-              <li>
-                <NavLink to="/directory">Directory</NavLink>
-              </li>
-              <li>
-                <NavLink to="/ranking">Ranking</NavLink>
-              </li>
-              <li style={{ display: "flex", flexDirection: "row" }}>
-                <NavLink to="/profile">
-                  Profile
-                  <FaAngleDown style={{ alignSelf: "center" }} />
-                </NavLink>
-              </li>
-              {isMobile &&
+            {isGuest ? (
+              <ul>
                 <li>
-                  <NavLink to="/login">Logout</NavLink>
-                </li>}
-            </ul>
+                  <NavLink to="/login" end>Login</NavLink>
+                </li>
+                <li>
+                  <NavLink to="/signup" end>Sign Up</NavLink>
+                </li>
+              </ul>
+            ) : (
+              <ul>
+                <li>
+                  <NavLink to="/" end>Home</NavLink>
+                </li>
+                <li>
+                  <NavLink to="/directory">Directory</NavLink>
+                </li>
+                <li>
+                  <NavLink to="/ranking">Ranking</NavLink>
+                </li>
+                <li style={{ display: "flex", flexDirection: "row" }}>
+                  <NavLink to="/profile">
+                    Profile
+                    <FaAngleDown style={{ alignSelf: "center" }} />
+                  </NavLink>
+                </li>
+                {isMobile &&
+                  <li>
+                    <NavLink to="/login">Logout</NavLink>
+                  </li>}
+              </ul>
+            )}
+
           </nav>
 
-          {!isMobile &&
+          {(!isMobile && !isGuest) &&
             <NavLink to="/login">
               <div className="logout-btn">
                 <div>
