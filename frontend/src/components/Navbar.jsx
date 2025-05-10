@@ -68,7 +68,7 @@ const Navbar = () => {
 
           {!isMobile &&
             <NavLink to="/login">
-              <button className="logout-btn">
+              <div className="logout-btn">
                 <div>
                   <div className="profile-container">
                     <img
@@ -79,7 +79,7 @@ const Navbar = () => {
                   </div>
                   <p>Logout</p>
                 </div>
-              </button>
+              </div>
             </NavLink>}
         </div>
 

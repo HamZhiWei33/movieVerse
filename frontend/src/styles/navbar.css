@@ -47,13 +47,20 @@ header {
   display: flex;
   justify-content: center;
   align-items: center;
-  color: white;
   background-color: #0F0F0F;
-  border: 0.2rem solid;
+  border: 0.15rem solid;
   border-color: #1F1F1F;
   border-radius: 0.8rem;
   padding: 0.5rem 0.7rem;
   outline: none;
+}
+
+.logout-btn:hover {
+  border-color: #C6FF00;
+}
+
+.logout-btn:hover > div {
+  color: #C6FF00;
 }
 
 .logout-btn > div {
