@@ -42,7 +42,7 @@ const WatchList = ({
           <div className="genre-tags">
             {movie.genre.map((genre, index) => (
               <span key={index} className="genre-tag">
-                {getGenreNamebyId(genre)}
+                {genre}
               </span>
             ))}
           </div>

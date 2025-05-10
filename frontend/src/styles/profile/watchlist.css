@@ -207,3 +207,39 @@
 .remove-watchlist-btn {
   background-color: var(--color-primary);
 }
+
+@media screen and (max-width: 768px) {
+  .movie-card-list {
+    flex-direction: column;
+    align-items: center;
+    width: 50%;
+    margin: 0.2rem 0;
+    padding: auto;
+  }
+  .movie-card-list img {
+    max-width: 70%;
+    height: auto;
+    border-radius: 0.5rem;
+  }
+  .poster-container-list {
+    flex: 0 0 7rem;
+  }
+  .remove-watchlist-btn {
+    background-color: var(--color-primary);
+    font-size: 0.8rem;
+  }
+  #watchlist-duration-and-icons-container {
+    /* display: flex;
+    align-items: center;
+    width: 80%;
+    margin: 0.2rem 0; */
+    font-size: 0.5rem;
+  }
+  .duration-icon,
+  .like-icon {
+    font-size: 1rem;
+  }
+  .remove-watchlist-container {
+    margin-top: 0.3rem;
+  }
+}

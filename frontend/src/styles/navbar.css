@@ -92,7 +92,8 @@ header {
 
 .logo img {
   display: block;
-  width: 100%;
+  width: auto;
+  height: 3rem;
 }
 /* Search bar */
 .search-bar {
@@ -113,7 +114,7 @@ header {
 }
 
 .search-bar input {
-  width: auto;
+  width: 100%;
   height: inherit;
   border: none;
   background-color: transparent;
