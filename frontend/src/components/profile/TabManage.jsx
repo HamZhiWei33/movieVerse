@@ -1,9 +1,12 @@
 import React from "react";
 import "../../styles/profile/tab-manage.css";
+import { useNavigate } from "react-router-dom";
+
 const TabManage = () => {
+  const navigate = useNavigate();
+
   const handlePasswordChange = () => {
-    alert("Redirecting to Change Password form...");
-    console.log("Change Password clicked");
+    navigate("/forgot_password");
   };
 
   const handleAccountDelete = () => {
