@@ -6,6 +6,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: start;
+  flex-wrap: wrap;
 }
 .home-section {
   width: 100%;
@@ -36,6 +37,11 @@
   scroll-behavior: smooth;
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
+}
+.home-movie-card {
+  flex: 0 0 auto; /* Don't grow, don't shrink, keep natural width */
+  width: 200px; /* or your preferred fixed width */
+  height: 300px;
 }
 .home-card-container::-webkit-scrollbar {
   display: none; /* Chrome, Safari */

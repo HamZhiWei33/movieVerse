@@ -1,92 +1,283 @@
 .hero-banner {
   position: relative;
+  overflow: hidden;
+  height: 60vh;
+  margin-bottom: 1rem;
+  min-height: 500px;
 }
 
-/* swiper container */
+/* Swiper container */
 .hero-swiper {
   position: relative;
+  height: 100%;
+  width: 100%;
 }
 
-/* left right button */
+/* Slide container */
+.home-swiper-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.home-swiper-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.5s ease;
+}
+
+.hero-slide:hover .home-swiper-image {
+  transform: scale(1.03);
+}
+
+/* Content overlay - completely hidden when not active */
+.hero-details-wrapper {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+.hero-slide:hover .hero-details-wrapper,
+.hero-slide:focus-within .hero-details-wrapper {
+  visibility: visible;
+  opacity: 1;
+}
+
+.hero-content-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.9) 20%,
+    rgba(0, 0, 0, 0.4) 60%,
+    transparent 100%
+  );
+  padding: 1rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+/* Text elements */
+.movieTitle {
+  margin-bottom: 1rem;
+  font-size: 2.5rem;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  transform: translateY(20px);
+  opacity: 0;
+  transition: all 0.4s ease 0.1s;
+}
+
+.movieDescription {
+  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
+  line-height: 1.5;
+  max-width: 600px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  transform: translateY(20px);
+  opacity: 0;
+  transition: all 0.4s ease 0.2s;
+}
+
+.watchNowButton {
+  align-self: flex-start;
+  padding: 0.75rem 2rem;
+  background: #c6ff00;
+  color: #000;
+  border: none;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transform: translateY(20px);
+  opacity: 0;
+  transition: all 0.4s ease 0.3s, background 0.2s ease;
+  pointer-events: auto;
+}
+
+.watchNowButton:hover {
+  background: #e4ff66;
+}
+
+.hero-slide:hover .movieTitle,
+.hero-slide:hover .movieDescription,
+.hero-slide:hover .watchNowButton,
+.hero-slide:focus-within .movieTitle,
+.hero-slide:focus-within .movieDescription,
+.hero-slide:focus-within .watchNowButton {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Navigation arrows - positioned relative to image only */
 .custom-prev,
 .custom-next {
-  user-select: none;
   position: absolute;
-  top: 50%; /* center vertically */
-  transform: translateY(-50%); /* adjust for exact center */
-  z-index: 20;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 30;
   background-color: rgba(0, 0, 0, 0.6);
   color: white;
-  width: 45px;
-  height: 45px;
-  font-size: 20px;
+  width: 50px;
+  height: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 9999px;
+  border-radius: 50%;
   cursor: pointer;
-  line-height: 1;   
-  padding: 0;
-  position: absolute;    
+  transition: all 0.3s ease;
+  opacity: 0.7;
 }
 
 .custom-prev {
-  left: 20px;
+  left: 25px;
 }
 
 .custom-next {
-  right: 20px;
+  right: 25px;
 }
 
 .custom-prev:hover,
 .custom-next:hover {
-  background: rgba(0, 0, 0, 0.7);
-}
-
-.custom-prev:focus,
-.custom-next:focus {
-  outline: none;
+  background: rgba(0, 0, 0, 0.9);
+  opacity: 1;
+  transform: translateY(-50%) scale(1.05);
 }
 
 .arrow {
-  display: inline-block;
-  font-size: 20px;
-  line-height: 1;
-  transform: translateY(-1.5px); /* 🔧 Adjust this value to move up/down */
+  font-size: 24px;
+  font-weight: bold;
 }
 
+/* Pagination */
 .swiper-pagination {
-  bottom: 30px !important;
-  text-align: center;
-}
-
-/* Pagination Bullets */
-.swiper-pagination {
-  bottom: 10px !important;
+  bottom: 20px !important;
+  z-index: 20;
 }
 
 .swiper-pagination-bullet {
   width: 25px;
   height: 4px;
-  border-radius: 5px;
-  background-color: #333; /* inactive bullets */
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.5);
   opacity: 1;
-  margin: 0 4px;
-  transition: background-color 0.3s, width 0.3s;
+  transition: all 0.3s ease;
 }
 
 .swiper-pagination-bullet-active {
-  background: #c6ff00; /* activate bullet become green colour */
-  opacity: 1;
+  background: #c6ff00;
   width: 30px;
 }
 
-/* Every swiper can add particular effect */
-.banner-avengers {
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .hero-banner {
+    height: 50vh;
+    min-height: 400px;
+  }
+
+  .custom-prev,
+  .custom-next {
+    width: 40px;
+    height: 40px;
+  }
 }
-.banner-parasite {
+
+@media (max-width: 768px) {
+  .hero-banner {
+    height: 40vh;
+    min-height: 350px;
+  }
+
+  .hero-content-overlay {
+    padding: 1rem;
+  }
+
+  .movieTitle {
+    font-size: 1.5rem;
+  }
+
+  .movieDescription {
+    font-size: 1rem;
+    max-width: 100%;
+  }
+
+  .custom-prev,
+  .custom-next {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+  }
+
+  .custom-prev {
+    left: 15px;
+  }
+
+  .custom-next {
+    right: 15px;
+  }
 }
-.banner-inception {
+
+@media (max-width: 480px) {
+  .hero-swiper {
+    height: 30vh;
+    min-height: 250px;
+  }
+
+  .hero-content-overlay {
+    padding: 0.5rem;
+  }
+
+  .movieTitle {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .movieDescription {
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+  }
+
+  .watchNowButton {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .custom-prev,
+  .custom-next {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
 }
-.banner-batman {
+
+@media (max-width: 360px) {
+  .hero-banner {
+    height: 25vh;
+    min-height: 200px;
+  }
+
+  .swiper-pagination-bullet {
+    width: 20px;
+    height: 3px;
+  }
+
+  .swiper-pagination-bullet-active {
+    width: 25px;
+  }
+  .home-swiper-image {
+    height: 40vh;
+  }
 }

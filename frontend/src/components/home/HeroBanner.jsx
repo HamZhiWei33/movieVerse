@@ -15,7 +15,11 @@ export default function HeroBanner() {
   const navigate = useNavigate();
 
   return (
-    <div className="hero-banner" role="region" aria-label="Featured movie highlights">
+    <div
+      className="hero-banner"
+      role="region"
+      aria-label="Featured movie highlights"
+    >
       <Swiper
         modules={[Navigation, Pagination, Autoplay]}
         onInit={(swiper) => {
@@ -40,8 +44,10 @@ export default function HeroBanner() {
             }}
             role={item.onClickTarget ? "button" : undefined}
             tabIndex={item.onClickTarget ? 0 : -1}
-            aria-label={item.onClickTarget ? `Explore ${item.title}` : undefined}
-            onKeyDown={(e) => { 
+            aria-label={
+              item.onClickTarget ? `Explore ${item.title}` : undefined
+            }
+            onKeyDown={(e) => {
               if (e.key === "Enter" && item.onClickTarget) {
                 navigate(item.onClickTarget);
               }
@@ -54,17 +60,20 @@ export default function HeroBanner() {
                 className="home-swiper-image"
               />
               <div className="hero-details-wrapper">
-                <h2 className="movieTitle">{item.title}</h2>
-                <p className="movieDescription">{item.description}</p>
-                <button className="watchNowButton">Explore</button>
+                <div className="hero-content-overlay">
+                  <h2 className="movieTitle">{item.title}</h2>
+                  <p className="movieDescription">{item.description}</p>
+                  <button className="watchNowButton">Explore</button>
+                </div>
               </div>
             </div>
           </SwiperSlide>
         ))}
 
         {/* Custom arrows */}
-        <div ref={prevRef} 
-          className="custom-prev select-none" 
+        <div
+          ref={prevRef}
+          className="custom-prev select-none"
           role="button"
           aria-label="Previous slide"
           tabIndex={0}
@@ -72,21 +81,24 @@ export default function HeroBanner() {
             if (e.key === "Enter") prevRef.current?.click();
           }}
         >
-
-        <span className="arrow" aria-hidden="true">←</span>
+          <span className="arrow" aria-hidden="true">
+            ←
+          </span>
         </div>
-        
-        <div ref={nextRef} 
-          className="custom-next select-none" 
+
+        <div
+          ref={nextRef}
+          className="custom-next select-none"
           role="button"
           aria-label="Next slide"
           tabIndex={0}
           onKeyDown={(e) => {
             if (e.key === "Enter") nextRef.current?.click();
           }}
-          >
-            
-        <span className="arrow" aria-hidden="true">→</span>
+        >
+          <span className="arrow" aria-hidden="true">
+            →
+          </span>
         </div>
       </Swiper>
     </div>
