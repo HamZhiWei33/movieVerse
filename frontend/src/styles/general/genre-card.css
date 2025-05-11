@@ -1,4 +1,4 @@
-.genre-card {
+.signup-genre-card {
     width: 15rem;
     display: flex;
     flex-direction: column;
@@ -17,13 +17,13 @@
     column-gap: 0.2rem;
 }
 
-.genre-card:hover {
+.signup-genre-card:hover {
     color: #ffffff;
     transform: translateY(-0.5rem);
     box-shadow: 0 0.4rem 2rem rgba(204, 255, 0, 0.15);
 }
 
-.genre-card h3 {
+.signup-genre-card h3 {
     display: flex;
     width: 100%;
     font-size: 1.2rem;
@@ -51,11 +51,11 @@
     margin: 0 0;
 }
 
-.genre-card:hover .hover-overlay {
+.signup-genre-card:hover .hover-overlay {
     opacity: 1;
 }
 
-.genre-card.selected {
+.signup-genre-card.selected {
     border-color: #C6FF00;
     color: #C6FF00;
 }

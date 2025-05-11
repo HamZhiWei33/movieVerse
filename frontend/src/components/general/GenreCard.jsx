@@ -38,7 +38,7 @@ const GenreCard = ({ genre, onCardClicked }) => {
     };
 
     return (
-        <article className={`genre-card ${selected ? "selected" : ""}`} onClick={handleCardClick}>
+        <article className={`signup-genre-card ${selected ? "selected" : ""}`} onClick={handleCardClick}>
             <PostersGrid genre={genre} />
             <h3>{genre.name}</h3>
         </article>
