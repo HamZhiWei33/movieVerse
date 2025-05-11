@@ -47,13 +47,20 @@ header {
   display: flex;
   justify-content: center;
   align-items: center;
-  color: white;
-  background-color: #0f0f0f;
-  border: 0.2rem solid;
-  border-color: #1f1f1f;
+  background-color: #0F0F0F;
+  border: 0.15rem solid;
+  border-color: #1F1F1F;
   border-radius: 0.8rem;
   padding: 0.5rem 0.7rem;
   outline: none;
+}
+
+.logout-btn:hover {
+  border-color: #C6FF00;
+}
+
+.logout-btn:hover > div {
+  color: #C6FF00;
 }
 
 .logout-btn > div {
@@ -158,7 +165,7 @@ header {
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
-    padding: 5rem 3rem;
+    padding: 5rem 3.5rem;
     z-index: 1000;
     transition: left 0.3s ease;
   }
@@ -179,6 +186,6 @@ header {
   .nav-links ul li a {
     width: 100%;
     display: block;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
   }
 }
