@@ -20,7 +20,7 @@ const GenreCard = ({ movie, rank, image, title, rating, genre, region, year, dur
   
 
     return (
-      <div className="genre-card" onClick={handleClick}>
+      <div className="genre-card-ranking" onClick={handleClick}>
         <div className="genre-card-header">
           <h3>Top {rank}</h3>
           <div className="genre-rating-value">{rating.toFixed(1)}</div>

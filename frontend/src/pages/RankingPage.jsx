@@ -56,6 +56,7 @@ import TopMovieSection from "../components/ranking/TopMovieSection";
           selectedMovie={selectedMovie}
           setSelectedMovie={setSelectedMovie}
           ratingDistribution={ratingDistribution}
+          aria-label={`Currently selected movie: ${selectedMovie.title}`}
         />
       )}
   
@@ -64,9 +65,9 @@ import TopMovieSection from "../components/ranking/TopMovieSection";
       </main>
 
       <div>
-      <h2 className="chart-title">Genre Distribution</h2>
+      <h2 className="chart-title" aria-label="Genre distribution chart">Genre Distribution</h2>
       <div>
-      <GenreDonutChart data={chartData} />
+      <GenreDonutChart data={chartData} aria-label="A donut chart showing the distribution of movie genres."/>
       </div>
     </div>
 
