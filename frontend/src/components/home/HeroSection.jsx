@@ -109,6 +109,7 @@ const HeroSection = ({ title, moviesType, items }) => {
             <div className="home-card-container">
               {items.map((movie) => (
                 <MovieCard
+                  className="home-movie-card"
                   key={movie.id}
                   movie={{
                     ...movie,
@@ -166,7 +167,7 @@ const HeroSection = ({ title, moviesType, items }) => {
 
                   <RankingCard
                     key={genre.id}
-                    genre={genre.name}
+                    genre={genre}
                     topMovies={topMoviesByGenre[genre.name] || []}
                   />
                 ))}

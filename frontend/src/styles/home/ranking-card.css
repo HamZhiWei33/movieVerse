@@ -56,7 +56,7 @@
 
   justify-content: end;
   padding: 0.5rem;
-  border-radius: 0.7rem;
+  border-radius: 0.2rem;
 }
 
 .home-movie-card:hover .hover-overlay {
@@ -66,7 +66,7 @@
 /* Responsive grid container */
 .genre-selection-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* 2 columns on mobile */
+  grid-template-columns: repeat(6, 1fr); /* 2 columns on mobile */
   gap: 16px;
 }
 .home-hover-bottom {
@@ -91,31 +91,4 @@
   font-weight: bold;
   padding: 0 0.5rem;
   margin-bottom: 0.2rem;
-}
-
-/* Responsive adjustments */
-@media (min-width: 768px) {
-  .genre-selection-grid {
-    grid-template-columns: repeat(4, 1fr); /* 4 columns on tablets */
-  }
-}
-
-@media (min-width: 1024px) {
-  .genre-selection-grid {
-    grid-template-columns: repeat(5, 1fr); /* 5 columns on laptops */
-  }
-}
-
-@media (min-width: 1280px) {
-  .genre-selection-grid {
-    grid-template-columns: repeat(6, 1fr); /* 6 columns on xl screens */
-  }
-
-  .home-movie-card {
-    padding-bottom: 120%; /* Slightly different aspect ratio for xl */
-  }
-
-  .genre-name-overlay h3 {
-    font-size: 1.1rem;
-  }
 }

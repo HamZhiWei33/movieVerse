@@ -46,11 +46,17 @@ main.home-page {
 
 /* tablet/ipad */
 @media screen and (max-width: 1200px) {
-  main.home-page {
+  .home-swiper-container {
+    margin-bottom: 10rem;
+  }
+
+  .home-swiper-image {
+    height: 50vh;
   }
 }
 /* phone */
 @media screen and (max-width: 768px) {
-  main.home-page {
+  .home-swiper-image {
+    height: 30vh;
   }
 }
