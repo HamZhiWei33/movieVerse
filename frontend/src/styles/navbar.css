@@ -7,7 +7,7 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 2rem 4rem;
+  padding: 2rem 4.5%;
   background-color: #0f0f0f;
   color: #ffffff;
   height: 5rem;
@@ -41,6 +41,7 @@ header {
   align-items: center;
   color: white;
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .logout-btn {

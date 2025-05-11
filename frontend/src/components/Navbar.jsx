@@ -10,7 +10,7 @@ const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
 
-  const guestRoutes = ["/login", "/signup", "/forgot_password", "/reset_password"];
+  const guestRoutes = ["/login", "/signup", "/forgot_password", "/reset_password", "/genre_selection"];
   const isGuest = guestRoutes.includes(location.pathname);
 
   useEffect(() => {

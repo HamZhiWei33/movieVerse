@@ -7,8 +7,13 @@ main.reset-password-page {
   font-family: Manrope;
   display: flex;
   flex-direction: column;
-  /* align-items: center; */
-  /* background-color: #141414; */
+  background: #141414;
+}
+
+main.genre-selection-page {
+  font-family: Manrope;
+  display: flex;
+  flex-direction: column;
   background: #141414;
 }
 
