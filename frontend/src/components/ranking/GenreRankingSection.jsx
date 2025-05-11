@@ -78,7 +78,7 @@ const GenreRankingSection = ({ movies, allGenres }) => {
   }, [top1, allGenres]);
 
   return (
-    <section className="genre-ranking-section" id="genre-ranking">
+    <section className="genre-ranking-section">
       <h2 className="genre-title">Order by Genre</h2>
 
       <nav className="genre-nav">

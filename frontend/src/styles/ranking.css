@@ -2,6 +2,7 @@
   position: relative;
   width: 100%;
   background-color: #000; 
+  overflow: hidden;
 }
 
 .blurred-banner-wrapper {
@@ -52,12 +53,6 @@
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.01);
 }
 
-@media screen and (max-width: 768px) {
-  .chart-container {
-    max-width: 90%; /* Reduce max width on smaller screens */
-    padding: 1.5rem; /* Adjust padding for smaller screens */
-  }
-}
 
 .chart-title {
   color: #fff;
@@ -371,7 +366,7 @@
   gap: 1.5rem;
 }
 
-.genre-card {
+.genre-card-ranking {
   background: #111;
   padding: 1rem;
   border-radius: 8px;
@@ -528,6 +523,64 @@
   .rating-visual-summary {
     flex-direction: column;
     align-items: center;
+  }
+
+  .score-number {
+    font-size: 2.5rem;
+  }
+
+  .star-label {
+    width: 50px;
+    font-size: 0.9rem;
+  }
+
+  .total-ratings {
+    text-align: center;
+  }
+
+  .genre-card-body {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .genre-poster {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .genre-info {
+    align-items: center;
+    text-align: center;
+  }
+}
+
+@media (max-width: 420px) {
+.genre-ranking-layout{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+
+  .ranking-three-columns {
+    flex-direction: column;
+    align-items: center;
+  }
+
+
+  .star-label {
+    width: 50px;
+    font-size: 0.9rem;
+  }
+
+  .rating-visual-summary {
+    flex-direction: column;
+    align-items: center;
+  }
+  .distribution-right{
+    visibility: collapse;
   }
 
   .score-number {
