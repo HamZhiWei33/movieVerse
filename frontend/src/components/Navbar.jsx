@@ -107,7 +107,7 @@ const Navbar = () => {
                 <li style={{ display: "flex", flexDirection: "row" }}>
                   <NavLink to="/profile" aria-label="Profile page">
                     Profile
-                    <FaAngleDown style={{ alignSelf: "center" }} />
+                    {/* <FaAngleDown style={{ alignSelf: "center" }} /> */}
                   </NavLink>
                 </li>
                 {isMobile && (
