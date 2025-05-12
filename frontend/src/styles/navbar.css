@@ -49,6 +49,7 @@ header {
   justify-content: center;
   align-items: center;
   color: white;
+  font-weight: 600;
   text-decoration: none;
   white-space: nowrap;
 }
