@@ -6,7 +6,7 @@ import ViewDropdown from "../components/directory/ViewDropdown";
 import { FaListUl } from "react-icons/fa";
 import "../styles/sidebar.css";
 import Sidebar from "../components/Sidebar";
-import { movies as movieData, genres as genreData } from "../constant";
+import { movies as movieData, genres as genreData, reviews } from "../constant";
 
 // Extract unique regions from movie data
 const regions = [...new Set(movieData.map((movie) => movie.region))];
@@ -189,13 +189,13 @@ const DirectoryPage = () => {
                       key={movie.id}
                       movie={{
                         ...movie,
-                        genre: movie.genre.map((id) => genreMap[id]), // Convert genre IDs to names
                         year: movie.year.toString(), // Ensure year is string
                       }}
                       liked={likedMovies.includes(movie.id)}
                       addedToWatchlist={addToWatchlistMovies.includes(movie.id)}
                       onLike={() => toggleLike(movie.id)}
                       onAddToWatchlist={() => toggleAddToWatchlist(movie.id)}
+                      allReviews={reviews}
                     />
                   ))}
                 </div>
@@ -206,13 +206,13 @@ const DirectoryPage = () => {
                       key={movie.id}
                       movie={{
                         ...movie,
-                        genre: movie.genre.map((id) => genreMap[id]), // Convert genre IDs to names
                         year: movie.year.toString(), // Ensure year is string
                       }}
                       liked={likedMovies.includes(movie.id)}
                       addedToWatchlist={addToWatchlistMovies.includes(movie.id)}
                       onLike={() => toggleLike(movie.id)}
                       onAddToWatchlist={() => toggleAddToWatchlist(movie.id)}
+                      allReviews={reviews}
                     />
                   ))}
                 </div>

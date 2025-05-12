@@ -5,6 +5,7 @@ import ReviewStars from "./ReviewStars";
 import { IoTime } from "react-icons/io5";
 import { FaPlay } from "react-icons/fa6";
 import "../../styles/directory/MovieCardList.css";
+import { genres } from '../../constant';
 
 const MovieCardList = ({
   movie,
@@ -16,6 +17,7 @@ const MovieCardList = ({
   showBottomInteractiveIcon = false,
   showCastInfo = false,
   likeCount = 0,
+  allReviews,
 }) => {
   const navigate = useNavigate();
 
@@ -53,6 +55,28 @@ const MovieCardList = ({
       : `${mins}min`;
   };
 
+  const calculateAverageRating = () => {
+    if (!Array.isArray(allReviews) || allReviews.length === 0) return 0;
+
+    const validRatings = allReviews
+      .map(r => Number(r.rating))
+      .filter(r => !isNaN(r));
+
+    if (validRatings.length === 0) return 0;
+
+    const sum = validRatings.reduce((acc, rating) => acc + rating, 0);
+    const average = sum / validRatings.length;
+
+    return average === 0 ? 0 : parseFloat(average.toFixed(1));
+  };
+
+  const averageRating = calculateAverageRating();
+
+  const getGenreName = (id) => {
+    const genreObj = genres.find(g => g.id === id);
+    return genreObj ? genreObj.name : String(id);
+  };
+
   return (
     <article
       className="movie-card-list"
@@ -69,14 +93,14 @@ const MovieCardList = ({
       <div className="movie-details-container-list">
         <h3>{movie.title}</h3>
         <ReviewStars
-          rating={movie.rating}
+          rating={averageRating}
           readOnly={true}
           showNumber={showRatingNumber}
         />
         <div className="genre-tags">
-          {movie.genre.map((genre, index) => (
+          {movie.genre.map((id, index) => (
             <span key={index} className="genre-tag">
-              {genre}
+              {getGenreName(id)}
             </span>
           ))}
         </div>
@@ -106,22 +130,33 @@ const MovieCardList = ({
         </div>
         {showCastInfo && (
           <div className="cast-info">
-            <div className="cast-row">
-              <span className="cast-label">Director</span>
-              <span className="director-item">{movie.director}</span>
-            </div>
-            <div className="cast-row">
-              <span className="cast-label">Cast</span>
-              <div className="actors-list">
-                {movie.actors.map((actor, index) => (
-                  <span key={index} className="actor-item">
-                    {actor}
-                  </span>
-                ))}
+            {/* Only show Director section if there is a director */}
+            {movie.director && (
+              <div className="cast-row">
+                <span className="cast-label">Director</span>
+                <span className="director-item">{movie.director}</span>
               </div>
-            </div>
+            )}
+
+            {/* Only show Cast section if there are valid actors */}
+            {movie.actors && movie.actors.filter(actor => actor.trim() !== "").length > 0 && (
+              <div className="cast-row">
+                <span className="cast-label">Cast</span>
+                <div className="actors-list">
+                  {movie.actors.map((actor, index) => (
+                    actor.trim() !== "" && (
+                      <span key={index} className="actor-item">
+                        {actor}
+                      </span>
+                    )
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
+
+
         <p className="clamp-text">{movie.description}</p>
         {showBottomInteractiveIcon && (
           <div
