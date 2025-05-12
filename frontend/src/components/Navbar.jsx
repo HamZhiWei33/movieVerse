@@ -1,24 +1,25 @@
 import "../styles/navbar.css";
-import React, { useState, useEffect } from "react";
+import { useState, useContext } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { FaAngleDown } from "react-icons/fa";
 import SearchIcon from "@mui/icons-material/Search";
 import MenuIcon from "@mui/icons-material/Menu";
 import useIsMobile from "../store/useIsMobile";
+import { UserValidationContext } from "../context/UserValidationProvider ";
 
 const Navbar = () => {
   const isMobile = useIsMobile();
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
-
-  const guestRoutes = [
-    "/login",
-    "/signup",
-    "/forgot_password",
-    "/reset_password",
-    "/genre_selection",
-  ];
-  const isGuest = guestRoutes.includes(location.pathname);
+  const { isValidateUser, logout } = useContext(UserValidationContext);
+  // const guestRoutes = [
+  //   "/login",
+  //   "/signup",
+  //   "/forgot_password",
+  //   "/reset_password",
+  //   "/genre_selection",
+  // ];
+  // const isGuest = guestRoutes.includes(location.pathname);
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -73,7 +74,7 @@ const Navbar = () => {
             role="navigation"
             aria-label="Main navigation"
           >
-            {isGuest ? (
+            {!isValidateUser ? (
               <ul>
                 <li>
                   <NavLink to="/login" end aria-label="Login page">
@@ -106,12 +107,12 @@ const Navbar = () => {
                 <li style={{ display: "flex", flexDirection: "row" }}>
                   <NavLink to="/profile" aria-label="Profile page">
                     Profile
-                    <FaAngleDown style={{ alignSelf: "center" }} />
+                    {/* <FaAngleDown style={{ alignSelf: "center" }} /> */}
                   </NavLink>
                 </li>
                 {isMobile && (
                   <li>
-                    <NavLink to="/login" aria-label="Logout">
+                    <NavLink to="/login" aria-label="Logout" onClick={logout}>
                       Logout
                     </NavLink>
                   </li>
@@ -120,7 +121,7 @@ const Navbar = () => {
             )}
           </nav>
 
-          {!isMobile && !isGuest && (
+          {!isMobile && isValidateUser && (
             <NavLink to="/login" aria-label="Logout">
               <div
                 className="logout-btn"
@@ -139,7 +140,7 @@ const Navbar = () => {
                       aria-label="User profile image"
                     />
                   </div>
-                  <p>Logout</p>
+                  <p onClick={logout}>Logout</p>
                 </div>
               </div>
             </NavLink>

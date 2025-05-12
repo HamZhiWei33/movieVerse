@@ -49,6 +49,7 @@ header {
   justify-content: center;
   align-items: center;
   color: white;
+  font-weight: 600;
   text-decoration: none;
   white-space: nowrap;
 }
@@ -146,6 +147,7 @@ header {
 /* Responsive behavior */
 @media screen and (max-width: 768px) {
   #navbar {
+    height: 3rem;
     padding: 2rem 2rem;
     gap: 1.5rem;
     justify-content: flex-start;
@@ -197,5 +199,9 @@ header {
     width: 100%;
     display: block;
     font-size: 1.2rem;
+  }
+  .search-bar {
+    font-size: smaller;
+    height: 2rem;
   }
 }

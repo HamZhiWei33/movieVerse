@@ -1,11 +1,13 @@
 import React from "react";
 import "../../styles/profile/tab-manage.css";
 import { useNavigate } from "react-router-dom";
-
+import { UserValidationContext } from "../../context/UserValidationProvider ";
 const TabManage = () => {
+  const { logout } = React.useContext(UserValidationContext);
   const navigate = useNavigate();
 
   const handlePasswordChange = () => {
+    logout();
     navigate("/forgot_password");
   };
 
@@ -15,6 +17,8 @@ const TabManage = () => {
     );
     if (confirmation) {
       alert("Account deletion confirmed.");
+      logout();
+      navigate("/");
       console.log("Account deletion confirmed");
     }
   };
