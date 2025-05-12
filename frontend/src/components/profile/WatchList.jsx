@@ -18,12 +18,12 @@ const WatchList = ({
     });
   };
 
+  const handleRemoveClick = (e) => {
+    e.stopPropagation();
+    alert("Remove from watchlist");
+  };
   return (
-    <article
-      id="watchlist"
-      onClick={handleCardClick}
-      style={{ cursor: "pointer" }}
-    >
+    <article id="watchlist" style={{ cursor: "pointer" }}>
       <div className="movie-card-list">
         <div className="poster-container-list">
           <img
@@ -32,7 +32,7 @@ const WatchList = ({
             className="poster-img-list"
           />
         </div>
-        <div className="movie-details-container-list">
+        <div className="movie-details-container-list" onClick={handleCardClick}>
           <h3>{movie.title}</h3>
           <ReviewStars
             rating={movie.rating}
@@ -62,7 +62,9 @@ const WatchList = ({
           </div>
         </div>
         <div className="remove-watchlist-container">
-          <button className="remove-watchlist-btn">Remove</button>
+          <button className="remove-watchlist-btn" onClick={handleRemoveClick}>
+            Remove
+          </button>
         </div>
       </div>
     </article>
