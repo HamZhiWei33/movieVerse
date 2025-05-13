@@ -9,6 +9,7 @@ const WatchList = ({
   movie,
   showRatingNumber = false,
   showBottomInteractiveIcon = false,
+  allReviews,
 }) => {
   const navigate = useNavigate();
 
@@ -22,6 +23,30 @@ const WatchList = ({
     e.stopPropagation();
     alert("Remove from watchlist");
   };
+
+  const calculateAverageRating = () => {
+    if (!Array.isArray(allReviews) || allReviews.length === 0) return 0;
+
+    // Filter reviews for this specific movie ID
+    const movieReviews = allReviews.filter((review) => review.movieId === movie.id);
+
+    if (movieReviews.length === 0) return 0;
+
+    const validRatings = movieReviews
+      .map((r) => Number(r.rating))
+      .filter((r) => !isNaN(r));
+
+    if (validRatings.length === 0) return 0;
+
+    const sum = validRatings.reduce((acc, rating) => acc + rating, 0);
+    const average = sum / validRatings.length;
+
+    return parseFloat(average.toFixed(1));
+  };
+
+
+  const averageRating = calculateAverageRating();
+
   return (
     <article id="watchlist" style={{ cursor: "pointer" }}>
       <div className="movie-card-list">
@@ -35,7 +60,7 @@ const WatchList = ({
         <div className="movie-details-container-list" onClick={handleCardClick}>
           <h3>{movie.title}</h3>
           <ReviewStars
-            rating={movie.rating}
+            rating={averageRating}
             readOnly={true}
             showNumber={true}
           />
