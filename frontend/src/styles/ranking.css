@@ -48,7 +48,7 @@
   position: relative;
   z-index: 3;
   border: 0.1rem solid #262626;
-  background-color: #141414;;
+  background-color: #141414;
   padding: 3rem;
   border-radius: 12px;
   width: 100%;
@@ -160,17 +160,17 @@
 .image-container {
   width: 100%;
   height: 100%;
-  padding: 0; 
-  overflow: hidden; 
-  border-radius: 0.7rem; 
+  padding: 0;
+  overflow: hidden;
+  border-radius: 0.7rem;
 }
 
 .card img {
   width: 100%;
   height: 100%;
-  object-fit: cover; 
-  object-position: center; 
-  display: block; 
+  object-fit: cover;
+  object-position: center;
+  display: block;
 }
 .main-card {
   transform: scale(1.4);
@@ -193,7 +193,7 @@
 }
 
 .side-card .image-container::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -208,7 +208,6 @@
   position: relative;
   z-index: 0; /* Ensure image stays below the overlay */
 }
-
 
 .movie-details-two-column {
   display: flex;
@@ -425,7 +424,7 @@
   position: relative;
   z-index: 3;
   border: 0.1rem solid #262626;
-  background-color: #141414;;
+  background-color: #141414;
   padding: 3rem;
   border-radius: 12px;
   width: 100%;
@@ -452,9 +451,9 @@
   padding-bottom: 0.5rem;
   border-bottom: 0.1rem solid #262626;
   border-top: 0.1rem solid #262626;
-  scrollbar-width: thin;     
+  scrollbar-width: thin;
   scrollbar-color: #bfbfbf #1a1a1a;
-  white-space: nowrap; 
+  white-space: nowrap;
 }
 
 .genre-nav button:focus {
@@ -471,7 +470,7 @@
   color: #bfbfbf;
   cursor: pointer;
   width: fit-content;
-  white-space: nowrap; 
+  white-space: nowrap;
   transition: color 0.3s;
 }
 
@@ -507,7 +506,7 @@
 
 .genre-card-ranking {
   border: 0.1rem solid #262626;
-  background-color: #1a1a1a;;
+  background-color: #1a1a1a;
   padding: 1rem;
   border-radius: 0.7rem;
   color: #fff;
@@ -521,23 +520,22 @@
 }
 
 .genre-card-ranking:hover {
-  transform: scale(1.05); 
+  transform: scale(1.04);
   box-shadow: 0 0.4rem 2rem rgba(204, 255, 0, 0.15);
 }
 
-.genre-card-ranking .badge-duration{
+.genre-card-ranking .badge-duration {
   padding: 0.2rem 0.7rem;
   width: fit-content;
   font-weight: 300;
   font-size: 0.9rem;
 }
 
-.genre-card-ranking .badge{
+.genre-card-ranking .badge {
   padding: 0.2rem 0.7rem;
   font-weight: 300;
   font-size: 0.9rem;
 }
-
 
 .genre-card:hover {
   transform: scale(1.03);
@@ -550,23 +548,23 @@
   justify-content: center;
 }
 
-.genre-card-header{
+.genre-card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.top1-card .genre-card-header h3{
+.top1-card .genre-card-header h3 {
   font-size: 1.7rem;
 }
 
-.top1-card .genre-card-header .genre-rating-value{
+.top1-card .genre-card-header .genre-rating-value {
   font-size: 1.7rem;
 }
 
-.genre-rank{
+.genre-rank {
   font-size: 1.2rem;
-  margin:0;
+  margin: 0;
 }
 
 .right-cards {
@@ -579,7 +577,7 @@
 .genre-rating-value {
   font-size: 1.2rem;
   font-weight: bold;
-  color: #ccff00; 
+  color: #ccff00;
 }
 
 .genre-ranking-layout {
@@ -594,21 +592,21 @@
   gap: 1rem;
 }
 
-.genre-card-body .badge-duration{
+.genre-card-body .badge-duration {
   padding: 0.2rem 0.7rem;
   width: fit-content;
   font-weight: 300;
   font-size: 0.9rem;
 }
 
-.genre-card-body .badge{
+.genre-card-body .badge {
   padding: 0.2rem 0.7rem;
   font-weight: 300;
   font-size: 0.9rem;
 }
 
 .genre-poster {
-  width: 120px;    
+  width: 120px;
   object-fit: cover;
   border-radius: 6px;
 }
@@ -627,7 +625,7 @@
 
 .top1-card {
   border: 0.1rem solid #262626;
-  background-color: #1a1a1a;;
+  background-color: #1a1a1a;
   padding: 1rem;
   border-radius: 0.7rem;
   color: #fff;
@@ -642,7 +640,7 @@
 }
 
 .top1-card:hover {
-  transform: scale(1.05); 
+  transform: scale(1.05);
   box-shadow: 0 0.4rem 2rem rgba(204, 255, 0, 0.15);
 }
 
@@ -659,13 +657,13 @@
   margin-bottom: 0.5rem;
 }
 
-.top1-card .badge{
+.top1-card .badge {
   padding: 0.2rem 0.7rem;
   font-weight: 300;
   font-size: 0.9rem;
 }
 
-.top1-card .badge-duration{
+.top1-card .badge-duration {
   padding: 0.2rem 0.7rem;
   width: fit-content;
   font-weight: 300;
@@ -679,9 +677,8 @@
   line-height: 1.5;
   max-height: 100px;
   overflow: hidden;
-  text-overflow: ellipsis; 
+  text-overflow: ellipsis;
 }
-
 
 @media (max-width: 768px) {
   .ranking-three-columns {
@@ -761,20 +758,18 @@
 }
 
 @media (max-width: 420px) {
-.genre-ranking-layout{
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 2rem;
-  align-items: flex-start;
-}
-
+  .genre-ranking-layout {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 2rem;
+    align-items: flex-start;
+  }
 
   .ranking-three-columns {
     flex-direction: column;
     align-items: center;
   }
-
 
   .star-label {
     width: 50px;
@@ -785,7 +780,7 @@
     flex-direction: column;
     align-items: center;
   }
-  .distribution-right{
+  .distribution-right {
     visibility: collapse;
   }
 
