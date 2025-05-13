@@ -379,8 +379,8 @@
   gap: 1rem;
   box-shadow: 0 0 12px rgba(0, 0, 0, 0.5);
 }
-.genre-card:hover {
-  transform: scale(1.03);
+.genre-card-ranking:hover {
+  transform: scale(1.04);
 }
 .genre-list {
   display: flex;
