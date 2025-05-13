@@ -43,6 +43,23 @@ const GenreRankingSection = ({ movies, allGenres, allReviews }) => {
     }
   }, [location.hash]);
 
+  const calculateAverageRating = (movieId) => {
+    if (!Array.isArray(allReviews) || allReviews.length === 0) return 0;
+
+    const selectedReviews = allReviews.filter((r) => r.movieId === movieId);
+
+    const validRatings = selectedReviews
+      .map((r) => Number(r.rating))
+      .filter((r) => !isNaN(r));
+
+    if (validRatings.length === 0) return 0;
+
+    const sum = validRatings.reduce((acc, rating) => acc + rating, 0);
+    const average = sum / validRatings.length;
+
+    return parseFloat(average.toFixed(1));
+  };
+
   const filtered = useMemo(() => {
     if (selectedGenre === "All") return movies;
     const genreId = allGenres.find((g) => g.name === selectedGenre)?.id;
@@ -52,9 +69,14 @@ const GenreRankingSection = ({ movies, allGenres, allReviews }) => {
   const sorted = [...filtered]
     .map((movie) => ({
       ...movie,
-      compositeScore: movie.rating * 0.8 + (movie.year - 2000) * 0.02,
+      compositeScore: calculateAverageRating(movie.id) * 0.9 + (movie.year - 2000) * 0.1,
     }))
-    .sort((a, b) => b.compositeScore - a.compositeScore);
+    .sort((a, b) =>  {
+    if (b.compositeScore === a.compositeScore) {
+       return a.id.localeCompare(b.id); 
+    }
+    return b.compositeScore - a.compositeScore;
+  });
   console.log("Sorted movies:", sorted); // Debugging line
   const top1 = sorted[0];
   const otherMovies = sorted.slice(1);
@@ -91,22 +113,7 @@ const GenreRankingSection = ({ movies, allGenres, allReviews }) => {
       .join(", ");
   }, [top1, allGenres]);
 
-  const calculateAverageRating = (movieId) => {
-    if (!Array.isArray(allReviews) || allReviews.length === 0) return 0;
-
-    const selectedReviews = allReviews.filter((r) => r.movieId === movieId);
-
-    const validRatings = selectedReviews
-      .map((r) => Number(r.rating))
-      .filter((r) => !isNaN(r));
-
-    if (validRatings.length === 0) return 0;
-
-    const sum = validRatings.reduce((acc, rating) => acc + rating, 0);
-    const average = sum / validRatings.length;
-
-    return parseFloat(average.toFixed(1));
-  };
+  
 
   return (
     <section className="genre-ranking-section">
