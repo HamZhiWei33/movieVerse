@@ -22,6 +22,11 @@ const ReviewStars = ({
     }
   };
 
+  const formatRating = (num) => {
+    if (num === 0) return "0";
+    return Number.isInteger(num) ? `${num}.0` : num.toString();
+  };
+
   React.useEffect(() => {
     setValue(rating);
   }, [rating]);
@@ -43,7 +48,9 @@ const ReviewStars = ({
       />
       {showNumber && (
         <span className="rating-number">
-          {hover !== -1 ? hover : value}
+          {hover !== -1
+            ? formatRating(hover)
+            : formatRating(value)}
         </span>
       )}
     </Box>

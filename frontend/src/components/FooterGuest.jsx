@@ -11,48 +11,56 @@ const FooterGuest = () => {
         <div className="footer-grid guest">
           <div>
             <nav aria-label="Login navigation">
-              <ul>
+              <ul className="footer-guest-link" aria-label="Login links">
                 <li>
-                  <Link to="/login">Login</Link>
+                  <Link to="/login" aria-label="Go to Login page">
+                    Login
+                  </Link>
                 </li>
               </ul>
             </nav>
           </div>
           <div>
             <nav aria-label="Signup navigation">
-              <ul>
+              <ul className="footer-guest-link" aria-label="Signup links">
                 <li>
-                  <Link to="/signup">Sign Up</Link>
+                  <Link to="/signup" aria-label="Go to Sign Up page">
+                    Sign Up
+                  </Link>
                 </li>
               </ul>
             </nav>
           </div>
-          <div>
-            <h4>Connect With Us</h4>
-            <div className="social-icons">
+          <div aria-labelledby="connect-heading">
+            <h4 id="connect-heading">Connect With Us</h4>
+            <div
+              className="social-icons"
+              role="navigation"
+              aria-label="Social media links"
+            >
               <a
                 href="https://www.facebook.com"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Visit our Facebook page"
               >
-                {/* <i className="fab fa-facebook-f"></i> */}
-                <FaFacebook aria-hidden="true"/>
+                <FaFacebook aria-hidden="true" />
               </a>
               <a
                 href="https://www.twitter.com"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Visit our Twitter page"
               >
-                {/* <i className="fab fa-twitter"></i> */}
-                <FaXTwitter aria-hidden="true"/>
+                <FaXTwitter aria-hidden="true" />
               </a>
               <a
                 href="https://www.linkedin.com"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Visit our LinkedIn page"
               >
-                {/* <i className="fab fa-linkedin-in"></i> */}
-                <FaLinkedin aria-hidden="true"/>
+                <FaLinkedin aria-hidden="true" />
               </a>
             </div>
           </div>
@@ -67,7 +75,15 @@ const FooterGuest = () => {
             concerns, please contact the appropriate content providers.
           </p>
           <p>&copy; MovieVerse | Powered by TMDB API</p>
-          <p>Email: MovieVerse@gmail.com</p>
+          <p>
+            Email:{" "}
+            <a
+              href="mailto:MovieVerse@gmail.com"
+              aria-label="Contact us by email"
+            >
+              MovieVerse@gmail.com
+            </a>
+          </p>
         </div>
       </div>
     </footer>

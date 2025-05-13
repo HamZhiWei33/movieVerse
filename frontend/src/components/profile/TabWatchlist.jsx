@@ -4,7 +4,7 @@ import { getMovieObject } from "./watchlist.js";
 import { useLocation } from "react-router-dom";
 import { useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
-import { genres } from "../../constant.js";
+import { genres, reviews } from "../../constant.js";
 const TabWatchlist = () => {
   const watchListMovies = getMovieObject("U2"); // Assume this returns an array of movie objects
   const location = useLocation();
@@ -40,6 +40,7 @@ const TabWatchlist = () => {
               ...movie,
               genre: movie.genre.map((id) => genreMap[id]), // Convert genre IDs to names
             }}
+            allReviews={reviews}
           />
         ))
       )}

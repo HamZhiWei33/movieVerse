@@ -1,6 +1,6 @@
 .rating-breakdown-container {
     display: flex;
-    background-color: #1A1A1A;
+    background-color: transparent;
     color: #cff600;
     padding: 1rem;
     gap: 1rem;

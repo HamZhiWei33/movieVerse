@@ -8,7 +8,7 @@ import ReviewCard from "../components/directory/ReviewCard";
 import UserReviewForm from "../components/directory/UserReviewForm";
 import "../styles/movieDetail.css";
 import RatingBarChart from '../components/directory/RatingBarChart';
-import { movies, reviews, users, likes } from '../constant';
+import { movies, reviews, users, likes, genres as genreData } from '../constant';
 
 const MovieDetailPage = () => {
     const { state } = useLocation();
@@ -55,23 +55,6 @@ const MovieDetailPage = () => {
 
     if (!movie) return <div>Movie not found</div>;
 
-    // Calculate rating breakdown for the chart
-    const calculateRatingBreakdown = () => {
-        const breakdown = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-        movieReviews.forEach(review => {
-            const roundedRating = Math.round(review.rating);
-            breakdown[roundedRating]++;
-        });
-        return breakdown;
-    };
-
-    // Calculate average rating
-    const calculateAverageRating = () => {
-        if (movieReviews.length === 0) return 0;
-        const sum = movieReviews.reduce((acc, review) => acc + review.rating, 0);
-        return (sum / movieReviews.length).toFixed(1);
-    };
-
     const reviewFormRef = useRef(null);
 
     const totalPages = Math.ceil(movieReviews.length / reviewsPerPage);
@@ -90,7 +73,7 @@ const MovieDetailPage = () => {
                 <MovieCardList
                     movie={{
                         ...movie,
-                        rating: calculateAverageRating(),
+                        genre: movie.genre, // Pass the entire genre object
                         reviewCount: movieReviews.length,
                         likes: likeCount
                     }}
@@ -99,11 +82,12 @@ const MovieDetailPage = () => {
                     onLike={() => {
                         setLikeCount(prevCount => liked ? prevCount - 1 : prevCount + 1);
                         setLiked(prev => !prev);
-                    }}                    
+                    }}
                     onAddToWatchlist={() => setWatchlisted(prev => !prev)}
                     showRatingNumber={true}
                     showBottomInteractiveIcon={true}
                     showCastInfo={true}
+                    allReviews={movieReviews}
                 />
 
                 <div className="rating-container">
@@ -114,11 +98,7 @@ const MovieDetailPage = () => {
                             onClick={() => reviewFormRef.current?.scrollIntoView({ behavior: 'smooth' })}
                         ><IoAdd className="add-icon" />Add Your Review</button>
                     </div>
-                    <RatingBarChart
-                        average={parseFloat(calculateAverageRating())}
-                        totalRatings={movieReviews.length}
-                        breakdown={calculateRatingBreakdown()}
-                    />
+                    <RatingBarChart movieReviews={movieReviews} />
                     <div className="review-list">
                         {currentReviews.length > 0 ? (
                             currentReviews.map((review) => {

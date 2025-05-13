@@ -206,6 +206,7 @@
 }
 .remove-watchlist-btn {
   background-color: var(--color-primary);
+  z-index: 1;
 }
 
 @media screen and (max-width: 768px) {
