@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import MovieCard from "../directory/MovieCard";
 import "../../styles/home/recommendation-section.css";
 import { TfiReload } from "react-icons/tfi";
-import { genres } from "../../constant";
+import { reviews, genres } from "../../constant";
 const RecommendationSection = ({ title, moviesType, items }) => {
   const [displayed, setDisplayed] = useState([]);
   const [likedMovies, setLikedMovies] = useState([]);
@@ -80,6 +80,7 @@ const RecommendationSection = ({ title, moviesType, items }) => {
                 addedToWatchlist={addToWatchlistMovies.includes(movie.id)}
                 onLike={() => toggleLike(movie.id)}
                 onAddToWatchlist={() => toggleAddToWatchlist(movie.id)}
+                allReviews={reviews}
               />
             ) : (
               <div key={index} className="movie-card-placeholder" />

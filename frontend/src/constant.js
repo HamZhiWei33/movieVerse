@@ -9,7 +9,7 @@ export const users = [
     password: "hashed_password_123",
     profilePic:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Cat_November_2010-1a.jpg/1200px-Cat_November_2010-1a.jpg",
-    watchlist: ["M101", "M102"], // Movie IDs
+    watchlist: ["M101", "M102","M109"], // Movie IDs
     likedMovies: ["M103"],
     createdAt: "2024-06-01T10:00:00Z",
   },
@@ -21,7 +21,7 @@ export const users = [
     password: "hashed_password_456",
     profilePic:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Cat_November_2010-1a.jpg/1200px-Cat_November_2010-1a.jpg",
-    watchlist: ["M104", "M105"],
+    watchlist: ["M104", "M105","M109"],
     likedMovies: ["M101", "M106"],
     createdAt: "2024-06-02T12:30:00Z",
   },
