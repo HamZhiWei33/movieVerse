@@ -9,14 +9,36 @@ const RankingPage = () => {
   const [movies, setMovies] = useState([]);
   const [selectedMovie, setSelectedMovie] = useState(null);
 
+  const calculateAverageRating = (movieId) => {
+    if (!Array.isArray(importedReviews) || importedReviews.length === 0) return 0;
+
+    const selectedReviews = importedReviews.filter((r) => r.movieId === movieId);
+
+    const validRatings = selectedReviews
+      .map((r) => Number(r.rating))
+      .filter((r) => !isNaN(r));
+
+    if (validRatings.length === 0) return 0;
+
+    const sum = validRatings.reduce((acc, rating) => acc + rating, 0);
+    const average = sum / validRatings.length;
+
+    return parseFloat(average.toFixed(1));
+  };
+
   useEffect(() => {
     // Compute a composite score: 80% rating + 20% recency (based on year)
     const sorted = [...importedMovies]
       .map((movie) => ({
         ...movie,
-        compositeScore: movie.rating * 0.8 + (movie.year - 2000) * 0.02,
+        compositeScore: calculateAverageRating(movie.id) * 0.9 + (movie.year - 2000) * 0.1,
       }))
-      .sort((a, b) => b.compositeScore - a.compositeScore);
+      .sort((a, b) =>  {
+    if (b.compositeScore === a.compositeScore) {
+       return a.id.localeCompare(b.id); 
+    }
+    return b.compositeScore - a.compositeScore;
+  });
 
     setMovies(sorted);
     setSelectedMovie(sorted[0] || null);

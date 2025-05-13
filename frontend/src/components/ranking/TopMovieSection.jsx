@@ -16,17 +16,44 @@ const TopMovieSection = ({ selectedMovie, setSelectedMovie, ratingDistribution, 
     setLiked(false);
     setAddedToWatchlist(false);
   }, [selectedMovie]);
+  
+  //Calculate average rating
+  const calculateAverageRating = (movieId) => {
+    if (!Array.isArray(allReviews) || allReviews.length === 0) return 0;
+
+    const selectedReviews = allReviews.filter(
+      (r) => r.movieId === movieId
+    );
+
+    const validRatings = selectedReviews
+      .map((r) => Number(r.rating))
+      .filter((r) => !isNaN(r));
+
+    if (validRatings.length === 0) return 0;
+
+    const sum = validRatings.reduce((acc, rating) => acc + rating, 0);
+    const average = sum / validRatings.length;
+
+    return parseFloat(average.toFixed(1));
+  };
 
   // compute top 3 for display
   const [first, second, third] = useMemo(() => {
     return [...allMovies]
       .map((movie) => ({
         ...movie,
-        compositeScore: movie.rating * 0.8 + (movie.year - 2000) * 0.02, // 80% rating + 20% recency (year)
+        compositeScore: calculateAverageRating(movie.id) * 0.9 + (movie.year - 2000) * 0.1, // 90% rating + 10% recency (year)
       }))
-      .sort((a, b) => b.compositeScore - a.compositeScore)
+      .sort((a, b) => {
+      // First, compare by compositeScore
+      if (b.compositeScore === a.compositeScore) {
+        // If compositeScore is the same, compare by id (you can also use a different field)
+        return a.id.localeCompare(b.id); // Sort by id in lexicographical order
+      }
+      return b.compositeScore - a.compositeScore; // If not, compare by compositeScore
+    })
       .slice(0, 3); // Get the top 3 movies
-  }, []);
+  }, [allMovies, allReviews]);
 
   const top3 = [second, first, third];
 
@@ -72,27 +99,7 @@ const TopMovieSection = ({ selectedMovie, setSelectedMovie, ratingDistribution, 
       .join(", ");
   }, [selectedMovie]);
 
-  //Calculate average rating
-  const calculateAverageRating = () => {
-    if (!Array.isArray(allReviews) || allReviews.length === 0) return 0;
-
-    const selectedReviews = allReviews.filter(
-      (r) => r.movieId === selectedMovie.id
-    );
-
-    const validRatings = selectedReviews
-      .map((r) => Number(r.rating))
-      .filter((r) => !isNaN(r));
-
-    if (validRatings.length === 0) return 0;
-
-    const sum = validRatings.reduce((acc, rating) => acc + rating, 0);
-    const average = sum / validRatings.length;
-
-    return parseFloat(average.toFixed(1));
-  };
-
-  const averageRating = useMemo(() => calculateAverageRating(), [selectedMovie, allReviews]);
+  const averageRating = useMemo(() => calculateAverageRating(selectedMovie.id), [selectedMovie, allReviews]);
 
   const movieReviews = useMemo(() => {
     if (!selectedMovie || !Array.isArray(allReviews)) return [];
@@ -105,7 +112,7 @@ const TopMovieSection = ({ selectedMovie, setSelectedMovie, ratingDistribution, 
         <div
           className="background-blur"
           style={{
-            backgroundImage: `url(${selectedMovie?.posterUrl})`
+            backgroundImage: `url(${selectedMovie ? selectedMovie.posterUrl : top3[0]?.posterUrl})`
           }}
         />
         <div className="dark-overlay" />
