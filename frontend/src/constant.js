@@ -11,6 +11,7 @@ export const users = [
       "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Cat_November_2010-1a.jpg/1200px-Cat_November_2010-1a.jpg",
     watchlist: ["M101", "M102"], // Movie IDs
     likedMovies: ["M103"],
+    favouriteGenres: ["G1", "G4", "G6", "G17"],
     createdAt: "2024-06-01T10:00:00Z",
   },
   {
@@ -23,6 +24,7 @@ export const users = [
       "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Cat_November_2010-1a.jpg/1200px-Cat_November_2010-1a.jpg",
     watchlist: ["M104", "M105"],
     likedMovies: ["M101", "M106"],
+    favouriteGenres: ["G2", "G4", "G9", "G17"],
     createdAt: "2024-06-02T12:30:00Z",
   },
   {
@@ -35,6 +37,7 @@ export const users = [
       "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Cat_November_2010-1a.jpg/1200px-Cat_November_2010-1a.jpg",
     watchlist: ["M104", "M105"],
     likedMovies: ["M101", "M106"],
+    favouriteGenres: ["G1", "G3", "G6", "G13", "G18"],
     createdAt: "2024-06-03T12:30:00Z",
   },
   {
@@ -47,6 +50,7 @@ export const users = [
       "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Cat_November_2010-1a.jpg/1200px-Cat_November_2010-1a.jpg",
     watchlist: ["M113", "M105"],
     likedMovies: ["M114", "M106"],
+    favouriteGenres: ["G4", "G5", "G6", "G17"],
     createdAt: "2024-06-03T12:45:00Z",
   },
   {
@@ -59,6 +63,7 @@ export const users = [
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFQUkXLkP65fs58H0PoRM63C32zJbNExDdLA&s",
     watchlist: ["M102", "M104"],
     likedMovies: ["M112", "M103"],
+    favouriteGenres: ["G2", "G7", "G12", "G15", "G17"],
     createdAt: "2024-06-03T12:46:00Z",
   },
   {
@@ -71,6 +76,7 @@ export const users = [
       "https://t3.ftcdn.net/jpg/01/03/87/88/360_F_103878807_z84l8RHnL5VRhCVVp6zbA2lvVt2v80Zy.jpg",
     watchlist: ["M112", "M115"],
     likedMovies: ["M113", "M106"],
+    favouriteGenres: ["G1", "G14", "G16", "G17"],
     createdAt: "2024-06-04T12:50:00Z",
   },
   {
@@ -83,6 +89,7 @@ export const users = [
       "https://plus.unsplash.com/premium_photo-1724654643848-ab19f6ec1c79?q=80&w=715&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     watchlist: ["M110", "M111", "M113", "M115"],
     likedMovies: ["M101", "M102", "M104"],
+    favouriteGenres: ["G2", "G15", "G16", "G17"],
     createdAt: "2024-06-04T12:55:00Z",
   },
   {
@@ -94,6 +101,7 @@ export const users = [
     profilePic: "https://imgs.699pic.com/images/601/354/628.jpg!list1x.v2",
     watchlist: ["M107", "M112", "M115"],
     likedMovies: ["M101", "M102", "M104"],
+    favouriteGenres: ["G2", "G7", "G8", "G17"],
     createdAt: "2024-06-05T11:50:00Z",
   },
   {
@@ -105,6 +113,7 @@ export const users = [
     profilePic: "https://imgs.699pic.com/images/601/354/628.jpg!list1x.v2",
     watchlist: ["M114"],
     likedMovies: ["M101"],
+    favouriteGenres: ["G1", "G2", "G9", "G11", "G14", "G17"],
     createdAt: "2024-06-05T11:57:00Z",
   },
   {
@@ -117,6 +126,7 @@ export const users = [
       "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Larix_decidua_Aletschwald.jpg/220px-Larix_decidua_Aletschwald.jpg",
     watchlist: ["M110", "M115"],
     likedMovies: ["M104", "M106", "M108"],
+    favouriteGenres: ["G1", "G2", "G7", "G8", "G17"],
     createdAt: "2024-06-05T12:30:00Z",
   },
 ];
