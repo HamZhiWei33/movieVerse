@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import MovieCard from "../directory/MovieCard";
 import "../../styles/home/recommendation-section.css";
 import { TfiReload } from "react-icons/tfi";
-import { genres } from "../../constant";
+import { genres, reviews } from "../../constant";
 const RecommendationSection = ({ title, moviesType, items }) => {
   const [displayed, setDisplayed] = useState([]);
   const [likedMovies, setLikedMovies] = useState([]);
@@ -22,10 +22,6 @@ const RecommendationSection = ({ title, moviesType, items }) => {
       handleReload(); // fallback if no saved data
     }
   }, [items]);
-
-  useEffect(() => {
-    console.log(displayed);
-  }, [displayed]);
 
   const toggleLike = (title) => {
     setLikedMovies((prev) =>
@@ -49,8 +45,8 @@ const RecommendationSection = ({ title, moviesType, items }) => {
         if (index % columns !== 0) cards.push(<div key={`spacer-${index}`} className="spacer" />);
         cards.push(
           movie ? (
-            < div key={index} className={"recommendation-movie-card-wrapper"}>
               <MovieCard
+              key={index}
                 role="listitem"
                 movie={{
                   ...movie,
@@ -61,8 +57,8 @@ const RecommendationSection = ({ title, moviesType, items }) => {
                 addedToWatchlist={addToWatchlistMovies.includes(movie.id)}
                 onLike={() => toggleLike(movie.id)}
                 onAddToWatchlist={() => toggleAddToWatchlist(movie.id)}
+                allReviews={reviews}
               />
-            </div>
           ) : (
             <div key={index} className="movie-card-placeholder" />
           )
