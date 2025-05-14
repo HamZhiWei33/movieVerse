@@ -6,8 +6,11 @@ main.reset-password-page {
   height: 90%;
   font-family: Manrope;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   background: #141414;
+  padding: 0;
+  align-items: center;
+  justify-content: center;
 }
 
 main.genre-selection-page {
@@ -21,12 +24,16 @@ main h1 {
   font-size: 2rem;
 }
 
-.form-group {
-  width: 25rem;
+.form-group{
+  max-width: 25rem;
   display: flex;
   flex-direction: column;
-  margin: auto;
+  /* flex-grow: 1; */
+  flex: 1 1 auto;
+  /* margin-top: auto;
+  margin-bottom: auto; */
   gap: 1rem;
+  margin: 0 10%;
 }
 
 .form {
@@ -39,7 +46,7 @@ main h1 {
   display: flex;
   flex-direction: row;
   position: relative;
-  width: 25rem;
+  width: inherit;
   height: 3rem;
   align-items: center;
   /* margin-top: 1rem;
@@ -69,7 +76,7 @@ main h1 {
   position: relative;
   top: -0.1rem;
   left: 0;
-  width: auto;
+  width: inherit;
   height: inherit;
   border: none;
   background-color: transparent;
@@ -119,8 +126,8 @@ main h1 {
   padding-right: 0.6rem;
 }
 
-.submitButton {
-  width: 25rem;
+.submitButton{
+  width: inherit;
   /* margin-bottom: 1rem; */
   background-color: #c6ff00;
   border: 0.15rem solid;
@@ -131,6 +138,7 @@ main h1 {
   color: black;
   outline: none;
   transition: none;
+  flex-grow: 1 1 auto;
 }
 
 .submitButton:hover {
@@ -140,8 +148,8 @@ main h1 {
   outline: none;
 }
 
-.submitButton.disabled {
-  width: 25rem;
+.submitButton.disabled{
+  width: inherit;
   /* border: none; */
   background-color: #c6ff0080;
   border-color: transparent;

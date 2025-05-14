@@ -23,10 +23,6 @@ const RecommendationSection = ({ title, moviesType, items }) => {
     }
   }, [items]);
 
-  useEffect(() => {
-    console.log(displayed);
-  }, [displayed]);
-
   const toggleLike = (title) => {
     setLikedMovies((prev) =>
       prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title]
@@ -50,8 +46,8 @@ const RecommendationSection = ({ title, moviesType, items }) => {
           cards.push(<div key={`spacer-${index}`} className="spacer" />);
         cards.push(
           movie ? (
-            <div key={index} className={"recommendation-movie-card-wrapper"}>
               <MovieCard
+              key={index}
                 role="listitem"
                 movie={{
                   ...movie,
@@ -64,7 +60,6 @@ const RecommendationSection = ({ title, moviesType, items }) => {
                 onAddToWatchlist={() => toggleAddToWatchlist(movie.id)}
                 allReviews={reviews}
               />
-            </div>
           ) : (
             <div key={index} className="movie-card-placeholder" />
           )
