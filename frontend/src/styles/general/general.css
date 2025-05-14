@@ -24,7 +24,7 @@ main h1 {
   font-size: 2rem;
 }
 
-.form-group{
+.form-group {
   max-width: 25rem;
   display: flex;
   flex-direction: column;
@@ -126,7 +126,7 @@ main h1 {
   padding-right: 0.6rem;
 }
 
-.submitButton{
+.submitButton {
   width: inherit;
   /* margin-bottom: 1rem; */
   background-color: #c6ff00;
@@ -148,7 +148,7 @@ main h1 {
   outline: none;
 }
 
-.submitButton.disabled{
+.submitButton.disabled {
   width: inherit;
   /* border: none; */
   background-color: #c6ff0080;

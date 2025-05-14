@@ -30,9 +30,9 @@ const GenreRankingSection = ({ movies, allGenres, allReviews }) => {
 
   // Scroll to section when component mounts or hash changes
   useEffect(() => {
-    if (location.hash === "#genre-ranking") {
+    if (location.hash === "#genre-ranking-section") {
       setTimeout(() => {
-        const element = document.getElementById("genre-ranking");
+        const element = document.getElementById("genre-ranking-section");
         if (element) {
           element.scrollIntoView({
             behavior: "smooth",
@@ -69,14 +69,15 @@ const GenreRankingSection = ({ movies, allGenres, allReviews }) => {
   const sorted = [...filtered]
     .map((movie) => ({
       ...movie,
-      compositeScore: calculateAverageRating(movie.id) * 0.9 + (movie.year - 2000) * 0.1,
+      compositeScore:
+        calculateAverageRating(movie.id) * 0.9 + (movie.year - 2000) * 0.1,
     }))
-    .sort((a, b) =>  {
-    if (b.compositeScore === a.compositeScore) {
-       return a.id.localeCompare(b.id); 
-    }
-    return b.compositeScore - a.compositeScore;
-  });
+    .sort((a, b) => {
+      if (b.compositeScore === a.compositeScore) {
+        return a.id.localeCompare(b.id);
+      }
+      return b.compositeScore - a.compositeScore;
+    });
   console.log("Sorted movies:", sorted); // Debugging line
   const top1 = sorted[0];
   const otherMovies = sorted.slice(1);
@@ -113,10 +114,8 @@ const GenreRankingSection = ({ movies, allGenres, allReviews }) => {
       .join(", ");
   }, [top1, allGenres]);
 
-  
-
   return (
-    <section className="genre-ranking-section">
+    <section className="genre-ranking-section" id="genre-ranking-section">
       <h2 className="genre-ranking-section-header">Order by Genre</h2>
 
       <nav className="genre-nav">
@@ -135,19 +134,19 @@ const GenreRankingSection = ({ movies, allGenres, allReviews }) => {
         <div className="genre-ranking-layout">
           {/* Top 1 - Left Side */}
           {top1 && (
-              <Top1Card
-                key={top1.id}
-                movie={top1}
-                rank={1}
-                image={top1.posterUrl}
-                title={top1.title}
-                rating={calculateAverageRating(top1.id)}
-                description={top1.description}
-                genre={genreNames}
-                region={top1.region}
-                year={top1.year}
-                duration={durationText}
-              />
+            <Top1Card
+              key={top1.id}
+              movie={top1}
+              rank={1}
+              image={top1.posterUrl}
+              title={top1.title}
+              rating={calculateAverageRating(top1.id)}
+              description={top1.description}
+              genre={genreNames}
+              region={top1.region}
+              year={top1.year}
+              duration={durationText}
+            />
           )}
 
           {/* Other movies (Top 2, Top 3, ...) - Right Side */}
