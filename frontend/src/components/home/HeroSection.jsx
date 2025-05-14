@@ -10,7 +10,7 @@ import { movies, genres, reviews } from "../../constant";
 import { useMemo, useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import useHorizontalScroll from "../../store/useHorizontalScroll";
-import { reviews } from "../../constant";
+
 const HeroSection = ({ title, moviesType, items }) => {
   const [likedMovies, setLikedMovies] = useState([]);
   const [addToWatchlistMovies, setAddToWatchlistMovies] = useState([]);
