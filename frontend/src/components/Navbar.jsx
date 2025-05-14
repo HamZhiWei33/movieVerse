@@ -40,10 +40,11 @@ const Navbar = () => {
           <MenuIcon />
         </button>
 
-        <div className="search-bar">
+        {!isGuest && (
+          <div className="search-bar">
           <input id="searchInput" type="text" placeholder="Search" />
           <SearchIcon size={20} />
-        </div>
+        </div>)}
 
         <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "1rem" }}>
           <nav className={`nav-links ${menuOpen ? "open" : ""}`}>
