@@ -1,40 +1,5 @@
-// import { Link } from "react-router-dom";
-// import "../styles/footer.css";
-// const Footer = () => {
-//   return (
-//     <footer id="footer">
-//       <ul>
-//         <li>
-//           <Link to="/">Home</Link>
-//         </li>
-//         <li>
-//           <Link to="/directory">Directory</Link>
-//         </li>
-//         <li>
-//           <Link to="/ranking">Ranking</Link>
-//         </li>
-//         <li>
-//           <Link to="/profile">Profile</Link>
-//         </li>
-//       </ul>
-//       <div>
-//         <p>
-//           Disclaimer: This website provides webpage services only and does not
-//           host, produce, or store any video content. All videos are embedded
-//           from third-party sources, and we do not take responsibility for their
-//           availability or copyright compliance. If you have any legal concerns,
-//           please contact the appropriate content providers.
-//         </p>
-//         <p>&copy; MovieVerse | Powered by TMDB API</p>
-//         <a href="mailto:movieverse@gmail.com">movieverse@gmail.com</a>
-//       </div>
-//     </footer>
-//   );
-// };
-// export default Footer;
 import { Link } from "react-router-dom";
 import "../styles/footer.css";
-// import "@fortawesome/fontawesome-free/css/all.min.css";
 import { FaFacebook } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 import { FaLinkedin } from "react-icons/fa";
@@ -48,104 +13,152 @@ const Footer = () => {
   const handleRecommendationClick = () => {
     navigate("/recommendation", { state: { targetTab: "Recommendation" } });
   };
+
   return (
-    <footer id="footer" role="contentinfo" aria-label="Main footer">
+    <footer
+      id="footer"
+      role="contentinfo"
+      aria-label="Website footer with navigation and contact information"
+    >
       <div className="footer-container">
         <div className="footer-grid">
-          <div>
-            <h4>Home</h4>
-            <nav aria-label="Home navigation">
-              <ul>
-                <li>
-                  <Link to="/watchlist">Watchlist</Link>
+          <section aria-labelledby="home-heading">
+            <h4 id="home-heading">Home</h4>
+            <nav aria-label="Home section navigation">
+              <ul role="list">
+                <li role="listitem">
+                  <Link
+                    to="/watchlist"
+                    aria-label="Navigate to Watchlist page"
+                    onClick={handleWatchlistClick}
+                  >
+                    Watchlist
+                  </Link>
                 </li>
-                <li>
-                  <Link to="/ranking">Ranking</Link>
+                <li role="listitem">
+                  <Link to="/ranking" aria-label="Navigate to Ranking page">
+                    Ranking
+                  </Link>
                 </li>
-                <li>
-                  <Link to="/directory/new">New Released</Link>
+                <li role="listitem">
+                  <Link
+                    to="/directory/new"
+                    aria-label="Navigate to New Releases page"
+                  >
+                    New Released
+                  </Link>
                 </li>
-                <li>
-                  <Link to="/recommendation">Recommendation</Link>
-                </li>
-              </ul>
-            </nav>
-          </div>
-
-          <div>
-            <h4>Directory</h4>
-            <nav aria-label="Directory navigation">
-              <ul>
-                <li>
-                  <Link to="/directory">Directory</Link>
-                </li>
-              </ul>
-            </nav>
-          </div>
-
-          <div>
-            <h4>Ranking</h4>
-            <nav aria-label="Ranking navigation">
-              <ul>
-                <li>
-                  <Link to="/ranking">Ranking</Link>
+                <li role="listitem">
+                  <Link
+                    to="/recommendation"
+                    aria-label="Navigate to Recommendations page"
+                    onClick={handleRecommendationClick}
+                  >
+                    Recommendation
+                  </Link>
                 </li>
               </ul>
             </nav>
-          </div>
+          </section>
 
-          <div>
-            <h4>Profile</h4>
-            <nav aria-label="Profile navigation">
-              <ul>
-                <li>
-                  <Link to="/contact">Contact Us</Link>
+          <section aria-labelledby="directory-heading">
+            <h4 id="directory-heading">Directory</h4>
+            <nav aria-label="Directory section navigation">
+              <ul role="list">
+                <li role="listitem">
+                  <Link
+                    to="/directory"
+                    aria-label="Navigate to Movie Directory"
+                  >
+                    Directory
+                  </Link>
                 </li>
               </ul>
             </nav>
-          </div>
+          </section>
 
-          <div>
-            <h4>Connect With Us</h4>
-            <div className="social-icons">
+          <section aria-labelledby="ranking-heading">
+            <h4 id="ranking-heading">Ranking</h4>
+            <nav aria-label="Ranking section navigation">
+              <ul role="list">
+                <li role="listitem">
+                  <Link to="/ranking" aria-label="Navigate to Movie Rankings">
+                    Ranking
+                  </Link>
+                </li>
+              </ul>
+            </nav>
+          </section>
+
+          <section aria-labelledby="profile-heading">
+            <h4 id="profile-heading">Profile</h4>
+            <nav aria-label="Profile section navigation">
+              <ul role="list">
+                <li role="listitem">
+                  <Link to="/profile" aria-label="Contact us page">
+                    Profile
+                  </Link>
+                </li>
+              </ul>
+            </nav>
+          </section>
+
+          <section aria-labelledby="social-heading">
+            <h4 id="social-heading">Connect With Us</h4>
+            <div
+              className="social-icons"
+              role="group"
+              aria-label="Social media links"
+            >
               <a
                 href="https://www.facebook.com"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Visit our Facebook page (opens in new tab)"
               >
-                {/* <i className="fab fa-facebook-f"></i> */}
-                <FaFacebook aria-hidden="true"/>
+                <FaFacebook aria-hidden="true" />
               </a>
               <a
                 href="https://www.twitter.com"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Visit our Twitter page (opens in new tab)"
               >
-                {/* <i className="fab fa-twitter"></i> */}
-                <FaXTwitter aria-hidden="true"/>
+                <FaXTwitter aria-hidden="true" />
               </a>
               <a
                 href="https://www.linkedin.com"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Visit our LinkedIn page (opens in new tab)"
               >
-                {/* <i className="fab fa-linkedin-in"></i> */}
-                <FaLinkedin aria-hidden="true"/>
+                <FaLinkedin aria-hidden="true" />
               </a>
             </div>
-          </div>
+          </section>
         </div>
 
-        <div className="footer-bottom">
-          <p>
+        <div
+          className="footer-bottom"
+          aria-label="Legal disclaimer and copyright information"
+        >
+          <p role="contentinfo">
             Disclaimer: This website provides webpage services only and does not
             host, produce, or store any video content. All videos are embedded
             from third-party sources. We do not take responsibility for their
             availability or copyright compliance. If you have any legal
             concerns, please contact the appropriate content providers.
           </p>
-          <p>&copy; MovieVerse | Powered by TMDB API</p>
-          <p>Email: MovieVerse@gmail.com</p>
+          <p role="contentinfo">&copy; MovieVerse | Powered by TMDB API</p>
+          <p role="contentinfo">
+            Email:{" "}
+            <a
+              href="mailto:MovieVerse@gmail.com"
+              aria-label="Send email to MovieVerse"
+            >
+              MovieVerse@gmail.com
+            </a>
+          </p>
         </div>
       </div>
     </footer>

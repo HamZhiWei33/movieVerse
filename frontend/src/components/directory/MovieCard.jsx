@@ -10,6 +10,7 @@ const MovieCard = ({
   onLike,
   onAddToWatchlist,
   children, // Add children prop
+  allReviews,
 }) => {
   const navigate = useNavigate();
 
@@ -29,9 +30,14 @@ const MovieCard = ({
     onAddToWatchlist();
   };
 
-  const formatRating = (rating) => {
-    if (rating === 0) return "0";
-    return rating.toFixed(1); 
+  // Calculate average rating
+  const calculateAverageRating = () => {
+    const movieReviews = (allReviews ?? []).filter(
+      (review) => review.movieId === movie.id
+    );
+    if (movieReviews.length === 0) return 0;
+    const sum = movieReviews.reduce((acc, review) => acc + review.rating, 0);
+    return (sum / movieReviews.length).toFixed(1);
   };
 
   return (
@@ -48,7 +54,7 @@ const MovieCard = ({
         />
         <div className="hover-overlay">
           <div className="top-right">
-            <span className="rating">{formatRating(movie.rating)}</span>
+            <span className="rating">{calculateAverageRating()}</span>
           </div>
           <div className="bottom-icons" onClick={(e) => e.stopPropagation()}>
             <LikeIcon liked={liked} onClick={handleLikeClick} />

@@ -2,6 +2,7 @@
   position: relative;
   width: 100%;
   background-color: #000; 
+  overflow: hidden;
 }
 
 .blurred-banner-wrapper {
@@ -52,16 +53,10 @@
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.01);
 }
 
-@media screen and (max-width: 768px) {
-  .chart-container {
-    max-width: 90%; /* Reduce max width on smaller screens */
-    padding: 1.5rem; /* Adjust padding for smaller screens */
-  }
-}
 
 .chart-title {
   color: #fff;
-  margin-bottom: 1rem;
+  margin: 1rem;
   font-size: 1.5rem;
   font-weight: bold;
   text-align: center;
@@ -371,7 +366,7 @@
   gap: 1.5rem;
 }
 
-.genre-card {
+.genre-card-ranking {
   background: #111;
   padding: 1rem;
   border-radius: 8px;
@@ -384,8 +379,8 @@
   gap: 1rem;
   box-shadow: 0 0 12px rgba(0, 0, 0, 0.5);
 }
-.genre-card:hover {
-  transform: scale(1.03);
+.genre-card-ranking:hover {
+  transform: scale(1.04);
 }
 .genre-list {
   display: flex;
@@ -466,6 +461,20 @@
   transform: scale(1.05); 
 }
 
+.image-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* This ensures the image fills the container */
+}
+
 .top1-image {
   width: 100%;
   height: 400px;
@@ -528,6 +537,64 @@
   .rating-visual-summary {
     flex-direction: column;
     align-items: center;
+  }
+
+  .score-number {
+    font-size: 2.5rem;
+  }
+
+  .star-label {
+    width: 50px;
+    font-size: 0.9rem;
+  }
+
+  .total-ratings {
+    text-align: center;
+  }
+
+  .genre-card-body {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .genre-poster {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .genre-info {
+    align-items: center;
+    text-align: center;
+  }
+}
+
+@media (max-width: 420px) {
+.genre-ranking-layout{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+
+  .ranking-three-columns {
+    flex-direction: column;
+    align-items: center;
+  }
+
+
+  .star-label {
+    width: 50px;
+    font-size: 0.9rem;
+  }
+
+  .rating-visual-summary {
+    flex-direction: column;
+    align-items: center;
+  }
+  .distribution-right{
+    visibility: collapse;
   }
 
   .score-number {

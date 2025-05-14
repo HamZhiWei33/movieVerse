@@ -5,7 +5,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 
-const GenreRankingSection = ({ movies, allGenres }) => {
+const GenreRankingSection = ({ movies, allGenres, allReviews }) => {
   const [searchParams] = useSearchParams();
   const urlGenre = searchParams.get("genre");
   const location = useLocation();
@@ -43,6 +43,23 @@ const GenreRankingSection = ({ movies, allGenres }) => {
     }
   }, [location.hash]);
 
+  const calculateAverageRating = (movieId) => {
+    if (!Array.isArray(allReviews) || allReviews.length === 0) return 0;
+
+    const selectedReviews = allReviews.filter((r) => r.movieId === movieId);
+
+    const validRatings = selectedReviews
+      .map((r) => Number(r.rating))
+      .filter((r) => !isNaN(r));
+
+    if (validRatings.length === 0) return 0;
+
+    const sum = validRatings.reduce((acc, rating) => acc + rating, 0);
+    const average = sum / validRatings.length;
+
+    return parseFloat(average.toFixed(1));
+  };
+
   const filtered = useMemo(() => {
     if (selectedGenre === "All") return movies;
     const genreId = allGenres.find((g) => g.name === selectedGenre)?.id;
@@ -52,19 +69,38 @@ const GenreRankingSection = ({ movies, allGenres }) => {
   const sorted = [...filtered]
     .map((movie) => ({
       ...movie,
-      compositeScore: movie.rating * 0.8 + (movie.year - 2000) * 0.02,
+      compositeScore: calculateAverageRating(movie.id) * 0.9 + (movie.year - 2000) * 0.1,
     }))
-    .sort((a, b) => b.compositeScore - a.compositeScore);
+    .sort((a, b) =>  {
+    if (b.compositeScore === a.compositeScore) {
+       return a.id.localeCompare(b.id); 
+    }
+    return b.compositeScore - a.compositeScore;
+  });
   console.log("Sorted movies:", sorted); // Debugging line
   const top1 = sorted[0];
   const otherMovies = sorted.slice(1);
 
+  const formatDuration = (minutes) => {
+    if (!minutes || isNaN(minutes)) return "N/A";
+
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+
+    return hours > 0
+      ? `${hours}h${mins > 0 ? ` ${mins}min` : ""}`.trim()
+      : `${mins}min`;
+  };
+
   // Format duration for Top 1 movie
+  // const durationText = useMemo(() => {
+  //   if (!top1?.duration) return "";
+  //   const hrs = Math.floor(top1.duration / 60);
+  //   const mins = top1.duration % 60;
+  //   return `${hrs}h ${mins}min`;
+  // }, [top1]);
   const durationText = useMemo(() => {
-    if (!top1?.duration) return "";
-    const hrs = Math.floor(top1.duration / 60);
-    const mins = top1.duration % 60;
-    return `⏱ ${hrs}h ${mins}min`;
+    return formatDuration(top1?.duration);
   }, [top1]);
 
   // Get genre names for Top 1 movie
@@ -77,9 +113,11 @@ const GenreRankingSection = ({ movies, allGenres }) => {
       .join(", ");
   }, [top1, allGenres]);
 
+  
+
   return (
-    <section className="genre-ranking-section" id="genre-ranking">
-      <h2 className="genre-title">Order by Genre</h2>
+    <section className="genre-ranking-section">
+      <h2 className="genre-ranking-section-header">Order by Genre</h2>
 
       <nav className="genre-nav">
         {genreOptions.map((g) => (
@@ -97,21 +135,19 @@ const GenreRankingSection = ({ movies, allGenres }) => {
         <div className="genre-ranking-layout">
           {/* Top 1 - Left Side */}
           {top1 && (
-            <div className="top1-card">
               <Top1Card
                 key={top1.id}
                 movie={top1}
                 rank={1}
                 image={top1.posterUrl}
                 title={top1.title}
-                rating={top1.rating}
+                rating={calculateAverageRating(top1.id)}
                 description={top1.description}
                 genre={genreNames}
                 region={top1.region}
                 year={top1.year}
                 duration={durationText}
               />
-            </div>
           )}
 
           {/* Other movies (Top 2, Top 3, ...) - Right Side */}
@@ -129,7 +165,7 @@ const GenreRankingSection = ({ movies, allGenres }) => {
                   })
                   .join(", ");
 
-                const movieDurationText = `⏱ ${Math.floor(
+                const movieDurationText = `${Math.floor(
                   movie.duration / 60
                 )}h ${movie.duration % 60}min`; // Calculate duration text for each movie
                 return (
@@ -139,7 +175,7 @@ const GenreRankingSection = ({ movies, allGenres }) => {
                     rank={index + 2}
                     image={movie.posterUrl}
                     title={movie.title}
-                    rating={movie.rating}
+                    rating={calculateAverageRating(movie.id)}
                     genre={movieGenreNames}
                     region={movie.region}
                     year={movie.year}

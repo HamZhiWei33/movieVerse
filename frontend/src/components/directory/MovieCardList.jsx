@@ -5,6 +5,7 @@ import ReviewStars from "./ReviewStars";
 import { IoTime } from "react-icons/io5";
 import { FaPlay } from "react-icons/fa6";
 import "../../styles/directory/MovieCardList.css";
+import { genres } from '../../constant';
 
 const MovieCardList = ({
   movie,
@@ -16,16 +17,9 @@ const MovieCardList = ({
   showBottomInteractiveIcon = false,
   showCastInfo = false,
   likeCount = 0,
+  allReviews,
 }) => {
   const navigate = useNavigate();
-
-  // Helper function to check if value exists and is not empty
-  const hasValue = (value) => {
-    if (value === undefined || value === null) return false;
-    if (typeof value === 'string') return value.trim() !== '';
-    if (Array.isArray(value)) return value.length > 0 && value[0] !== '';
-    return true;
-  };
 
   const handleCardClick = () => {
     navigate(`/movie/${encodeURIComponent(movie.title)}`, {
@@ -61,6 +55,28 @@ const MovieCardList = ({
       : `${mins}min`;
   };
 
+  const calculateAverageRating = () => {
+    if (!Array.isArray(allReviews) || allReviews.length === 0) return 0;
+
+    const validRatings = allReviews
+      .map(r => Number(r.rating))
+      .filter(r => !isNaN(r));
+
+    if (validRatings.length === 0) return 0;
+
+    const sum = validRatings.reduce((acc, rating) => acc + rating, 0);
+    const average = sum / validRatings.length;
+
+    return average === 0 ? 0 : parseFloat(average.toFixed(1));
+  };
+
+  const averageRating = calculateAverageRating();
+
+  const getGenreName = (id) => {
+    const genreObj = genres.find(g => g.id === id);
+    return genreObj ? genreObj.name : String(id);
+  };
+
   return (
     <article
       className="movie-card-list"
@@ -75,21 +91,19 @@ const MovieCardList = ({
         />
       </div>
       <div className="movie-details-container-list">
-        <h3 style={{paddingInlineStart:7}}>{movie.title}</h3>
+        <h3>{movie.title}</h3>
         <ReviewStars
-          rating={movie.rating}
+          rating={averageRating}
           readOnly={true}
           showNumber={showRatingNumber}
         />
-        {hasValue(movie.genre) && (
-          <div className="genre-tags">
-            {movie.genre.map((genre, index) => (
-              <span key={index} className="genre-tag">
-                {genre}
-              </span>
-            ))}
-          </div>
-        )}
+        <div className="genre-tags">
+          {movie.genre.map((id, index) => (
+            <span key={index} className="genre-tag">
+              {getGenreName(id)}
+            </span>
+          ))}
+        </div>
         <div className="duration-and-icons-container">
           <div className="duration-tag">
             <span className="duration-icon">
@@ -114,23 +128,27 @@ const MovieCardList = ({
             </div>
           )}
         </div>
-        {showCastInfo && (hasValue(movie.director) || hasValue(movie.actors)) && (
+        {showCastInfo && (
           <div className="cast-info">
-            {hasValue(movie.director) && (
+            {/* Only show Director section if there is a director */}
+            {movie.director && (
               <div className="cast-row">
                 <span className="cast-label">Director</span>
                 <span className="director-item">{movie.director}</span>
               </div>
             )}
 
-            {hasValue(movie.actors) && (
+            {/* Only show Cast section if there are valid actors */}
+            {movie.actors && movie.actors.filter(actor => actor.trim() !== "").length > 0 && (
               <div className="cast-row">
                 <span className="cast-label">Cast</span>
                 <div className="actors-list">
                   {movie.actors.map((actor, index) => (
-                    <span key={index} className="actor-item">
-                      {actor}
-                    </span>
+                    actor.trim() !== "" && (
+                      <span key={index} className="actor-item">
+                        {actor}
+                      </span>
+                    )
                   ))}
                 </div>
               </div>
@@ -138,9 +156,8 @@ const MovieCardList = ({
           </div>
         )}
 
-        {hasValue(movie.description) && (
-          <p className="clamp-text">{movie.description}</p>
-        )}
+
+        <p className="clamp-text">{movie.description}</p>
         {showBottomInteractiveIcon && (
           <div
             className="bottom-iteractive-icon-container"
@@ -152,7 +169,6 @@ const MovieCardList = ({
             </button>
             <div className="iteractive-icon" onClick={handleLikeClick}>
               <LikeIcon liked={liked} />
-              <span className="like-count">{movie.likes}</span>
             </div>
             <div
               className="iteractive-icon"

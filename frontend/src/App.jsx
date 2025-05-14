@@ -2,8 +2,9 @@ import "./App.css";
 import { Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import HomePage from "./pages/HomePage";
-import SignupPage from "./pages/SignUpPage";
+import SignupPage from "./pages/SignupPage";
 import LoginPage from "./pages/LoginPage";
+import GenreSelectionPage from "./pages/GenreSelectionPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import DirectoryPage from "./pages/DirectoryPage";
@@ -35,6 +36,7 @@ function AppContent() {
         <Route path="/" element={<HomePage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/genre_selection" element={<GenreSelectionPage />} />
         <Route path="/forgot_password" element={<ForgotPasswordPage />} />
         <Route path="/reset_password" element={<ResetPasswordPage />} />
         <Route path="/directory" element={<DirectoryPage />} />

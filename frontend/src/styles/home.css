@@ -8,7 +8,11 @@ main.home-page {
   position: relative;
   overflow: hidden;
 }
-
+.homePageWrapper {
+  padding: 0 5%;
+  background-color: #141414;
+  padding-bottom: 3rem;
+}
 .hero-swiper {
   width: 100%;
   height: 100%;
@@ -46,11 +50,17 @@ main.home-page {
 
 /* tablet/ipad */
 @media screen and (max-width: 1200px) {
-  main.home-page {
+  .home-swiper-container {
+    margin-bottom: 10rem;
+  }
+
+  .home-swiper-image {
+    height: 50vh;
   }
 }
 /* phone */
 @media screen and (max-width: 768px) {
-  main.home-page {
+  .home-swiper-image {
+    height: 30vh;
   }
 }
