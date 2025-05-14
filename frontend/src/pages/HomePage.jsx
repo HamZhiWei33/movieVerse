@@ -22,26 +22,28 @@ const HomePage = () => {
   useGuestUser(isValidateUser);
 
   return (
-    <div className="homePageWrapper" role="main" aria-label="MovieVerse home page">
+    <div
+      className="homePageWrapper"
+      role="main"
+      aria-label="MovieVerse home page"
+    >
       {isValidateUser ? <HeroBanner /> : <HomeRanking />}
-      <HeroSection
-        title="Watchlist"
-        moviesType={"watchlist"}
-        items={watchlist}
-      />
+      {isValidateUser && (
+        <HeroSection
+          title="Watchlist"
+          moviesType={"watchlist"}
+          items={watchlist}
+        />
+      )}
 
-      <HeroSection 
-        title="Ranking" 
-        moviesType={"ranking"} 
-        items={genres} 
-      />
-      
+      <HeroSection title="Ranking" moviesType={"ranking"} items={genres} />
+
       <HeroSection
         title="New Released"
         moviesType={"newReleased"}
         items={recentMovies}
       />
-      
+
       <RecommendationSection
         title="Recommendation"
         moviesType={"recommendation"}

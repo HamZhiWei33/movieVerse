@@ -52,7 +52,10 @@
   display: grid;
   width: 100%;
   align-self: center;
-  grid-template-columns: minmax(15rem, 1fr) repeat(auto-fill, minmax(1rem, 1fr) minmax(15rem, 1fr)); 
+  grid-template-columns: minmax(15rem, 1fr) repeat(
+      auto-fill,
+      minmax(1rem, 1fr) minmax(15rem, 1fr)
+    );
   /* gap: 1rem; */
   row-gap: 2rem;
 }
@@ -147,7 +150,7 @@
   font-size: 0.9rem;
 }
 
-.recommendation-card-container>*:hover p {
+.recommendation-card-container > *:hover p {
   color: #fff;
   /* white on hover */
 }
