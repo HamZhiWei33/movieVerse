@@ -46,20 +46,20 @@ const RecommendationSection = ({ title, moviesType, items }) => {
           cards.push(<div key={`spacer-${index}`} className="spacer" />);
         cards.push(
           movie ? (
-              <MovieCard
+            <MovieCard
               key={index}
-                role="listitem"
-                movie={{
-                  ...movie,
-                  genre: movie.genre.map((id) => genreMap[id]), // Convert genre IDs to names
-                  year: movie.year.toString(), // Ensure year is string
-                }}
-                liked={likedMovies.includes(movie.id)}
-                addedToWatchlist={addToWatchlistMovies.includes(movie.id)}
-                onLike={() => toggleLike(movie.id)}
-                onAddToWatchlist={() => toggleAddToWatchlist(movie.id)}
-                allReviews={reviews}
-              />
+              role="listitem"
+              movie={{
+                ...movie,
+                genre: movie.genre.map((id) => genreMap[id]), // Convert genre IDs to names
+                year: movie.year.toString(), // Ensure year is string
+              }}
+              liked={likedMovies.includes(movie.id)}
+              addedToWatchlist={addToWatchlistMovies.includes(movie.id)}
+              onLike={() => toggleLike(movie.id)}
+              onAddToWatchlist={() => toggleAddToWatchlist(movie.id)}
+              allReviews={reviews}
+            />
           ) : (
             <div key={index} className="movie-card-placeholder" />
           )
