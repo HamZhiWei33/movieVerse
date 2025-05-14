@@ -1,105 +1,151 @@
 import "../styles/navbar.css";
-import React, { useState, useEffect } from "react";
+import { useState, useContext } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { FaAngleDown } from "react-icons/fa";
 import SearchIcon from "@mui/icons-material/Search";
 import MenuIcon from "@mui/icons-material/Menu";
+import useIsMobile from "../store/useIsMobile";
+import { UserValidationContext } from "../context/UserValidationProvider ";
 
 const Navbar = () => {
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const isMobile = useIsMobile();
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
-
-  const guestRoutes = ["/login", "/signup", "/forgot_password", "/reset_password", "/genre_selection"];
-  const isGuest = guestRoutes.includes(location.pathname);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-
-    window.addEventListener("resize", handleResize);
-    handleResize(); // Optional: ensure state is correct on mount
-
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  const { isValidateUser, logout } = useContext(UserValidationContext);
+  // const guestRoutes = [
+  //   "/login",
+  //   "/signup",
+  //   "/forgot_password",
+  //   "/reset_password",
+  //   "/genre_selection",
+  // ];
+  // const isGuest = guestRoutes.includes(location.pathname);
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
 
   return (
-    <header>
+    <header role="banner">
       <div id="navbar">
-        <div className="logo">
+        <div className="logo" aria-label="Go to homepage">
           <NavLink to="/">
-            <img src="logo.gif" alt="logo" width={300} height={50} />
+            <img src="logo.gif" alt="App logo" width={300} height={50} />
           </NavLink>
         </div>
-        <button id="menu-button" onClick={toggleMenu}>
+        <button
+          id="menu-button"
+          onClick={toggleMenu}
+          aria-label="Toggle navigation menu"
+          aria-expanded={menuOpen}
+          aria-controls="navigation-menu"
+        >
           <MenuIcon />
         </button>
-
-        {!isGuest && (
-          <div className="search-bar">
-          <input id="searchInput" type="text" placeholder="Search" />
+        {/* Overlay to close sidebar */}
+        {menuOpen && (
+          <div
+            className="navbar-overlay"
+            onClick={toggleMenu}
+            aria-label="Close navigation menu overlay"
+            aria-hidden="true"
+          ></div>
+        )}
+        <div className="search-bar" role="search" aria-label="Site search">
+          <input
+            id="searchInput"
+            type="text"
+            placeholder="Search"
+            aria-label="Search input"
+          />
           <SearchIcon size={20} />
-        </div>)}
+        </div>
 
-        <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "1rem" }}>
-          <nav className={`nav-links ${menuOpen ? "open" : ""}`}>
-            {isGuest ? (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            gap: "1rem",
+          }}
+        >
+          <nav
+            className={`nav-links ${menuOpen ? "open" : ""}`}
+            role="navigation"
+            aria-label="Main navigation"
+          >
+            {!isValidateUser ? (
               <ul>
                 <li>
-                  <NavLink to="/login" end>Login</NavLink>
+                  <NavLink to="/login" end aria-label="Login page">
+                    Login
+                  </NavLink>
                 </li>
                 <li>
-                  <NavLink to="/signup" end>Sign Up</NavLink>
+                  <NavLink to="/signup" end aria-label="Sign up page">
+                    Sign Up
+                  </NavLink>
                 </li>
               </ul>
             ) : (
               <ul>
                 <li>
-                  <NavLink to="/" end>Home</NavLink>
-                </li>
-                <li>
-                  <NavLink to="/directory">Directory</NavLink>
-                </li>
-                <li>
-                  <NavLink to="/ranking">Ranking</NavLink>
-                </li>
-                <li style={{ display: "flex", flexDirection: "row" }}>
-                  <NavLink to="/profile">
-                    Profile
-                    <FaAngleDown style={{ alignSelf: "center" }} />
+                  <NavLink to="/" end aria-label="Homepage">
+                    Home
                   </NavLink>
                 </li>
-                {isMobile &&
+                <li>
+                  <NavLink to="/directory" aria-label="Movie directory page">
+                    Directory
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink to="/ranking" aria-label="Movie ranking page">
+                    Ranking
+                  </NavLink>
+                </li>
+                <li style={{ display: "flex", flexDirection: "row" }}>
+                  <NavLink to="/profile" aria-label="Profile page">
+                    Profile
+                    {/* <FaAngleDown style={{ alignSelf: "center" }} /> */}
+                  </NavLink>
+                </li>
+                {isMobile && (
                   <li>
-                    <NavLink to="/login">Logout</NavLink>
-                  </li>}
+                    <NavLink to="/login" aria-label="Logout" onClick={logout}>
+                      Logout
+                    </NavLink>
+                  </li>
+                )}
               </ul>
             )}
-
           </nav>
 
-          {(!isMobile && !isGuest) &&
-            <NavLink to="/login">
-              <div className="logout-btn">
+          {!isMobile && isValidateUser && (
+            <NavLink to="/login" aria-label="Logout">
+              <div
+                className="logout-btn"
+                role="button"
+                aria-label="Logout button with profile image"
+              >
                 <div>
                   <div className="profile-container">
                     <img
-                      src={localStorage.getItem("profileImg") || "/profile/placeholder_avatar.svg"}
-                      alt="profile picture"
+                      src={
+                        localStorage.getItem("profileImg") ||
+                        "/profile/placeholder_avatar.svg"
+                      }
+                      alt="User profile avatar"
                       height={50}
-                      aria-describedby="image-instruction" />
+                      aria-label="User profile image"
+                    />
                   </div>
-                  <p>Logout</p>
+                  <p onClick={logout}>Logout</p>
                 </div>
               </div>
-            </NavLink>}
+            </NavLink>
+          )}
         </div>
-
       </div>
     </header>
   );

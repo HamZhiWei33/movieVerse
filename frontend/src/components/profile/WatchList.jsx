@@ -9,6 +9,7 @@ const WatchList = ({
   movie,
   showRatingNumber = false,
   showBottomInteractiveIcon = false,
+  allReviews,
 }) => {
   const navigate = useNavigate();
 
@@ -18,12 +19,36 @@ const WatchList = ({
     });
   };
 
+  const handleRemoveClick = (e) => {
+    e.stopPropagation();
+    alert("Remove from watchlist");
+  };
+
+  const calculateAverageRating = () => {
+    if (!Array.isArray(allReviews) || allReviews.length === 0) return 0;
+
+    // Filter reviews for this specific movie ID
+    const movieReviews = allReviews.filter((review) => review.movieId === movie.id);
+
+    if (movieReviews.length === 0) return 0;
+
+    const validRatings = movieReviews
+      .map((r) => Number(r.rating))
+      .filter((r) => !isNaN(r));
+
+    if (validRatings.length === 0) return 0;
+
+    const sum = validRatings.reduce((acc, rating) => acc + rating, 0);
+    const average = sum / validRatings.length;
+
+    return parseFloat(average.toFixed(1));
+  };
+
+
+  const averageRating = calculateAverageRating();
+
   return (
-    <article
-      id="watchlist"
-      onClick={handleCardClick}
-      style={{ cursor: "pointer" }}
-    >
+    <article id="watchlist" style={{ cursor: "pointer" }}>
       <div className="movie-card-list">
         <div className="poster-container-list">
           <img
@@ -32,10 +57,10 @@ const WatchList = ({
             className="poster-img-list"
           />
         </div>
-        <div className="movie-details-container-list">
+        <div className="movie-details-container-list" onClick={handleCardClick}>
           <h3>{movie.title}</h3>
           <ReviewStars
-            rating={movie.rating}
+            rating={averageRating}
             readOnly={true}
             showNumber={true}
           />
@@ -62,7 +87,9 @@ const WatchList = ({
           </div>
         </div>
         <div className="remove-watchlist-container">
-          <button className="remove-watchlist-btn">Remove</button>
+          <button className="remove-watchlist-btn" onClick={handleRemoveClick}>
+            Remove
+          </button>
         </div>
       </div>
     </article>

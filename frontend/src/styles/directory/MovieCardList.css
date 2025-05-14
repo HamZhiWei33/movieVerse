@@ -61,10 +61,12 @@
   /* Standard property (future) */
   box-orient: vertical;
   /* Standard property (future) */
+  padding-left: 0.3rem;
 }
 
 .movie-card-list h3 {
   font-size: 1.3rem;
+  padding-left: 0.3rem;
 }
 
 .movie-card-list p {
@@ -189,7 +191,7 @@
 .cast-label {
   display: inline-flex;
   align-items: center;
-  color: #bfbfbf;
+  color: #ffffff;
   padding: 0 0.7rem;
   width: fit-content;
   font-weight: 400;

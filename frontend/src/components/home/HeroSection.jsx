@@ -10,6 +10,7 @@ import { movies, genres, reviews } from "../../constant";
 import { useMemo, useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import useHorizontalScroll from "../../store/useHorizontalScroll";
+import { reviews } from "../../constant";
 const HeroSection = ({ title, moviesType, items }) => {
   const [likedMovies, setLikedMovies] = useState([]);
   const [addToWatchlistMovies, setAddToWatchlistMovies] = useState([]);
@@ -184,13 +185,13 @@ const HeroSection = ({ title, moviesType, items }) => {
                   key={movie.id}
                   movie={{
                     ...movie,
-                    genre: movie.genre.map((id) => genreMap[id]), // Convert genre IDs to names
                     year: movie.year.toString(), // Ensure year is string
                   }}
                   liked={likedMovies.includes(movie.id)}
                   addedToWatchlist={addToWatchlistMovies.includes(movie.id)}
                   onLike={() => toggleLike(movie.id)}
                   onAddToWatchlist={() => toggleAddToWatchlist(movie.id)}
+                  allReviews={reviews}
                 />
               ))}
             </div>
@@ -219,15 +220,6 @@ const HeroSection = ({ title, moviesType, items }) => {
             </div>
           )}
         </div>
-        {/* <div className="home-card-section">
-          {moviesType === "recommendation" && (
-            <div id="recommendation" className="home-card-container">
-              {items.map((movie) => (
-                <MovieCard key={movie.id} movie={movie} />
-              ))}
-            </div>
-          )}
-        </div> */}
       </div>
     </section>
   );

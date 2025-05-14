@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import MovieCard from "../directory/MovieCard";
 import "../../styles/home/recommendation-section.css";
 import { TfiReload } from "react-icons/tfi";
-import { genres, reviews } from "../../constant";
+import { reviews, genres } from "../../constant";
 const RecommendationSection = ({ title, moviesType, items }) => {
   const [displayed, setDisplayed] = useState([]);
   const [likedMovies, setLikedMovies] = useState([]);
@@ -42,7 +42,8 @@ const RecommendationSection = ({ title, moviesType, items }) => {
     displayed.forEach((movie, index) => {
       if (index < maxMoviesCount) {
         // Spacer before every item except the first
-        if (index % columns !== 0) cards.push(<div key={`spacer-${index}`} className="spacer" />);
+        if (index % columns !== 0)
+          cards.push(<div key={`spacer-${index}`} className="spacer" />);
         cards.push(
           movie ? (
               <MovieCard
@@ -81,7 +82,7 @@ const RecommendationSection = ({ title, moviesType, items }) => {
     const observer = new ResizeObserver(() => {
       if (!gridRef.current) return;
       const style = getComputedStyle(gridRef.current);
-      const columns = style.gridTemplateColumns.split(' ').length;
+      const columns = style.gridTemplateColumns.split(" ").length;
 
       // setGridColCount(columns);
 
@@ -90,7 +91,6 @@ const RecommendationSection = ({ title, moviesType, items }) => {
       // setVisibleCount(maxVisible);
 
       setupMovieCards(columns);
-
     });
 
     observer.observe(gridRef.current);
@@ -132,7 +132,7 @@ const RecommendationSection = ({ title, moviesType, items }) => {
           {movieCards}
         </div>
       </div>
-    </section >
+    </section>
   );
 };
 

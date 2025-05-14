@@ -202,7 +202,7 @@ legend {
   display: grid;
   border: 0.1rem solid #262626;
   border-radius: 0.7rem;
-  /* padding: 2.5rem; */
+  padding: 2.5rem;
   grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
   gap: 1.5rem;
 }
