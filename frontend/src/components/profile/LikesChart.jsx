@@ -44,14 +44,18 @@ const LikesChart = ({ userId }) => {
         position: isMobile ? "bottom" : "right",
         labels: {
           usePointStyle: true,
+          pointStyle: "circle",
+          boxHeight: isMobile ? 5 : 10,
           boxWidth: 10,
-          padding: 20,
+          padding: isMobile ? 8 : 20,
           color: "white",
           font: {
-            size: isMobile ? 12 : 16,
-            weight: "bold",
+            size: isMobile ? 10 : 14,
+            // weight: "bold",
             // color: "white",
           },
+          maxHeight: isMobile ? 60 : 300,
+          maxWidth: isMobile ? undefined : 120,
         },
       },
       tooltip: {
@@ -72,7 +76,7 @@ const LikesChart = ({ userId }) => {
         },
         font: {
           weight: "bold",
-          size: 14,
+          size: isMobile ? 8 : 14,
         },
       },
       animation: {
@@ -93,6 +97,7 @@ const LikesChart = ({ userId }) => {
       },
     },
     cutout: isMobile ? "40%" : "60%",
+    responsive: true,
     maintainAspectRatio: false,
   };
 
@@ -102,7 +107,7 @@ const LikesChart = ({ userId }) => {
         width: "100%",
         maxWidth: "800px",
         margin: "0 auto",
-        padding: "3rem",
+        padding: isMobile ? "0.5rem" : "3rem",
         boxSizing: "border-box",
       }}
     >
@@ -111,7 +116,7 @@ const LikesChart = ({ userId }) => {
           textAlign: "center",
           marginBottom: "20px",
           color: "#fff",
-          fontSize: "1.5rem",
+          fontSize: isMobile ? "1rem" : "1.5rem",
           fontWeight: "bold",
         }}
       >
@@ -119,7 +124,7 @@ const LikesChart = ({ userId }) => {
       </h2>
       <div
         style={{
-          height: isMobile ? "300px" : "400px",
+          height: isMobile ? "350px" : "400px",
           position: "relative",
         }}
       >

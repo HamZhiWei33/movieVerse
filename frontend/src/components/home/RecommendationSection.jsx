@@ -62,6 +62,7 @@ const RecommendationSection = ({ title, moviesType, items }) => {
                 addedToWatchlist={addToWatchlistMovies.includes(movie.id)}
                 onLike={() => toggleLike(movie.id)}
                 onAddToWatchlist={() => toggleAddToWatchlist(movie.id)}
+                allReviews={reviews}
               />
             </div>
           ) : (
