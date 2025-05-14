@@ -61,11 +61,12 @@ const RecommendationSection = ({ title, moviesType, items }) => {
                 onAddToWatchlist={() => toggleAddToWatchlist(movie.id)}
                 allReviews={reviews}
               >
-          <div className="movie-rating">
-            <ReviewStars rating={movie.rating} />
-          </div>
-          
-            </MovieCard>
+              
+              <div className="movie-rating">
+                <ReviewStars rating={movie.rating} />
+              </div>
+              </MovieCard>
+
           ) : (
             <div key={index} className="movie-card-placeholder" />
           )
@@ -135,7 +136,6 @@ const RecommendationSection = ({ title, moviesType, items }) => {
           role="list"
           aria-label="List of recommended movies"
         >
-
           {movieCards}
         </div>
       </div>

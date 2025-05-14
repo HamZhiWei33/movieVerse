@@ -39,6 +39,7 @@ const HeroSection = ({ title, moviesType, items }) => {
       navigate("/ranking");
     }
   };
+<<<<<<< HEAD
 
   // const handleWatchlistClick = () => {
   //   navigate("/profile", { state: { targetTab: "WatchList" } });
@@ -48,6 +49,8 @@ const HeroSection = ({ title, moviesType, items }) => {
   //   console.log("ranking click");
   //   navigate("/ranking");
   // };
+=======
+>>>>>>> d44e1624173a81ff2a9f7bcf45040653903b78be
 
   const toggleLike = (title) => {
     setLikedMovies((prev) =>
@@ -75,6 +78,7 @@ const HeroSection = ({ title, moviesType, items }) => {
     items.forEach((movie, index) => {
       if (index < maxMoviesCount) {
         // Spacer before every item except the first
+<<<<<<< HEAD
         if (index % columns !== 0 && window.innerWidth >= 922) cards.push(<div key={`spacer-${index}`} className="spacer" />);
         cards.push(
           movie ? (
@@ -84,6 +88,16 @@ const HeroSection = ({ title, moviesType, items }) => {
               movie={{
                 ...movie,
                 genre: movie.genre.map((id) => genreMap[id]), // Convert genre IDs to names
+=======
+        if (index % columns !== 0 && window.innerWidth >= 922)
+          cards.push(<div key={`spacer-${index}`} className="spacer" />);
+        cards.push(
+          movie ? (
+            <MovieCard
+              key={movie.id}
+              movie={{
+                ...movie,
+>>>>>>> d44e1624173a81ff2a9f7bcf45040653903b78be
                 year: movie.year.toString(), // Ensure year is string
               }}
               liked={likedMovies.includes(movie.id)}
@@ -108,12 +122,19 @@ const HeroSection = ({ title, moviesType, items }) => {
     if (moviesType === "ranking") return;
     if (!gridRef.current) return;
     const observer = new ResizeObserver(() => {
+<<<<<<< HEAD
 
       const style = getComputedStyle(gridRef.current);
       const columns = style.gridTemplateColumns.split(' ').length;
 
       setupMovieCards(columns);
 
+=======
+      const style = getComputedStyle(gridRef.current);
+      const columns = style.gridTemplateColumns.split(" ").length;
+
+      setupMovieCards(columns);
+>>>>>>> d44e1624173a81ff2a9f7bcf45040653903b78be
     });
 
     observer.observe(gridRef.current);
@@ -137,6 +158,7 @@ const HeroSection = ({ title, moviesType, items }) => {
               role="button"
               tabIndex={0}
               aria-label={`Go to full ${moviesType} view`}
+<<<<<<< HEAD
               onKeyDown={(e) => { if (e.key === "Enter") { navigateFullPage() } }}
             >
               <FaAngleRight aria-hidden="true" />
@@ -162,16 +184,40 @@ const HeroSection = ({ title, moviesType, items }) => {
         </div>
         {(moviesType === "watchlist" || moviesType === "newReleased") && (
           <div style={{maxWidth:"100%", width:"100%", padding:"1rem 2rem"}}>
+=======
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  navigateFullPage();
+                }
+              }}
+            >
+              <FaAngleRight aria-hidden="true" />
+            </span>
+          </h2>
+        </div>
+        {(moviesType === "watchlist" || moviesType === "newReleased") && (
+          <div
+            style={{ maxWidth: "100%", width: "100%", padding: "1rem 2rem" }}
+          >
+>>>>>>> d44e1624173a81ff2a9f7bcf45040653903b78be
             <div
               id={moviesType}
               ref={gridRef}
               className="recommendation-card-container"
               role="region"
+<<<<<<< HEAD
               aria-label={ariaLabel}>
               {movieCards}
             </div>
           </div>
 
+=======
+              aria-label={ariaLabel}
+            >
+              {movieCards}
+            </div>
+          </div>
+>>>>>>> d44e1624173a81ff2a9f7bcf45040653903b78be
         )}
         {/* <div
           className="home-card-section"
@@ -197,11 +243,15 @@ const HeroSection = ({ title, moviesType, items }) => {
             </div>
           )}
         </div> */}
+<<<<<<< HEAD
         <div
           className="home-card-section"
           role="region"
           aria-label={ariaLabel}
         >
+=======
+        <div className="home-card-section" role="region" aria-label={ariaLabel}>
+>>>>>>> d44e1624173a81ff2a9f7bcf45040653903b78be
           {moviesType === "ranking" && (
             <div className="home-card-container" ref={containerRef}>
               <div className="genre-selection-grid">

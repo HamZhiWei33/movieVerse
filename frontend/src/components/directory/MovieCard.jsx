@@ -9,7 +9,7 @@ const MovieCard = ({
   addedToWatchlist,
   onLike,
   onAddToWatchlist,
-  children, // Add children prop
+  children,
   allReviews,
 }) => {
   const navigate = useNavigate();
@@ -54,6 +54,7 @@ const MovieCard = ({
         />
         <div className="hover-overlay">
           <div className="top-right">
+            <span className="rating">{calculateAverageRating()}</span>
             <span className="rating">{calculateAverageRating()}</span>
           </div>
           <div className="bottom-icons" onClick={(e) => e.stopPropagation()}>
