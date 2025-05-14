@@ -10,7 +10,7 @@ import { movies, genres, reviews } from "../../constant";
 import { useMemo, useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import useHorizontalScroll from "../../store/useHorizontalScroll";
-import { reviews } from "../../constant";
+
 const HeroSection = ({ title, moviesType, items }) => {
   const [likedMovies, setLikedMovies] = useState([]);
   const [addToWatchlistMovies, setAddToWatchlistMovies] = useState([]);
@@ -40,15 +40,6 @@ const HeroSection = ({ title, moviesType, items }) => {
     }
   };
 
-  // const handleWatchlistClick = () => {
-  //   navigate("/profile", { state: { targetTab: "WatchList" } });
-  // };
-
-  // const handleRankingClick = () => {
-  //   console.log("ranking click");
-  //   navigate("/ranking");
-  // };
-
   const toggleLike = (title) => {
     setLikedMovies((prev) =>
       prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title]
@@ -75,15 +66,14 @@ const HeroSection = ({ title, moviesType, items }) => {
     items.forEach((movie, index) => {
       if (index < maxMoviesCount) {
         // Spacer before every item except the first
-        if (index % columns !== 0 && window.innerWidth >= 922) cards.push(<div key={`spacer-${index}`} className="spacer" />);
+        if (index % columns !== 0 && window.innerWidth >= 922)
+          cards.push(<div key={`spacer-${index}`} className="spacer" />);
         cards.push(
           movie ? (
             <MovieCard
-              key={index}
-              role="listitem"
+              key={movie.id}
               movie={{
                 ...movie,
-                genre: movie.genre.map((id) => genreMap[id]), // Convert genre IDs to names
                 year: movie.year.toString(), // Ensure year is string
               }}
               liked={likedMovies.includes(movie.id)}
@@ -108,12 +98,10 @@ const HeroSection = ({ title, moviesType, items }) => {
     if (moviesType === "ranking") return;
     if (!gridRef.current) return;
     const observer = new ResizeObserver(() => {
-
       const style = getComputedStyle(gridRef.current);
-      const columns = style.gridTemplateColumns.split(' ').length;
+      const columns = style.gridTemplateColumns.split(" ").length;
 
       setupMovieCards(columns);
-
     });
 
     observer.observe(gridRef.current);
@@ -137,41 +125,30 @@ const HeroSection = ({ title, moviesType, items }) => {
               role="button"
               tabIndex={0}
               aria-label={`Go to full ${moviesType} view`}
-              onKeyDown={(e) => { if (e.key === "Enter") { navigateFullPage() } }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  navigateFullPage();
+                }
+              }}
             >
               <FaAngleRight aria-hidden="true" />
             </span>
-            {/* )} */}
-
-            {/* {moviesType === "recommendation" && (
-              <span
-                className="home-icon reload-icon"
-                role="button"
-                tabIndex={0}
-                aria-label="Refresh recommendations"
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    console.log("refresh recommendations");
-                  }
-                }}
-              >
-                <TfiReload aria-hidden="true" />
-              </span>
-            )} */}
           </h2>
         </div>
         {(moviesType === "watchlist" || moviesType === "newReleased") && (
-          <div style={{maxWidth:"100%", width:"100%", padding:"1rem 2rem"}}>
+          <div
+            style={{ maxWidth: "100%", width: "100%", padding: "1rem 2rem" }}
+          >
             <div
               id={moviesType}
               ref={gridRef}
               className="recommendation-card-container"
               role="region"
-              aria-label={ariaLabel}>
+              aria-label={ariaLabel}
+            >
               {movieCards}
             </div>
           </div>
-
         )}
         {/* <div
           className="home-card-section"
@@ -197,11 +174,7 @@ const HeroSection = ({ title, moviesType, items }) => {
             </div>
           )}
         </div> */}
-        <div
-          className="home-card-section"
-          role="region"
-          aria-label={ariaLabel}
-        >
+        <div className="home-card-section" role="region" aria-label={ariaLabel}>
           {moviesType === "ranking" && (
             <div className="home-card-container" ref={containerRef}>
               <div className="genre-selection-grid">
