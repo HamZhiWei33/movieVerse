@@ -95,8 +95,8 @@ const Footer = () => {
             <nav aria-label="Profile section navigation">
               <ul role="list">
                 <li role="listitem">
-                  <Link to="/contact" aria-label="Contact us page">
-                    Contact Us
+                  <Link to="/profile" aria-label="Contact us page">
+                    Profile
                   </Link>
                 </li>
               </ul>

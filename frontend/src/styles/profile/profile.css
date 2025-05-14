@@ -25,9 +25,6 @@
   height: 15rem;
   border-radius: 50%;
   overflow: hidden;
-  /* border: 3px solid var(--color-primary); */
-  /* background-color: #c8ff0000; */
-  /* box-shadow: 0 4px 12px rgba(136, 255, 9, 0.797); */
   transition: all 0.3s ease;
 }
 
@@ -113,9 +110,15 @@
   border-radius: 8px;
   color: white;
 }
+
+.profile-value.gender {
+  width: 5rem;
+}
+
 .profile-name {
   font-size: 2rem;
   font-weight: 600;
+  width: 25rem;
 }
 .profile-input {
   background-color: rgba(255, 255, 255, 0.08);
@@ -125,7 +128,9 @@
   color: white;
   font-size: 2rem;
   font-weight: 600;
+  font-family: inherit;
   outline: none;
+  width: 25rem;
 }
 .profile-select {
   padding: 0.3rem 0.6rem;
@@ -134,7 +139,9 @@
   background-color: rgba(255, 255, 255, 0.1);
   color: white;
   font-size: 1rem;
+  font-family: inherit;
   outline: none;
+  width: 5rem;
 }
 .profile-select option {
   padding: 0.3rem 0.6rem;
@@ -150,12 +157,22 @@
   color: var(--color-grey);
   cursor: pointer;
 }
+
 .edit-icon:hover {
   color: white;
   transform: scale(1.1);
 }
+
 .edit-icon.confirm {
   color: var(--color-primary);
+}
+
+.profile-select + .edit-icon.confirm {
+  margin-left: 14.5rem;
+}
+
+.gender + .edit-icon.edit {
+  margin-left: 14.5rem;
 }
 
 .edit-icon.cancel {
@@ -175,23 +192,48 @@ button {
     flex-direction: column;
     align-items: center;
   }
-  .profile-header {
-    font-size: small;
+  .profile-header h1 {
+    font-size: 1.5rem;
   }
   .left {
     width: 100%;
     padding: 1rem;
   }
   .left .profile-image div {
-    width: 12rem;
-    height: 12rem;
+    width: 10rem;
+    height: 10rem;
   }
   .right {
     width: 100%;
     margin-left: 0;
     margin-top: 0.2rem;
+    margin-bottom: 0.5rem;
   }
   .profile-info:first-child {
     justify-content: center;
+  }
+
+  .profile-name,
+  .profile-input {
+    font-size: 1.5rem;
+    width: fit-content;
+  }
+
+  .profile-input {
+    width: 100%;
+  }
+  .profile-select + .edit-icon.confirm {
+    margin-left: 2.5rem;
+  }
+
+  .gender + .edit-icon.edit {
+    margin-left: 2rem;
+  }
+  .profile-select option {
+    font-size: smaller;
+  }
+
+  .edit-icon {
+    padding: 0.3rem 0.6rem;
   }
 }
