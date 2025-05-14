@@ -13,7 +13,6 @@ const HomeRanking = () => {
   const [selectedMovie, setSelectedMovie] = useState(null);
 
   useEffect(() => {
-    // Compute a composite score: 80% rating + 20% recency (based on year)
     const sorted = [...importedMovies]
       .map((movie) => ({
         ...movie,
