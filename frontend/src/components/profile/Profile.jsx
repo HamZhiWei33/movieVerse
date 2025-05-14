@@ -151,7 +151,7 @@ const Profile = () => {
                   <>
                     <h3 className="profile-name">{name}</h3>
                     <button
-                      className="edit-icon"
+                      className="edit-icon edit"
                       onClick={startEditing}
                       aria-label="Edit name"
                     >
@@ -163,10 +163,10 @@ const Profile = () => {
             </div>
             {/* Gender */}
             <div className="profile-row" role="group" aria-label="gender-label">
-              <label className="profile-label" id="gender-label">
-                Gender
-              </label>
               <div className="profile-info">
+                <label className="profile-label" id="gender-label">
+                  Gender
+                </label>
                 {isEditingGender ? (
                   <>
                     <select
@@ -196,11 +196,11 @@ const Profile = () => {
                   </>
                 ) : (
                   <>
-                    <span className="profile-value">
+                    <span className="profile-value gender">
                       {gender === "" ? "-" : gender}
                     </span>
                     <button
-                      className="edit-icon"
+                      className="edit-icon edit"
                       onClick={startGenderEdit}
                       aria-label="Edit gender"
                     >
@@ -212,10 +212,11 @@ const Profile = () => {
             </div>
             {/* Email */}
             <div className="profile-row" role="group" aria-label="email-label">
-              <label className="profile-label" id="email-label">
-                Email
-              </label>
               <div className="profile-info">
+                <label className="profile-label" id="email-label">
+                  Email
+                </label>
+
                 <span className="profile-value">username@gmail.com</span>
               </div>
             </div>

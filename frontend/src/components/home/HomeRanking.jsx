@@ -4,6 +4,7 @@ import {
   movies as importedMovies,
   reviews as importedReviews,
   genres as allGenres,
+  reviews as allReviews,
 } from "../../constant";
 import TopMovieSection from "../ranking/TopMovieSection";
 
@@ -12,7 +13,6 @@ const HomeRanking = () => {
   const [selectedMovie, setSelectedMovie] = useState(null);
 
   useEffect(() => {
-    // Compute a composite score: 80% rating + 20% recency (based on year)
     const sorted = [...importedMovies]
       .map((movie) => ({
         ...movie,
@@ -55,12 +55,18 @@ const HomeRanking = () => {
   }, [movies]);
 
   return (
-    <div className="page-wrapper" role="region" aria-label="Top rated movie ranking section">
+    <div
+      className="page-wrapper"
+      role="region"
+      aria-label="Top rated movie ranking section"
+    >
       {selectedMovie && (
         <TopMovieSection
           selectedMovie={selectedMovie}
           setSelectedMovie={setSelectedMovie}
           ratingDistribution={ratingDistribution}
+          allReviews={importedReviews}
+          aria-label={`Currently selected movie: ${selectedMovie.title}`}
         />
       )}
     </div>
