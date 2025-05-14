@@ -6,14 +6,23 @@ import { FaAngleRight } from "react-icons/fa6";
 import { TfiReload } from "react-icons/tfi";
 import { getTopMoviesByGenre } from "./ranking";
 import RankingCard from "./RankingCard";
-import { movies, genres } from "../../constant";
-import { useMemo, useRef, useState } from "react";
+import { movies, genres, reviews } from "../../constant";
+import { useMemo, useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import useHorizontalScroll from "../../store/useHorizontalScroll";
 import { reviews } from "../../constant";
 const HeroSection = ({ title, moviesType, items }) => {
   const [likedMovies, setLikedMovies] = useState([]);
   const [addToWatchlistMovies, setAddToWatchlistMovies] = useState([]);
+
+  var ariaLabel;
+  if (moviesType === "watchlist") {
+    ariaLabel = "Your watchlist movies";
+  } else if (moviesType === "newReleased") {
+    ariaLabel = "Newly released movies";
+  } else if (moviesType === "ranking") {
+    ariaLabel = "Top ranked movies by genre";
+  }
 
   //items=allGenres
   const topMoviesByGenre = useMemo(
@@ -23,14 +32,22 @@ const HeroSection = ({ title, moviesType, items }) => {
   const navigate = useNavigate();
   const containerRef = useRef(null);
 
-  const handleWatchlistClick = () => {
-    navigate("/profile", { state: { targetTab: "WatchList" } });
+  const navigateFullPage = () => {
+    if (moviesType === "watchlist") {
+      navigate("/profile", { state: { targetTab: "WatchList" } });
+    } else if (moviesType === "ranking") {
+      navigate("/ranking");
+    }
   };
 
-  const handleRankingClick = () => {
-    console.log("ranking click");
-    navigate("/ranking");
-  };
+  // const handleWatchlistClick = () => {
+  //   navigate("/profile", { state: { targetTab: "WatchList" } });
+  // };
+
+  // const handleRankingClick = () => {
+  //   console.log("ranking click");
+  //   navigate("/ranking");
+  // };
 
   const toggleLike = (title) => {
     setLikedMovies((prev) =>
@@ -50,6 +67,59 @@ const HeroSection = ({ title, moviesType, items }) => {
     map[genre.id] = genre.name;
     return map;
   }, {});
+
+  const setupMovieCards = (colCount) => {
+    const columns = Math.ceil(colCount / 2); // colCount is columns with spacer(gap), need to calculate without gap
+    const maxMoviesCount = Math.max(4, columns * 2); // Show only 2 rows, with at least 4 movies
+    const cards = [];
+    items.forEach((movie, index) => {
+      if (index < maxMoviesCount) {
+        // Spacer before every item except the first
+        if (index % columns !== 0 && window.innerWidth >= 922) cards.push(<div key={`spacer-${index}`} className="spacer" />);
+        cards.push(
+          movie ? (
+            <MovieCard
+              key={index}
+              role="listitem"
+              movie={{
+                ...movie,
+                genre: movie.genre.map((id) => genreMap[id]), // Convert genre IDs to names
+                year: movie.year.toString(), // Ensure year is string
+              }}
+              liked={likedMovies.includes(movie.id)}
+              addedToWatchlist={addToWatchlistMovies.includes(movie.id)}
+              onLike={() => toggleLike(movie.id)}
+              onAddToWatchlist={() => toggleAddToWatchlist(movie.id)}
+              allReviews={reviews}
+            />
+          ) : (
+            <div key={index} className="movie-card-placeholder" />
+          )
+        );
+      }
+    });
+    setMovieCards(cards);
+  };
+
+  const gridRef = useRef(null);
+  const [movieCards, setMovieCards] = useState([]);
+
+  useEffect(() => {
+    if (moviesType === "ranking") return;
+    if (!gridRef.current) return;
+    const observer = new ResizeObserver(() => {
+
+      const style = getComputedStyle(gridRef.current);
+      const columns = style.gridTemplateColumns.split(' ').length;
+
+      setupMovieCards(columns);
+
+    });
+
+    observer.observe(gridRef.current);
+    return () => observer.disconnect();
+  }, [items]);
+
   return (
     <section
       className="hero-section"
@@ -57,33 +127,23 @@ const HeroSection = ({ title, moviesType, items }) => {
       aria-label={`Home section: ${title}`}
     >
       <div className="home-section-container">
-        <div className="home-section">
+        <div className="home-section-title">
           <h2 className="home-title">
             {title}
-            {(moviesType === "watchlist" || moviesType === "ranking") && (
-              <span
-                className="home-icon"
-                onClick={
-                  moviesType === "watchlist"
-                    ? handleWatchlistClick
-                    : handleRankingClick
-                }
-                role="button"
-                tabIndex={0}
-                aria-label={`Go to full ${moviesType} view`}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    moviesType === "watchlist"
-                      ? handleWatchlistClick()
-                      : handleRankingClick();
-                  }
-                }}
-              >
-                <FaAngleRight aria-hidden="true" />
-              </span>
-            )}
+            {/* {(moviesType === "watchlist" || moviesType === "ranking") && ( */}
+            <span
+              className="home-icon"
+              onClick={navigateFullPage}
+              role="button"
+              tabIndex={0}
+              aria-label={`Go to full ${moviesType} view`}
+              onKeyDown={(e) => { if (e.key === "Enter") { navigateFullPage() } }}
+            >
+              <FaAngleRight aria-hidden="true" />
+            </span>
+            {/* )} */}
 
-            {moviesType === "recommendation" && (
+            {/* {moviesType === "recommendation" && (
               <span
                 className="home-icon reload-icon"
                 role="button"
@@ -97,39 +157,26 @@ const HeroSection = ({ title, moviesType, items }) => {
               >
                 <TfiReload aria-hidden="true" />
               </span>
-            )}
+            )} */}
           </h2>
         </div>
-        <div
-          id="watchlist"
-          className="home-card-section"
-          role="region"
-          aria-label="Your watchlist movies"
-        >
-          {moviesType === "watchlist" && (
-            <div className="home-card-container">
-              {items.map((movie) => (
-                <MovieCard
-                  className="home-movie-card"
-                  key={movie.id}
-                  movie={{
-                    ...movie,
-                    year: movie.year.toString(), // Ensure year is string
-                  }}
-                  liked={likedMovies.includes(movie.id)}
-                  addedToWatchlist={addToWatchlistMovies.includes(movie.id)}
-                  onLike={() => toggleLike(movie.id)}
-                  onAddToWatchlist={() => toggleAddToWatchlist(movie.id)}
-                  allReviews={reviews}
-                />
-              ))}
+        {(moviesType === "watchlist" || moviesType === "newReleased") && (
+          <div style={{maxWidth:"100%", width:"100%", padding:"1rem 2rem"}}>
+            <div
+              id={moviesType}
+              ref={gridRef}
+              className="recommendation-card-container"
+              role="region"
+              aria-label={ariaLabel}>
+              {movieCards}
             </div>
-          )}
-        </div>
-        <div
+          </div>
+
+        )}
+        {/* <div
           className="home-card-section"
           role="region"
-          aria-label="Newly released movies"
+          aria-label={ariaLabel}
         >
           {moviesType === "newReleased" && (
             <div className="home-card-container">
@@ -149,20 +196,17 @@ const HeroSection = ({ title, moviesType, items }) => {
               ))}
             </div>
           )}
-        </div>
+        </div> */}
         <div
           className="home-card-section"
           role="region"
-          aria-label="Top ranked movies by genre"
+          aria-label={ariaLabel}
         >
           {moviesType === "ranking" && (
             <div className="home-card-container" ref={containerRef}>
               <div className="genre-selection-grid">
-                {/* "All" genre card */}
-                {/* <RankingCard isAllGenre /> */}
                 <RankingCard isAllGenre topMovies={topMoviesByGenre.All} />
 
-                {/* Individual genre cards */}
                 {items.slice(0, 5).map((genre) => (
                   // <RankingCard key={genre.id} genre={genre} />
 
