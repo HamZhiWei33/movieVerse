@@ -48,7 +48,6 @@
     "chart3 .";
   gap: 1.5rem;
   margin: 1rem 0;
-  /* max-width: 900px; */
 }
 
 .chart-1 {
@@ -82,13 +81,6 @@
     }
   }
 
-  .chart-grid {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "chart1"
-      "chart2"
-      "chart3";
-  }
   .chart-grid {
     grid-template-columns: 1fr;
     grid-template-areas:

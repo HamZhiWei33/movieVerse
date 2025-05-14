@@ -16,10 +16,13 @@ const Profile = () => {
   const [tempGender, setTempGender] = useState(gender);
   const [isEditingGender, setIsEditingGender] = useState(false);
   const [selectedImg, setSelectedImg] = useState(() => {
-    return (
-      localStorage.getItem("profileImg") || "/profile/placeholder_avatar.svg"
-    );
+    const storedImg = localStorage.getItem("profileImg");
+    return storedImg ? storedImg : "/profile/placeholder_avatar.svg";
   });
+  console.log(
+    "Stored image in localStorage:",
+    localStorage.getItem("profileImg")
+  );
 
   const startEditing = () => {
     setTempName(name); // reset temp value to current
