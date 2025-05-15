@@ -165,7 +165,7 @@ const MovieCardList = ({
           >
             <button className="main-button" onClick={handlePlayTrailerClick}>
               <FaPlay className="play-icon" />
-              Play Trailer
+              Watch Trailer
             </button>
             <div className="iteractive-icon" onClick={handleLikeClick}>
               <LikeIcon liked={liked} />

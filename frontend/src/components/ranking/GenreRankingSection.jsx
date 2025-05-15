@@ -19,6 +19,21 @@ const GenreRankingSection = ({ movies, allGenres, allReviews }) => {
   const [selectedGenre, setSelectedGenre] = useState(
     genreOptions.includes(urlGenre) ? urlGenre : "All"
   );
+
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  useEffect(() => {
+
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.addEventListener("resize", handleResize);
+    };
+  }, []);
+
   // Effect to sync state when URL changes
   useEffect(() => {
     if (urlGenre && genreOptions.includes(urlGenre)) {
@@ -80,7 +95,7 @@ const GenreRankingSection = ({ movies, allGenres, allReviews }) => {
     });
   console.log("Sorted movies:", sorted); // Debugging line
   const top1 = sorted[0];
-  const otherMovies = sorted.slice(1);
+  const otherMovies = sorted.slice(1,Math.min(10, sorted.length));
 
   const formatDuration = (minutes) => {
     if (!minutes || isNaN(minutes)) return "N/A";
@@ -133,7 +148,7 @@ const GenreRankingSection = ({ movies, allGenres, allReviews }) => {
       <div className="genre-list">
         <div className="genre-ranking-layout">
           {/* Top 1 - Left Side */}
-          {top1 && (
+          {(top1 && windowWidth >= 1200) && (
             <Top1Card
               key={top1.id}
               movie={top1}
@@ -151,6 +166,20 @@ const GenreRankingSection = ({ movies, allGenres, allReviews }) => {
 
           {/* Other movies (Top 2, Top 3, ...) - Right Side */}
           <div className="right-cards">
+            {(top1 && windowWidth < 1200) && (
+              <GenreCard
+                key={top1.id}
+                movie={top1}
+                rank={1}
+                image={top1.posterUrl}
+                title={top1.title}
+                rating={calculateAverageRating(top1.id)}
+                genre={genreNames}
+                region={top1.region}
+                year={top1.year}
+                duration={durationText}
+              />
+            )}
             {otherMovies.length === 0 ? (
               <p style={{ color: "#888", padding: "1rem" }}>
                 No movies in this genre.
