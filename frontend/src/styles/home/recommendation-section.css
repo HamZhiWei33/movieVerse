@@ -1,14 +1,14 @@
 .recommendation-section {
-  width: 100%;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
   cursor: pointer;
-  margin-bottom: 3rem;
+  /* margin-bottom: 3rem; */
 }
 
 .recommendation-wrapper {
   position: relative;
-  width: 100%;
+  max-width: 100%;
   padding: 0 2rem;
   box-sizing: border-box;
   /* max-width: fit-content; */
@@ -22,9 +22,9 @@
 }
 
 .recommendation-refresh {
-  position: absolute;
-  top: 0;
-  right: 2rem;
+  position: relative;
+  /* top: 0;
+  right: 2rem; */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -46,11 +46,6 @@
   display: grid;
   width: 100%;
   align-self: center;
-  grid-template-columns: minmax(15rem, 1fr) repeat(
-      auto-fill,
-      minmax(1rem, 1fr) minmax(15rem, 1fr)
-    );
-  /* gap: 1rem; */
   grid-template-columns: 15rem repeat(auto-fill, minmax(1rem, 1fr) 15rem);
   row-gap: 2rem;
   justify-items: center;
@@ -67,119 +62,27 @@
 .recommendation-card-container .movie-card {
   width: 15rem;
   height: 100%;
-  /* flex-grow: 1; */
-  align-self: center;
-  /* background-color: #1e1e1e;
-  border-radius: 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  overflow: hidden;
-  padding: 1rem 0.5rem;
-  transition: transform 0.2s ease;
-  flex-shrink: 0; */
-}
-
-.recommendation-movie-card-wrapper {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-items: center;
-  justify-content: center;
-  flex-grow: 2;
-  flex-shrink: 0;
-}
-
-.recommendation-movie-card-wrapper.no-grow {
-  /* width: 15rem; */
-  flex-grow: 1;
-  flex-shrink: 0;
-  background-color: white;
 }
 
 .recommendation-card-container .movie-card:hover {
   transform: scale(1.03);
-}
-
-.card-image-wrapper {
-  position: relative;
-  width: 100%;
-  height: 280px;
-  overflow: hidden;
-  border-radius: 8px;
-}
-
-.card-image-wrapper img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.movie-icons {
-  position: absolute;
-  bottom: 0.5rem;
-  right: 0.5rem;
-  display: flex;
-  gap: 0.5rem;
-  z-index: 2;
-}
-
-.movie-icons i {
-  background-color: rgba(0, 0, 0, 0.6);
-  padding: 6px;
-  border-radius: 50%;
   color: white;
-  font-size: 1rem;
-  transition: transform 0.2s ease;
 }
 
-.movie-icons i:hover {
-  transform: scale(1.2);
-  color: #c6ff00;
-}
-
-.recommendation-card-container p {
-  margin-top: 0.5rem;
+.recommendation-card-container .movie-card p {
+  margin-top: 0;
+  min-height: 1.725rem;
+  display: flex;
+  flex-grow: 1;
   text-align: center;
-  text-overflow: ellipsis;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-style: bold;
+  font-weight: 500;
   color: #cccccc;
-  font-size: 1rem;
-  padding: 0 0.5rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-size: 0.9rem;
 }
 
-.recommendation-card-container > *:hover p {
+.recommendation-card-container .movie-card:hover p {
   color: #fff;
-  /* white on hover */
 }
-
-/* Responsive */
-/* @media (max-width: 1200px) {
-  .recommendation-card-container {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-@media (max-width: 992px) {
-  .recommendation-card-container {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
-  .recommendation-card-container {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 480px) {
-  .recommendation-card-container {
-    grid-template-columns: 1fr;
-  }
-} */
