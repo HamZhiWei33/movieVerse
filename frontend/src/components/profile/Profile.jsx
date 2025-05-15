@@ -6,7 +6,7 @@ import { FaCheck } from "react-icons/fa";
 import { FaTimes } from "react-icons/fa";
 const Profile = () => {
   const [name, setName] = useState(
-    () => localStorage.getItem("profileName") || "Username"
+    () => localStorage.getItem("profileName") || "u1"
   );
   const [tempName, setTempName] = useState(name); // temp value while editing
   const [isEditingName, setIsEditingName] = useState(false);
@@ -68,6 +68,23 @@ const Profile = () => {
       localStorage.setItem("profileImg", base64Image); // Save to localStorage
       // await updateProfile({ profilePic: base64Image });
     };
+  };
+
+  const handlePasswordChange = () => {
+    logout();
+    navigate("/forgot_password");
+  };
+
+  const handleAccountDelete = () => {
+    const confirmation = window.confirm(
+      "Are you sure you want to delete your account? This action cannot be undone."
+    );
+    if (confirmation) {
+      alert("Account deletion confirmed.");
+      logout();
+      navigate("/");
+      console.log("Account deletion confirmed");
+    }
   };
 
   return (
@@ -220,8 +237,37 @@ const Profile = () => {
                   Email
                 </label>
 
-                <span className="profile-value">username@gmail.com</span>
+                <span className="profile-value">u1@gmail.com</span>
               </div>
+            </div>
+            {/* Manage */}
+            <div className="profile-row" role="group" aria-label="manage-label">
+              <ul className="manage-container" aria-label="manage-lists">
+                <li className="manage-item" aria-labelledby="change-password">
+                  <button
+                    type="button"
+                    className="btn-change-password"
+                    id="change-password"
+                    onClick={handlePasswordChange}
+                  >
+                    Change Password
+                  </button>
+                </li>
+                <li className="manage-item" aria-labelledby="delete-account">
+                  <button
+                    type="button"
+                    className="btn-delete-account"
+                    id="delete-account"
+                    aria-describedby="delete-warning"
+                    onClick={handleAccountDelete}
+                  >
+                    Delete Account
+                    <span id="delete-warning" className="sr-only">
+                      Warning: This action cannot be undone
+                    </span>
+                  </button>
+                </li>
+              </ul>
             </div>
           </div>
         </div>

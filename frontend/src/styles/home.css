@@ -2,17 +2,23 @@ main.home-page {
   height: 100%;
   overflow: hidden;
 }
+
 .hero-banner {
   width: 100%;
   height: 100%;
   position: relative;
   overflow: hidden;
 }
+
 .homePageWrapper {
-  padding: 0 5%;
+  display: flex;
+  flex-direction: column;
+  /* padding: 0 5%; */
   background-color: #141414;
   padding-bottom: 3rem;
+  gap: 2.5rem;
 }
+
 .hero-swiper {
   width: 100%;
   height: 100%;
@@ -27,7 +33,8 @@ main.home-page {
 
 .home-swiper-image {
   width: 100%;
-  height: 80vh; /* Full screen height */
+  height: 80vh;
+  /* Full screen height */
   object-fit: contain;
   object-position: center;
 }
@@ -38,6 +45,7 @@ main.home-page {
   z-index: 10;
   /* absolute left-10 bottom-20 text-white z-10 */
 }
+
 .movieTitle {
   font-size: 2.5rem;
   font-weight: bold;
@@ -46,6 +54,21 @@ main.home-page {
 .movieDescription {
   font-size: 1.25rem;
   margin-top: 0.5rem;
+}
+
+.hero-section-container {
+  display: flex;
+  flex-direction: column;
+  /* justify-content: center;
+  align-items: center; */
+  gap: 3rem;
+  /* padding: min(5%, 2.5rem); */
+  padding-top: 1rem;
+  padding-bottom: 1.5rem;
+  border: 0.1rem solid #262626;
+  border-radius: 0.7rem;
+  padding: 1.5rem 2.5rem 2rem 2.5rem;
+  margin: 0 5%;
 }
 
 /* tablet/ipad */
@@ -58,6 +81,7 @@ main.home-page {
     height: 50vh;
   }
 }
+
 /* phone */
 @media screen and (max-width: 768px) {
   .home-swiper-image {

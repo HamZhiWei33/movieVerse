@@ -9,6 +9,7 @@ const MovieCard = ({
   addedToWatchlist,
   onLike,
   onAddToWatchlist,
+  children,
   allReviews,
 }) => {
   const navigate = useNavigate();
@@ -65,6 +66,7 @@ const MovieCard = ({
         </div>
       </div>
       <p>{movie.title}</p>
+      {children} {/* Render children here */}
     </article>
   );
 };

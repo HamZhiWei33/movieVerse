@@ -8,18 +8,19 @@ import { BsFire } from "react-icons/bs";
 const RankingCard = ({ genre, isAllGenre = false, topMovies = [] }) => {
   const navigate = useNavigate();
   console.log("RankingCard", genre, isAllGenre, topMovies);
+
+  const genreName = isAllGenre ? "All Genres" : genre.name;
   const handleCardClick = () => {
     if (isAllGenre) {
-      navigate("/ranking#genre-ranking");
+      navigate("/ranking#genre-ranking-section");
     } else {
       navigate(
-        `/ranking?genre=${encodeURIComponent(genre.name)}#genre-ranking`
+        `/ranking?genre=${encodeURIComponent(genreName)}#genre-ranking-section`
       );
     }
   };
 
   const previewMovie = topMovies[0];
-  const genreName = isAllGenre ? "All Genres" : genre.name;
 
   return (
     <article

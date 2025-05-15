@@ -1,7 +1,7 @@
 .page-wrapper {
   position: relative;
   width: 100%;
-  background-color: #000; 
+  background-color: #000;
   overflow: hidden;
 }
 
@@ -52,7 +52,6 @@
   max-width: 100%;
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.01);
 }
-
 
 .chart-title {
   color: #fff;
@@ -128,7 +127,6 @@
   transform: scale(1.3);
   box-shadow: 0 0 25px rgba(255, 255, 255, 0.3);
 }
-
 
 .side-card {
   opacity: 0.85;
@@ -340,7 +338,7 @@
   padding-bottom: 0.5rem;
   border-bottom: 1px solid #444;
 
-  scrollbar-width: thin;     
+  scrollbar-width: thin;
   scrollbar-color: #666 #222;
 }
 
@@ -388,15 +386,15 @@
   gap: 1rem;
 }
 
-.genre-card-header{
+.genre-card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.genre-rank{
+.genre-rank {
   font-size: 1.2rem;
-  margin:0;
+  margin: 0;
 }
 
 .right-cards {
@@ -409,7 +407,7 @@
 .genre-rating-value {
   font-size: 1.2rem;
   font-weight: bold;
-  color: #ccff00; 
+  color: #ccff00;
 }
 
 .genre-ranking-layout {
@@ -425,7 +423,7 @@
 }
 
 .genre-poster {
-  width: 120px;    
+  width: 120px;
   object-fit: cover;
   border-radius: 6px;
 }
@@ -458,7 +456,7 @@
 }
 
 .top1-card:hover {
-  transform: scale(1.05); 
+  transform: scale(1.05);
 }
 
 .image-container {
@@ -488,9 +486,8 @@
   line-height: 1.5;
   max-height: 100px;
   overflow: hidden;
-  text-overflow: ellipsis; 
+  text-overflow: ellipsis;
 }
-
 
 @media (max-width: 768px) {
   .ranking-three-columns {
@@ -569,20 +566,18 @@
 }
 
 @media (max-width: 420px) {
-.genre-ranking-layout{
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 2rem;
-  align-items: flex-start;
-}
-
+  .genre-ranking-layout {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 2rem;
+    align-items: flex-start;
+  }
 
   .ranking-three-columns {
     flex-direction: column;
     align-items: center;
   }
-
 
   .star-label {
     width: 50px;
@@ -593,7 +588,7 @@
     flex-direction: column;
     align-items: center;
   }
-  .distribution-right{
+  .distribution-right {
     visibility: collapse;
   }
 

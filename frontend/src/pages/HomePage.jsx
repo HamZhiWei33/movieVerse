@@ -28,27 +28,41 @@ const HomePage = () => {
       aria-label="MovieVerse home page"
     >
       {isValidateUser ? <HeroBanner /> : <HomeRanking />}
-      {isValidateUser && (
+
+      <div className="hero-section-container">
+
+        {isValidateUser && (
+          <HeroSection
+            title="Watchlist"
+            moviesType={"watchlist"}
+            items={watchlist}
+          />
+        )}
+
         <HeroSection
-          title="Watchlist"
-          moviesType={"watchlist"}
-          items={watchlist}
+          title="Ranking"
+          moviesType={"ranking"}
+          items={genres}
         />
-      )}
 
-      <HeroSection title="Ranking" moviesType={"ranking"} items={genres} />
+        <HeroSection
+          title="New Released"
+          moviesType={"newReleased"}
+          items={recentMovies}
+        />
 
-      <HeroSection
-        title="New Released"
-        moviesType={"newReleased"}
-        items={recentMovies}
-      />
+        <HeroSection
+          title="Recommendation"
+          moviesType={"recommendation"}
+          items={movies}
+        />
 
-      <RecommendationSection
-        title="Recommendation"
-        moviesType={"recommendation"}
-        items={movies}
-      />
+        {/* <RecommendationSection
+              title="Recommendation"
+              moviesType={"recommendation"}
+              items={movies}
+            /> */}
+      </div>
     </div>
   );
 };
