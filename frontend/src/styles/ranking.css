@@ -553,7 +553,7 @@
 .genre-list {
   display: flex;
   flex-direction: column;
-  padding: 2rem 0;
+  padding-top: 2rem;
   align-items: center;
   justify-content: center;
 }
