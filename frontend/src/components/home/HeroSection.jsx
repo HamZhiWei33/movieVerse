@@ -57,7 +57,6 @@ const HeroSection = ({ title, moviesType, items }) => {
     console.log(likedMovies);
   }, [likedMovies]);
 
-
   const toggleAddToWatchlist = (title) => {
     setAddToWatchlistMovies((prev) =>
       prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title]
@@ -199,24 +198,38 @@ const HeroSection = ({ title, moviesType, items }) => {
           role="region"
           aria-label={ariaLabel}
         >
-          {movieList.slice(0, Math.max(4, cardPerRow * 2)).map((movie, index) => (
-            <React.Fragment key={movie.id}>
-              {index % cardPerRow !== 0 && window.innerWidth >= 922 && (
-                <div className="spacer" />
-              )}
-              <MovieCard
-                movie={{
-                  ...movie,
-                  year: movie.year.toString(),
-                }}
-                liked={likedMovies.includes(movie.id)}
-                addedToWatchlist={addToWatchlistMovies.includes(movie.id)}
-                onLike={() => toggleLike(movie.id)}
-                onAddToWatchlist={() => toggleAddToWatchlist(movie.id)}
-                allReviews={reviews}
-              />
-            </React.Fragment>
-          ))}
+          {movieList
+            .slice(0, Math.max(4, cardPerRow * 2))
+            .map((movie, index) => (
+              <React.Fragment key={movie.id}>
+                {index % cardPerRow !== 0 && window.innerWidth >= 922 && (
+                  <div className="spacer" />
+                )}
+                <MovieCard
+                  key={index}
+                  role="listitem"
+                  movie={{
+                    ...movie,
+                    genre: (movie.genre || []).map((id) => genreMap[id]),
+                    year: movie.year.toString(),
+                  }}
+                  liked={likedMovies.includes(movie.id)}
+                  addedToWatchlist={addToWatchlistMovies.includes(movie.id)}
+                  onLike={() => toggleLike(movie.id)}
+                  onAddToWatchlist={() => toggleAddToWatchlist(movie.id)}
+                  allReviews={reviews}
+                >
+                  {moviesType === "recommendation" && (
+                    <div className="movie-rating">
+                      <ReviewStars
+                        showNumber="true"
+                        rating={calculateAverageRating(movie.id)}
+                      />
+                    </div>
+                  )}
+                </MovieCard>
+              </React.Fragment>
+            ))}
         </div>
       )}
 
