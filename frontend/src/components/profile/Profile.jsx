@@ -4,7 +4,13 @@ import { RiEditLine } from "react-icons/ri";
 import { FaCamera } from "react-icons/fa";
 import { FaCheck } from "react-icons/fa";
 import { FaTimes } from "react-icons/fa";
+import { UserValidationContext } from "../../context/UserValidationProvider ";
+import { useNavigate } from "react-router-dom";
+
 const Profile = () => {
+  const { logout } = React.useContext(UserValidationContext);
+  const navigate = useNavigate();
+
   const [name, setName] = useState(
     () => localStorage.getItem("profileName") || "u1"
   );
