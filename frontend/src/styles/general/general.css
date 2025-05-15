@@ -24,7 +24,7 @@ main h1 {
   font-size: 2rem;
 }
 
-.form-group{
+.form-group {
   max-width: 25rem;
   display: flex;
   flex-direction: column;

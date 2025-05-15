@@ -112,7 +112,7 @@
 }
 
 .profile-value.gender {
-  width: 5rem;
+  width: 7rem;
 }
 
 .profile-name {
@@ -141,7 +141,7 @@
   font-size: 1rem;
   font-family: inherit;
   outline: none;
-  width: 5rem;
+  width: 7rem;
 }
 .profile-select option {
   padding: 0.3rem 0.6rem;
@@ -168,11 +168,11 @@
 }
 
 .profile-select + .edit-icon.confirm {
-  margin-left: 14.5rem;
+  margin-left: 12.5rem;
 }
 
 .gender + .edit-icon.edit {
-  margin-left: 14.5rem;
+  margin-left: 12.5rem;
 }
 
 .edit-icon.cancel {
@@ -220,7 +220,7 @@ button {
   }
 
   .profile-input {
-    width: 100%;
+    width: 50%;
   }
   .profile-select + .edit-icon.confirm {
     margin-left: 2.5rem;

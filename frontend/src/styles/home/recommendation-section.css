@@ -1,8 +1,10 @@
 .recommendation-section {
   max-width: 100%;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
   cursor: pointer;
+  /* margin-bottom: 3rem; */
   /* margin-bottom: 3rem; */
 }
 

@@ -6,7 +6,7 @@ import { FaCheck } from "react-icons/fa";
 import { FaTimes } from "react-icons/fa";
 const Profile = () => {
   const [name, setName] = useState(
-    () => localStorage.getItem("profileName") || "Username"
+    () => localStorage.getItem("profileName") || "u1"
   );
   const [tempName, setTempName] = useState(name); // temp value while editing
   const [isEditingName, setIsEditingName] = useState(false);
@@ -220,7 +220,7 @@ const Profile = () => {
                   Email
                 </label>
 
-                <span className="profile-value">username@gmail.com</span>
+                <span className="profile-value">u1@gmail.com</span>
               </div>
             </div>
           </div>
