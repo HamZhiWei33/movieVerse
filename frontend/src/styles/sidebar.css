@@ -77,8 +77,17 @@
   text-decoration: none;
   font-weight: 600;
   font-size: 1.1rem;
-  display: block;
+  display: flex;
+  align-items: center;
   margin-bottom: 0.5rem;
+}
+
+.sidebar-title {
+  width: 3rem;
+}
+
+.sidebar-icon {
+  margin-left: 2rem;
 }
 
 .sidebar-filter-group {
