@@ -47,7 +47,7 @@
   justify-content: center;
   font-size: 1rem;
   font-weight: 500;
-  color: #cccccc;
+  color: #cccccc;
 }
 
 .poster-container {
@@ -90,13 +90,13 @@
 }
 
 .top-right {
-  position: absolute; 
-  top: 0.5rem;       
-  right: 0.5rem;     
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
   font-weight: 500;
   font-size: 1.7rem;
   color: #ccff00;
-  z-index: 1;        
+  z-index: 1;
 }
 
 .bottom-icons {
