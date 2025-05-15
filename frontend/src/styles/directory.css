@@ -199,6 +199,7 @@ legend {
 
 /* Grid View */
 .movie-container.grid .movie-grid {
+  width: 100%;
   display: grid;
   border: 0.1rem solid #262626;
   border-radius: 0.7rem;
@@ -233,36 +234,21 @@ legend {
     grid-template-columns: 1fr;
   }
 
-  .movie-container.list .movie-list {
-    padding: 1.25rem;
-    gap: 1.25rem;
-  }
-
-  .movie-container.list .movie-list .movie-card-list {
-    flex-direction: row;
-    align-items: flex-start;
-  }
-
-  .movie-card-list .movie-details-container-list {
-    align-items: flex-start;
-    text-align: left;
-  }
-
-  .genre-tags,
-  .duration-and-icons-container,
-  .iteractive-icon-container {
-    justify-content: flex-start !important;
-    text-align: left;
-    width: 100%;
-  }
-}
-@media (max-width: 1024px) {
-  .filters {
-    grid-template-columns: 1fr;
-  }
-
   .filter-group {
     grid-template-columns: repeat(3, 1fr);
+  }
+
+  .movie-card {
+    transform: scale(1);
+  }
+  
+  .movie-grid {
+    padding: 0;
+    gap: 0 ;
+  }
+
+  .movie-container.list .movie-list {
+    grid-template-columns: repeat(1, 1fr);
   }
 }
 
@@ -277,27 +263,41 @@ legend {
     padding: 0.4rem 0.1rem;
   }
 
-  .movie-container.list .movie-list {
-    grid-template-columns: 1fr;
-    padding: 1rem;
-    gap: 1rem;
+  .movie-card {
+    transform: scale(1);
   }
-  .movie-container.list .movie-list .movie-card-list {
-    flex-direction: column;
-    align-items: center;
-    gap: 0.75rem;
+  
+  .movie-grid {
+    padding: 0;
+    gap: 0 ;
   }
 
-  .movie-card-list .movie-details-container-list {
+  .movie-container.list .movie-list .movie-card-list {
+    transform: scale(1);
+  }
+
+  /* .movie-card-list .movie-details-container-list {
     margin-left: 0;
     text-align: center;
-  }
+    align-items: center !important;
+    justify-content: center !important;
+  } */
+
 }
 
 /* Small phones (adjust spacing) */
 @media (max-width: 480px) {
   main.directory-page {
     padding: 1rem;
+  }
+
+  .movie-card {
+    transform: scale(0.8);
+  }
+
+  .movie-container.grid .movie-grid {
+    padding: 0;
+    gap: 0 ;
   }
 
   .movie-list {
@@ -314,14 +314,14 @@ legend {
     padding: 0.35rem 0.1rem;
   }
 
-  .movie-container.list .movie-list {
+  /* .movie-container.list .movie-list {
     padding: 0.75rem;
     gap: 0.75rem;
   }
 
   .movie-container.list .movie-list .movie-card-list {
     gap: 0.5rem;
-  }
+  } */
 }
 
 /* Very small phones (adjust button sizing) */
@@ -330,7 +330,13 @@ legend {
     font-size: 0.7rem;
     padding: 0.3rem 0;
   }
-  .movie-container.grid .movie-grid {
-    padding: 0.5rem;
+
+  .filter-group {
+    gap: 0.5rem;
+    row-gap: 0.8rem;
   }
+
+  /* .movie-container.grid .movie-grid {
+    padding: 0.5rem;
+  } */
 }
