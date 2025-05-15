@@ -116,7 +116,10 @@ const HeroSection = ({ title, moviesType, items, belowRanking }) => {
           >
             {moviesType === "recommendation" && (
               <div className="movie-rating">
-                <ReviewStars rating={calculateAverageRating(movie.id)} />
+                <ReviewStars
+                  showNumber="true"
+                  rating={calculateAverageRating(movie.id)}
+                />
               </div>
             )}
           </MovieCard>
