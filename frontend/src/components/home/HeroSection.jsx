@@ -11,6 +11,7 @@ import { movies, genres, reviews } from "../../constant";
 import { useMemo, useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import useHorizontalScroll from "../../store/useHorizontalScroll";
+import ReviewStars from "../directory/ReviewStars";
 
 const HeroSection = ({ title, moviesType, items }) => {
   const [cardPerRow, setCardPerRow] = useState(1);
@@ -91,6 +92,54 @@ const HeroSection = ({ title, moviesType, items }) => {
     return map;
   }, {});
 
+  const calculateAverageRating = (movieId) => {
+    const movieReviews = reviews.filter((review) => review.movieId === movieId);
+    if (movieReviews.length === 0) return 0;
+    const sum = movieReviews.reduce((acc, review) => acc + review.rating, 0);
+    return sum / movieReviews.length;
+  };
+
+  const setupMovieCards = (colCount) => {
+    const columns = Math.ceil(colCount / 2); // colCount is columns with spacer(gap), need to calculate without gap
+    const maxMoviesCount = Math.max(4, columns * 2); // Show only 2 rows, with at least 4 movies
+    const cards = [];
+    const movieList = moviesType === "recommendation" ? displayed : items;
+    movieList.forEach((movie, index) => {
+      if (index < maxMoviesCount) {
+        // Spacer before every item except the first
+        if (index % columns !== 0 && window.innerWidth >= 922) {
+          cards.push(<div key={`spacer-${index}`} className="spacer" />);
+        }
+
+        cards.push(
+          <MovieCard
+            key={index}
+            role="listitem"
+            movie={{
+              ...movie,
+              genre: (movie.genre || []).map((id) => genreMap[id]),
+              year: movie.year.toString(),
+            }}
+            liked={likedMovies.includes(movie.id)}
+            addedToWatchlist={addToWatchlistMovies.includes(movie.id)}
+            onLike={() => toggleLike(movie.id)}
+            onAddToWatchlist={() => toggleAddToWatchlist(movie.id)}
+            allReviews={reviews}
+          >
+            {moviesType === "recommendation" && (
+              <div className="movie-rating">
+                <ReviewStars rating={calculateAverageRating(movie.id)} />
+              </div>
+            )}
+          </MovieCard>
+        );
+      } else {
+        cards.push(<div key={index} className="movie-card-placeholder" />);
+      }
+    });
+    setMovieCards(cards);
+  };
+
   const gridRef = useRef(null);
 
   useEffect(() => {
@@ -101,7 +150,6 @@ const HeroSection = ({ title, moviesType, items }) => {
       const columns = style.gridTemplateColumns.split(" ").length;
       setCardPerRow(Math.ceil(columns / 2));
     });
-
 
     observer.observe(gridRef.current);
     return () => observer.disconnect();
@@ -146,7 +194,9 @@ const HeroSection = ({ title, moviesType, items }) => {
           </span>
         )}
       </div>
-      {(moviesType === "watchlist" || moviesType === "newReleased" || moviesType === "recommendation") && (
+      {(moviesType === "watchlist" ||
+        moviesType === "newReleased" ||
+        moviesType === "recommendation") && (
         <div
           id={moviesType}
           ref={gridRef}
@@ -194,7 +244,9 @@ const HeroSection = ({ title, moviesType, items }) => {
         </div>
       )}
       {moviesType === "ranking" && (
-        <div style={{ position: "relative", height: "22rem", zIndex: "100" }}></div>
+        <div
+          style={{ position: "relative", height: "22rem", zIndex: "100" }}
+        ></div>
       )}
       {/* </div> */}
       {/* </div> */}

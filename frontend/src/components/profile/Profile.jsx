@@ -70,6 +70,23 @@ const Profile = () => {
     };
   };
 
+  const handlePasswordChange = () => {
+    logout();
+    navigate("/forgot_password");
+  };
+
+  const handleAccountDelete = () => {
+    const confirmation = window.confirm(
+      "Are you sure you want to delete your account? This action cannot be undone."
+    );
+    if (confirmation) {
+      alert("Account deletion confirmed.");
+      logout();
+      navigate("/");
+      console.log("Account deletion confirmed");
+    }
+  };
+
   return (
     <section className="profile-section">
       <div className="profile-header">
@@ -222,6 +239,35 @@ const Profile = () => {
 
                 <span className="profile-value">u1@gmail.com</span>
               </div>
+            </div>
+            {/* Manage */}
+            <div className="profile-row" role="group" aria-label="manage-label">
+              <ul className="manage-container" aria-label="manage-lists">
+                <li className="manage-item" aria-labelledby="change-password">
+                  <button
+                    type="button"
+                    className="btn-change-password"
+                    id="change-password"
+                    onClick={handlePasswordChange}
+                  >
+                    Change Password
+                  </button>
+                </li>
+                <li className="manage-item" aria-labelledby="delete-account">
+                  <button
+                    type="button"
+                    className="btn-delete-account"
+                    id="delete-account"
+                    aria-describedby="delete-warning"
+                    onClick={handleAccountDelete}
+                  >
+                    Delete Account
+                    <span id="delete-warning" className="sr-only">
+                      Warning: This action cannot be undone
+                    </span>
+                  </button>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
