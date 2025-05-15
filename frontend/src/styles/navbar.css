@@ -2,7 +2,7 @@ header {
   max-width: 100%;
 }
 
-#navbar {
+.navbar {
   position: sticky;
   display: flex;
   justify-content: space-between;
@@ -24,7 +24,7 @@ header {
   background-color: rgba(0, 0, 0, 0.4); /* semi-transparent black */
 }
 
-#navbar ul {
+.navbar ul {
   list-style: none;
   padding: 0;
   margin: 0;
@@ -137,7 +137,7 @@ header {
   flex-grow: 1;
 }
 
-#menu-button {
+.menu-button {
   display: none;
   color: white;
   background: none;
@@ -145,15 +145,15 @@ header {
 }
 
 /* Responsive behavior */
-@media screen and (max-width: 768px) {
-  #navbar {
+@media screen and (max-width: 960px) {
+  .navbar.validate {
     height: 3rem;
     padding: 2rem 2rem;
     gap: 1.5rem;
     justify-content: flex-start;
   }
 
-  .logo {
+  .logo.validate {
     display: none;
   }
 
@@ -162,12 +162,12 @@ header {
     align-self: flex-end;
   } */
 
-  #menu-button {
+  .menu-button.validate {
     display: flex;
     z-index: 1100;
   }
 
-  .nav-links {
+  .nav-links.validate {
     position: fixed;
     top: 0;
     left: -100%;
@@ -182,20 +182,20 @@ header {
     transition: left 0.3s ease;
   }
 
-  .nav-links.open {
+  .nav-links.validate.open {
     left: 0;
   }
 
-  .nav-links ul {
+  .nav-links.validate ul {
     flex-direction: column;
     gap: 2rem;
   }
 
-  .nav-links ul li {
+  .nav-links.validate ul li {
     width: 100%;
   }
 
-  .nav-links ul li a {
+  .nav-links.validate ul li a {
     width: 100%;
     display: block;
     font-size: 1.2rem;

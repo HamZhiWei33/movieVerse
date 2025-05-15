@@ -126,8 +126,8 @@ main h1 {
   padding-right: 0.6rem;
 }
 
-.submitButton {
-  width: inherit;
+.submitButton{
+  width: 100%;
   /* margin-bottom: 1rem; */
   background-color: #c6ff00;
   border: 0.15rem solid;
@@ -148,12 +148,15 @@ main h1 {
   outline: none;
 }
 
-.submitButton.disabled {
-  width: inherit;
+.submitButton.disabled{
+  width: 100%;
+  max-width: 25rem;
+  /* margin: 0 25rem; */
   /* border: none; */
   background-color: #c6ff0080;
   border-color: transparent;
   outline: none;
+  flex-grow: 0 1 auto;
 }
 
 .submitButton.disabled:hover {

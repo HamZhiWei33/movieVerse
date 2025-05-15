@@ -68,6 +68,11 @@
   display: grid;
   grid-template-columns: repeat(6, 1fr); /* 2 columns on mobile */
   gap: 16px;
+  /* padding: 2rem 0; */
+  /* overflow: visible; */
+  position: relative;
+  margin: 3rem 0;
+  /* top: 1rem; */
 }
 .home-hover-bottom {
   display: flex;
