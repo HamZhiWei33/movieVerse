@@ -38,7 +38,7 @@
   top: -1rem;
   overflow: visible;
 }
-.hero-section.below-ranking{
+.hero-section.below-ranking {
   /* max-height: 25.25rem; */
   overflow-y: auto;
 }
@@ -60,7 +60,7 @@
   z-index: 1000;
   /* top: -3rem; */
 }
-.home-card-container.scroll-box .movie-card{
+.home-card-container.scroll-box .movie-card {
   flex: 0 0 auto;
 }
 .home-movie-card {
