@@ -48,14 +48,9 @@ const HeroSection = ({ title, moviesType, items }) => {
   };
 
   const toggleLike = (title) => {
-    setLikedMovies((prev) => {
-      const updated = prev.includes(title)
-        ? prev.filter((t) => t !== title)
-        : [...prev, title];
-      console.log("Previous liked:", prev);
-      console.log("Updating to:", updated);
-      return updated;
-    });
+    setLikedMovies((prev) =>
+      prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title]
+    );
   };
 
   useEffect(() => {
