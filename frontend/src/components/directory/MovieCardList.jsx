@@ -169,6 +169,7 @@ const MovieCardList = ({
             </button>
             <div className="iteractive-icon" onClick={handleLikeClick}>
               <LikeIcon liked={liked} />
+              <span className="like-count">{likeCount}</span>
             </div>
             <div
               className="iteractive-icon"

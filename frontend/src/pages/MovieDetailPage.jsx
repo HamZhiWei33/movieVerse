@@ -75,7 +75,6 @@ const MovieDetailPage = () => {
                         ...movie,
                         genre: movie.genre, // Pass the entire genre object
                         reviewCount: movieReviews.length,
-                        likes: likeCount
                     }}
                     liked={liked}
                     addedToWatchlist={watchlisted}
@@ -87,6 +86,7 @@ const MovieDetailPage = () => {
                     showRatingNumber={true}
                     showBottomInteractiveIcon={true}
                     showCastInfo={true}
+                    likeCount={likeCount}
                     allReviews={movieReviews}
                 />
 
