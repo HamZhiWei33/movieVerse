@@ -13,7 +13,8 @@ const currentUserId = "U2";
 
 const userReviews = reviews.filter((review) => review.userId === currentUserId);
 
-const tabList = ["Overview", "WatchList", "Review", "Manage"];
+// const tabList = ["Overview", "WatchList", "Review", "Manage"];
+const tabList = ["Overview", "WatchList", "Review"];
 const Tab = () => {
   const location = useLocation();
   const initialTab =
@@ -99,8 +100,8 @@ const Tab = () => {
         return <TabWatchlist />;
       case "Review":
         return <TabReview reviews={userReviews} />;
-      case "Manage":
-        return <TabManage />;
+      // case "Manage":
+      //   return <TabManage />;
       default:
         return null;
     }
