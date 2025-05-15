@@ -95,7 +95,7 @@ const GenreRankingSection = ({ movies, allGenres, allReviews }) => {
     });
   console.log("Sorted movies:", sorted); // Debugging line
   const top1 = sorted[0];
-  const otherMovies = sorted.slice(1,10);
+  const otherMovies = sorted.slice(1,Math.min(10, sorted.length));
 
   const formatDuration = (minutes) => {
     if (!minutes || isNaN(minutes)) return "N/A";
