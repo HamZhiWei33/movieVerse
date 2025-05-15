@@ -27,14 +27,15 @@ const Navbar = () => {
 
   return (
     <header role="banner">
-      <div id="navbar">
-        <div className="logo" aria-label="Go to homepage">
+      <div className={`navbar ${isValidateUser?"validate":""}`}>
+        <div className={`logo ${isValidateUser?"validate":""}`} aria-label="Go to homepage">
           <NavLink to="/">
             <img src="logo.gif" alt="App logo" width={300} height={50} />
           </NavLink>
         </div>
         <button
           id="menu-button"
+          className={`menu-button ${isValidateUser?"validate":""}`}
           onClick={toggleMenu}
           aria-label="Toggle navigation menu"
           aria-expanded={menuOpen}
@@ -51,15 +52,17 @@ const Navbar = () => {
             aria-hidden="true"
           ></div>
         )}
-        <div className="search-bar" role="search" aria-label="Site search">
-          <input
-            id="searchInput"
-            type="text"
-            placeholder="Search"
-            aria-label="Search input"
-          />
-          <SearchIcon size={20} />
-        </div>
+        {isValidateUser && (
+          <div className="search-bar" role="search" aria-label="Site search">
+            <input
+              id="searchInput"
+              type="text"
+              placeholder="Search"
+              aria-label="Search input"
+            />
+            <SearchIcon size={20} />
+          </div>
+        )}
 
         <div
           style={{
@@ -70,7 +73,7 @@ const Navbar = () => {
           }}
         >
           <nav
-            className={`nav-links ${menuOpen ? "open" : ""}`}
+            className={`nav-links ${isValidateUser?"validate":""} ${menuOpen ? "open" : ""}`}
             role="navigation"
             aria-label="Main navigation"
           >
@@ -127,6 +130,7 @@ const Navbar = () => {
                 className="logout-btn"
                 role="button"
                 aria-label="Logout button with profile image"
+                onClick={logout}
               >
                 <div>
                   <div className="profile-container">
@@ -140,7 +144,7 @@ const Navbar = () => {
                       aria-label="User profile image"
                     />
                   </div>
-                  <p onClick={logout}>Logout</p>
+                  <p>Logout</p>
                 </div>
               </div>
             </NavLink>
