@@ -18,7 +18,7 @@
     align-items: center;
 }
 
-.genre-selection-section .title p{
+.genre-selection-section .title p {
     font-size: 1.2rem;
     color: white;
 }
@@ -32,4 +32,11 @@
     row-gap: 2rem;
     align-items: center;
     justify-items: center;
+}
+
+.genre-selection-section .submit-button-wrapper {
+    width: 100%;
+    min-width: 15rem;
+    max-width: min(37.5%, 25rem);
+    margin-top: 0.5rem;
 }
