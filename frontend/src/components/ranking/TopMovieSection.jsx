@@ -16,7 +16,7 @@ const TopMovieSection = ({ selectedMovie, setSelectedMovie, ratingDistribution, 
     setLiked(false);
     setAddedToWatchlist(false);
   }, [selectedMovie]);
-  
+
   //Calculate average rating
   const calculateAverageRating = (movieId) => {
     if (!Array.isArray(allReviews) || allReviews.length === 0) return 0;
@@ -45,13 +45,13 @@ const TopMovieSection = ({ selectedMovie, setSelectedMovie, ratingDistribution, 
         compositeScore: calculateAverageRating(movie.id) * 0.9 + (movie.year - 2000) * 0.1, // 90% rating + 10% recency (year)
       }))
       .sort((a, b) => {
-      // First, compare by compositeScore
-      if (b.compositeScore === a.compositeScore) {
-        // If compositeScore is the same, compare by id (you can also use a different field)
-        return a.id.localeCompare(b.id); // Sort by id in lexicographical order
-      }
-      return b.compositeScore - a.compositeScore; // If not, compare by compositeScore
-    })
+        // First, compare by compositeScore
+        if (b.compositeScore === a.compositeScore) {
+          // If compositeScore is the same, compare by id (you can also use a different field)
+          return a.id.localeCompare(b.id); // Sort by id in lexicographical order
+        }
+        return b.compositeScore - a.compositeScore; // If not, compare by compositeScore
+      })
       .slice(0, 3); // Get the top 3 movies
   }, [allMovies, allReviews]);
 
@@ -119,25 +119,25 @@ const TopMovieSection = ({ selectedMovie, setSelectedMovie, ratingDistribution, 
       </div>
 
       <section className="top-section">
-  <section className="ranking-three-columns">
-    {top3.map((movie, idx) => {
-      const label = idx === 0 ? "Top 2" : idx === 1 ? "Top 1" : "Top 3";
-      const isActive = movie.id === selectedMovie.id;
-      return (
-        <div
-          key={movie.id}
-          className={`card ${isActive ? "main-card active" : "side-card"}`}
-          onClick={() => setSelectedMovie(movie)}
-          onMouseEnter={() => setSelectedMovie(movie)}
-        >
-          <h2 className="rank-label">{label}</h2>
-          <div className="image-container">
-            <img src={movie.posterUrl} alt={movie.title} />
-          </div>
-        </div>
-      );
-    })}
-  </section>
+        <section className="ranking-three-columns">
+          {top3.map((movie, idx) => {
+            const label = idx === 0 ? "Top 2" : idx === 1 ? "Top 1" : "Top 3";
+            const isActive = movie.id === selectedMovie.id;
+            return (
+              <div
+                key={movie.id}
+                className={`card ${isActive ? "main-card active" : "side-card"}`}
+                onClick={() => setSelectedMovie(movie)}
+                onMouseEnter={() => setSelectedMovie(movie)}
+              >
+                <h2 className="rank-label">{label}</h2>
+                <div className="image-container">
+                  <img src={movie.posterUrl} alt={movie.title} />
+                </div>
+              </div>
+            );
+          })}
+        </section>
 
         <section className="movie-details-two-column">
           <div className="left-column">
