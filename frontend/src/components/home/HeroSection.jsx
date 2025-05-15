@@ -15,6 +15,7 @@ import ReviewStars from "../directory/ReviewStars";
 
 const HeroSection = ({ title, moviesType, items }) => {
   const [cardPerRow, setCardPerRow] = useState(1);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [displayed, setDisplayed] = useState([]);
   const [likedMovies, setLikedMovies] = useState([]);
   const [addToWatchlistMovies, setAddToWatchlistMovies] = useState([]);
@@ -53,10 +54,6 @@ const HeroSection = ({ title, moviesType, items }) => {
     );
   };
 
-  useEffect(() => {
-    console.log(likedMovies);
-  }, [likedMovies]);
-
   const toggleAddToWatchlist = (title) => {
     setAddToWatchlistMovies((prev) =>
       prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title]
@@ -93,46 +90,46 @@ const HeroSection = ({ title, moviesType, items }) => {
     return sum / movieReviews.length;
   };
 
-  const setupMovieCards = (colCount) => {
-    const columns = Math.ceil(colCount / 2); // colCount is columns with spacer(gap), need to calculate without gap
-    const maxMoviesCount = Math.max(4, columns * 2); // Show only 2 rows, with at least 4 movies
-    const cards = [];
-    const movieList = moviesType === "recommendation" ? displayed : items;
-    movieList.forEach((movie, index) => {
-      if (index < maxMoviesCount) {
-        // Spacer before every item except the first
-        if (index % columns !== 0 && window.innerWidth >= 922) {
-          cards.push(<div key={`spacer-${index}`} className="spacer" />);
-        }
+  // const setupMovieCards = (colCount) => {
+  //   const columns = Math.ceil(colCount / 2); // colCount is columns with spacer(gap), need to calculate without gap
+  //   const maxMoviesCount = Math.max(4, columns * 2); // Show only 2 rows, with at least 4 movies
+  //   const cards = [];
+  //   const movieList = moviesType === "recommendation" ? displayed : items;
+  //   movieList.forEach((movie, index) => {
+  //     if (index < maxMoviesCount) {
+  //       // Spacer before every item except the first
+  //       if (index % columns !== 0 && windowWidth >= 942) {
+  //         cards.push(<div key={`spacer-${index}`} className="spacer" />);
+  //       }
 
-        cards.push(
-          <MovieCard
-            key={index}
-            role="listitem"
-            movie={{
-              ...movie,
-              genre: (movie.genre || []).map((id) => genreMap[id]),
-              year: movie.year.toString(),
-            }}
-            liked={likedMovies.includes(movie.id)}
-            addedToWatchlist={addToWatchlistMovies.includes(movie.id)}
-            onLike={() => toggleLike(movie.id)}
-            onAddToWatchlist={() => toggleAddToWatchlist(movie.id)}
-            allReviews={reviews}
-          >
-            {moviesType === "recommendation" && (
-              <div className="movie-rating">
-                <ReviewStars rating={calculateAverageRating(movie.id)} />
-              </div>
-            )}
-          </MovieCard>
-        );
-      } else {
-        cards.push(<div key={index} className="movie-card-placeholder" />);
-      }
-    });
-    setMovieCards(cards);
-  };
+  //       cards.push(
+  //         <MovieCard
+  //           key={index}
+  //           role="listitem"
+  //           movie={{
+  //             ...movie,
+  //             genre: (movie.genre || []).map((id) => genreMap[id]),
+  //             year: movie.year.toString(),
+  //           }}
+  //           liked={likedMovies.includes(movie.id)}
+  //           addedToWatchlist={addToWatchlistMovies.includes(movie.id)}
+  //           onLike={() => toggleLike(movie.id)}
+  //           onAddToWatchlist={() => toggleAddToWatchlist(movie.id)}
+  //           allReviews={reviews}
+  //         >
+  //           {moviesType === "recommendation" && (
+  //             <div className="movie-rating">
+  //               <ReviewStars rating={calculateAverageRating(movie.id)} />
+  //             </div>
+  //           )}
+  //         </MovieCard>
+  //       );
+  //     } else {
+  //       cards.push(<div key={index} className="movie-card-placeholder" />);
+  //     }
+  //   });
+  //   setMovieCards(cards);
+  // };
 
   const gridRef = useRef(null);
 
@@ -142,12 +139,13 @@ const HeroSection = ({ title, moviesType, items }) => {
     const observer = new ResizeObserver(() => {
       const style = getComputedStyle(gridRef.current);
       const columns = style.gridTemplateColumns.split(" ").length;
+      setWindowWidth(window.innerWidth);
       setCardPerRow(Math.ceil(columns / 2));
     });
 
     observer.observe(gridRef.current);
     return () => observer.disconnect();
-  }, [items, displayed]);
+  }, []);
 
   return (
     <section
@@ -202,7 +200,7 @@ const HeroSection = ({ title, moviesType, items }) => {
             .slice(0, Math.max(4, cardPerRow * 2))
             .map((movie, index) => (
               <React.Fragment key={movie.id}>
-                {index % cardPerRow !== 0 && window.innerWidth >= 922 && (
+                {index % cardPerRow !== 0 && windowWidth >= 942 && (
                   <div className="spacer" />
                 )}
                 <MovieCard
