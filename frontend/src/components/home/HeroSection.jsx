@@ -201,7 +201,7 @@ const HeroSection = ({ title, moviesType, items, belowRanking }) => {
         </div>
       )}
       {moviesType === "ranking" && (
-        <div style={{ position: "relative", height: "22rem" }}></div>
+        <div style={{ position: "relative", height: "22rem", zIndex:"100" }}></div>
       )}
       {/* </div> */}
       {/* </div> */}
