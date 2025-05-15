@@ -13,10 +13,12 @@ import { useNavigate } from "react-router-dom";
 import useHorizontalScroll from "../../store/useHorizontalScroll";
 import ReviewStars from "../directory/ReviewStars";
 
-const HeroSection = ({ title, moviesType, items, belowRanking }) => {
+const HeroSection = ({ title, moviesType, items }) => {
+  const [cardPerRow, setCardPerRow] = useState(1);
   const [displayed, setDisplayed] = useState([]);
   const [likedMovies, setLikedMovies] = useState([]);
   const [addToWatchlistMovies, setAddToWatchlistMovies] = useState([]);
+  const movieList = moviesType === "recommendation" ? displayed : items;
 
   var ariaLabel;
   if (moviesType === "watchlist") {
@@ -46,10 +48,20 @@ const HeroSection = ({ title, moviesType, items, belowRanking }) => {
   };
 
   const toggleLike = (title) => {
-    setLikedMovies((prev) =>
-      prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title]
-    );
+    setLikedMovies((prev) => {
+      const updated = prev.includes(title)
+        ? prev.filter((t) => t !== title)
+        : [...prev, title];
+      console.log("Previous liked:", prev);
+      console.log("Updating to:", updated);
+      return updated;
+    });
   };
+
+  useEffect(() => {
+    console.log(likedMovies);
+  }, [likedMovies]);
+
 
   const toggleAddToWatchlist = (title) => {
     setAddToWatchlistMovies((prev) =>
@@ -132,7 +144,6 @@ const HeroSection = ({ title, moviesType, items, belowRanking }) => {
   };
 
   const gridRef = useRef(null);
-  const [movieCards, setMovieCards] = useState([]);
 
   useEffect(() => {
     if (moviesType === "ranking") return;
@@ -140,8 +151,7 @@ const HeroSection = ({ title, moviesType, items, belowRanking }) => {
     const observer = new ResizeObserver(() => {
       const style = getComputedStyle(gridRef.current);
       const columns = style.gridTemplateColumns.split(" ").length;
-
-      setupMovieCards(columns);
+      setCardPerRow(Math.ceil(columns / 2));
     });
 
     observer.observe(gridRef.current);
@@ -197,7 +207,24 @@ const HeroSection = ({ title, moviesType, items, belowRanking }) => {
           role="region"
           aria-label={ariaLabel}
         >
-          {movieCards}
+          {movieList.slice(0, Math.max(4, cardPerRow * 2)).map((movie, index) => (
+            <React.Fragment key={movie.id}>
+              {index % cardPerRow !== 0 && window.innerWidth >= 922 && (
+                <div className="spacer" />
+              )}
+              <MovieCard
+                movie={{
+                  ...movie,
+                  year: movie.year.toString(),
+                }}
+                liked={likedMovies.includes(movie.id)}
+                addedToWatchlist={addToWatchlistMovies.includes(movie.id)}
+                onLike={() => toggleLike(movie.id)}
+                onAddToWatchlist={() => toggleAddToWatchlist(movie.id)}
+                allReviews={reviews}
+              />
+            </React.Fragment>
+          ))}
         </div>
       )}
 
