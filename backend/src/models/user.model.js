@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    fullName: {
+    name: {
       type: String,
       required: true,
     },
@@ -24,6 +24,10 @@ const userSchema = new mongoose.Schema(
     },
     watchlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Movie" }],
     likedMovies: [{ type: mongoose.Schema.Types.ObjectId, ref: "Movie" }],
+    favouriteGenres: {
+      type: [String],
+      default: [],
+    },
   },
   { timestamps: true }
 );
