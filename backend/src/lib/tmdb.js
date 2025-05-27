@@ -62,6 +62,21 @@ export const fetchAndStorePopularMovies = async () => {
       let trailerUrl = "";
       let director = "Unknown";
       let actors = [];
+      let duration = 0;
+
+      try {
+        const detailData = await axios.get(`${TMDB_BASE_URL}/movie/${m.id}`, {
+          params: { api_key: TMDB_API_KEY }
+        });
+
+        const runtime = detailData.data.runtime || 0;
+        const hours = Math.floor(runtime / 60);
+        const minutes = runtime % 60;
+        duration = `${hours}h ${minutes}min`;
+
+      } catch (err) {
+        console.warn(`⚠️ Duration fetch failed for movie ${m.id}: ${err.message}`);
+      }
 
       try {
         //  Region
@@ -116,20 +131,15 @@ export const fetchAndStorePopularMovies = async () => {
           tmdbId: m.id,
           title: m.title,
           year: new Date(m.release_date).getFullYear(),
-          genre: m.genre_ids.map((id) => genreMap[id] || `Unknown (${id})`), // Real genre names
+          genre: m.genre_ids,
           director,
           actors,
-          //   rating: m.vote_average,
-          rating: 0,
-          //   reviewCount: m.vote_count,
-          reviewCount: 0,
-          likes: 0,
           posterUrl: m.poster_path
             ? `https://image.tmdb.org/t/p/w500${m.poster_path}`
             : "",
           trailerUrl,
           description: m.overview,
-          duration: 0,
+          duration,
           releaseDate: m.release_date,
           region,
         },

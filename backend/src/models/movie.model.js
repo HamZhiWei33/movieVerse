@@ -15,8 +15,8 @@ const movieSchema = new mongoose.Schema({
   },
   genre: [
     {
-      type: [String],
-      default: [],
+      type: Number,
+      // Assuming genre is stored as an array of genre IDs
       ref: "Genre",
       required: true,
     },
@@ -57,7 +57,7 @@ const movieSchema = new mongoose.Schema({
     required: true,
   },
   duration: {
-    type: Number,
+    type: String,
     required: true,
   },
   releaseDate: {
