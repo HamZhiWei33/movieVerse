@@ -1,40 +1,38 @@
 // components/GenreRankingSection.jsx
+import { useState, useEffect, useMemo } from "react";
+import axios from "axios";
 import GenreCard from "./GenreCard";
 import Top1Card from "./Top1Card";
-import { useState, useMemo, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
-import { useLocation } from "react-router-dom";
+import { useSearchParams, useLocation } from "react-router-dom";
 
-const GenreRankingSection = ({ movies, allGenres, allReviews }) => {
+const GenreRankingSection = ({ movies = [], allGenres = [], allReviews = [] }) => {
   const [searchParams] = useSearchParams();
-  const urlGenre = searchParams.get("genre");
   const location = useLocation();
-  // const [selectedGenre, setSelectedGenre] = useState("All");
-  // Set initial state to URL genre if valid, otherwise "All"
-
-  const genreOptions = useMemo(
-    () => ["All", ...allGenres.map((g) => g.name)],
-    [allGenres]
-  );
-  const [selectedGenre, setSelectedGenre] = useState(
-    genreOptions.includes(urlGenre) ? urlGenre : "All"
-  );
-
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [data, setData] = useState({
+    movies: [],
+    reviews: [],
+    genres: [],
+  });
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  useEffect(() => {
 
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth);
-    };
+  // Get genre from URL or default to "All"
+  const urlGenre = searchParams.get("genre");
+  
+  // Modified genreOptions to use allGenres prop and sort alphabetically
+  const genreOptions = useMemo(() => {
+    const genres = Array.isArray(allGenres) ? allGenres : [];
+    const sortedGenres = genres
+      .map(genre => genre.name)
+      .sort((a, b) => a.localeCompare(b));
+    
+    return ["All", ...sortedGenres];
+  }, [allGenres]);
 
-    window.addEventListener("resize", handleResize);
+  const [selectedGenre, setSelectedGenre] = useState("All");
 
-    return () => {
-      window.addEventListener("resize", handleResize);
-    };
-  }, []);
-
-  // Effect to sync state when URL changes
+  // Update selectedGenre when URL changes
   useEffect(() => {
     if (urlGenre && genreOptions.includes(urlGenre)) {
       setSelectedGenre(urlGenre);
@@ -42,6 +40,57 @@ const GenreRankingSection = ({ movies, allGenres, allReviews }) => {
       setSelectedGenre("All");
     }
   }, [urlGenre, genreOptions]);
+
+  // Fetch data from backend
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        console.log('Fetching data for genre:', selectedGenre); // Debug log
+        
+        const response = await axios.get("http://localhost:5001/api/rankings/genres", {
+          params: { genre: selectedGenre }
+        });
+        
+        console.log('Received data:', response.data); // Debug log
+        
+        if (!response.data) {
+          throw new Error('No data received from server');
+        }
+        
+        setData({
+          movies: response.data.movies || [],
+          reviews: response.data.reviews || [],
+          genres: response.data.genres || []
+        });
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching rankings:", err);
+        setError(`Failed to load rankings: ${err.message}`);
+        setData({
+          movies: [],
+          reviews: [],
+          genres: []
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [selectedGenre]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   // Scroll to section when component mounts or hash changes
   useEffect(() => {
@@ -59,75 +108,57 @@ const GenreRankingSection = ({ movies, allGenres, allReviews }) => {
   }, [location.hash]);
 
   const calculateAverageRating = (movieId) => {
-    if (!Array.isArray(allReviews) || allReviews.length === 0) return 0;
+    if (!Array.isArray(data.reviews) || data.reviews.length === 0) return 0;
 
-    const selectedReviews = allReviews.filter((r) => r.movieId === movieId);
+    const movieReviews = data.reviews.filter((r) => r.movieId === movieId);
+    if (movieReviews.length === 0) return 0;
 
-    const validRatings = selectedReviews
-      .map((r) => Number(r.rating))
-      .filter((r) => !isNaN(r));
-
-    if (validRatings.length === 0) return 0;
-
-    const sum = validRatings.reduce((acc, rating) => acc + rating, 0);
-    const average = sum / validRatings.length;
-
-    return parseFloat(average.toFixed(1));
+    const sum = movieReviews.reduce((acc, r) => acc + r.rating, 0);
+    return parseFloat((sum / movieReviews.length).toFixed(1));
   };
 
-  const filtered = useMemo(() => {
-    if (selectedGenre === "All") return movies;
-    const genreId = allGenres.find((g) => g.name === selectedGenre)?.id;
-    return genreId ? movies.filter((m) => m.genre.includes(genreId)) : [];
-  }, [selectedGenre, movies, allGenres]);
-
-  const sorted = [...filtered]
-    .map((movie) => ({
-      ...movie,
-      compositeScore:
-        calculateAverageRating(movie.id) * 0.9 + (movie.year - 2000) * 0.1,
-    }))
-    .sort((a, b) => {
-      if (b.compositeScore === a.compositeScore) {
-        return a.id.localeCompare(b.id);
-      }
-      return b.compositeScore - a.compositeScore;
-    });
-  console.log("Sorted movies:", sorted); // Debugging line
-  const top1 = sorted[0];
-  const otherMovies = sorted.slice(1,Math.min(10, sorted.length));
-
-  const formatDuration = (minutes) => {
-    if (!minutes || isNaN(minutes)) return "N/A";
-
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-
-    return hours > 0
-      ? `${hours}h${mins > 0 ? ` ${mins}min` : ""}`.trim()
-      : `${mins}min`;
-  };
-
-  // Format duration for Top 1 movie
-  // const durationText = useMemo(() => {
-  //   if (!top1?.duration) return "";
-  //   const hrs = Math.floor(top1.duration / 60);
-  //   const mins = top1.duration % 60;
-  //   return `${hrs}h ${mins}min`;
-  // }, [top1]);
-  const durationText = useMemo(() => {
-    return formatDuration(top1?.duration);
-  }, [top1]);
-
-  // Get genre names for Top 1 movie
-  const genreNames = useMemo(() => {
-    return top1?.genre
-      .map((gid) => {
-        const g = allGenres.find((item) => item.id === gid);
-        return g ? g.name : gid;
+  const sorted = useMemo(() => {
+    if (!Array.isArray(movies)) return [];
+    
+    return movies
+      .filter(movie => {
+        if (selectedGenre === "All") return true;
+        
+        // Find the genre ID for the selected genre name
+        const selectedGenreId = allGenres.find(g => g.name === selectedGenre)?.id;
+        
+        // Check if the movie has this genre ID
+        return selectedGenreId && movie.genre.includes(selectedGenreId);
       })
-      .join(", ");
-  }, [top1, allGenres]);
+      .sort((a, b) => {
+        // Sort by rating first
+        const ratingDiff = calculateAverageRating(b._id) - calculateAverageRating(a._id);
+        if (ratingDiff !== 0) return ratingDiff;
+        // If ratings are equal, sort by year
+        return b.year - a.year;
+      })
+      .slice(0, 10); // Limit to 10 movies
+  }, [movies, selectedGenre, allGenres, calculateAverageRating]);
+
+  const [top1, ...otherMovies] = sorted;
+
+  // const formatDuration = (minutes) => {
+  //   if (!minutes || isNaN(minutes)) return "N/A";
+  //   const hours = Math.floor(minutes / 60);
+  //   const mins = minutes % 60;
+  //   return hours > 0
+  //     ? `${hours}h${mins > 0 ? ` ${mins}min` : ""}`
+  //     : `${mins}min`;
+  // };
+
+  if (loading) return <div className="loading">Loading rankings...</div>;
+  if (error) return <div className="error">{error}</div>;
+
+  // Update the genre mapping in the cards to use allGenres
+  const getGenreName = (genreId) => {
+    const genre = allGenres.find(g => g.id === genreId);
+    return genre?.name || '';
+  };
 
   return (
     <section className="genre-ranking-section" id="genre-ranking-section">
@@ -146,77 +177,66 @@ const GenreRankingSection = ({ movies, allGenres, allReviews }) => {
       </nav>
 
       <div className="genre-list">
-        <div className="genre-ranking-layout">
-          {/* Top 1 - Left Side */}
-          {(top1 && windowWidth >= 1200) && (
-            <Top1Card
-              key={top1.id}
-              movie={top1}
-              rank={1}
-              image={top1.posterUrl}
-              title={top1.title}
-              rating={calculateAverageRating(top1.id)}
-              description={top1.description}
-              genre={genreNames}
-              region={top1.region}
-              year={top1.year}
-              duration={durationText}
-            />
-          )}
-
-          {/* Other movies (Top 2, Top 3, ...) - Right Side */}
-          <div className="right-cards">
-            {(top1 && windowWidth < 1200) && (
-              <GenreCard
-                key={top1.id}
+        {!sorted.length ? (
+          <div className="no-movies">No movies available for this genre</div>
+        ) : (
+          <div className="genre-ranking-layout">
+            {top1 && windowWidth >= 1200 && (
+              <Top1Card
                 movie={top1}
                 rank={1}
                 image={top1.posterUrl}
                 title={top1.title}
-                rating={calculateAverageRating(top1.id)}
-                genre={genreNames}
+                rating={calculateAverageRating(top1._id)}
+                description={top1.description}
+                genre={top1.genre.map(getGenreName).filter(Boolean).join(", ")}
                 region={top1.region}
                 year={top1.year}
-                duration={durationText}
+                duration={top1.duration}
               />
             )}
-            {otherMovies.length === 0 ? (
-              <p style={{ color: "#888", padding: "1rem" }}>
-                No movies in this genre.
-              </p>
-            ) : (
-              otherMovies.map((movie, index) => {
-                const movieGenreNames = movie.genre
-                  .map((gid) => {
-                    const g = allGenres.find((item) => item.id === gid);
-                    return g ? g.name : gid;
-                  })
-                  .join(", ");
 
-                const movieDurationText = `${Math.floor(
-                  movie.duration / 60
-                )}h ${movie.duration % 60}min`; // Calculate duration text for each movie
-                return (
-                  <GenreCard
-                    key={movie.id}
-                    movie={movie}
-                    rank={index + 2}
-                    image={movie.posterUrl}
-                    title={movie.title}
-                    rating={calculateAverageRating(movie.id)}
-                    genre={movieGenreNames}
-                    region={movie.region}
-                    year={movie.year}
-                    duration={movieDurationText}
-                  />
-                );
-              })
-            )}
+            <div className="right-cards">
+              {top1 && windowWidth < 1200 && (
+                <GenreCard
+                  movie={top1}
+                  rank={1}
+                  image={top1.posterUrl}
+                  title={top1.title}
+                  rating={calculateAverageRating(top1._id)}
+                  genre={top1.genre.map(getGenreName).filter(Boolean).join(", ")}
+                  region={top1.region}
+                  year={top1.year}
+                  duration={top1.duration}
+                />
+              )}
+              {otherMovies.map((movie, index) => (
+                <GenreCard
+                  key={movie._id}
+                  movie={movie}
+                  rank={index + 2}
+                  image={movie.posterUrl}
+                  title={movie.title}
+                  rating={calculateAverageRating(movie._id)}
+                  genre={movie.genre.map(getGenreName).filter(Boolean).join(", ")}
+                  region={movie.region}
+                  year={movie.year}
+                  duration={movie.duration}
+                />
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </section>
   );
+};
+
+// Add prop types for better type checking
+GenreRankingSection.defaultProps = {
+  movies: [],
+  allGenres: [],
+  allReviews: []
 };
 
 export default GenreRankingSection;
