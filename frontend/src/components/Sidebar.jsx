@@ -1,22 +1,3 @@
-// const Sidebar = () => {
-//   return (
-//     <aside id="sidebar">
-//       <h2>Sidebar</h2>
-//       <ul>
-//         <li>
-//           <a href="#genre_dir">Genre</a>
-//         </li>
-//         <li>
-//           <a href="#region_dir">Region</a>
-//         </li>
-//         <li>
-//           <a href="#year_dir">Year</a>
-//         </li>
-//       </ul>
-//     </aside>
-//   );
-// };import { Link } from "react-scroll";
-// import { Link } from "react-scroll";
 import { useState } from "react";
 import "../styles/sidebar.css";
 
@@ -75,8 +56,14 @@ const Sidebar = ({
               role="button"
               tabIndex={0}
             >
-              {title}{" "}
-              {openSections.includes(id) ? <FaAngleDown /> : <FaAngleUp />}
+              <span className="sidebar-title">{title}</span>
+
+              {"  "}
+              {openSections.includes(id) ? (
+                <FaAngleUp className="sidebar-icon" />
+              ) : (
+                <FaAngleDown className="sidebar-icon" />
+              )}
             </div>
 
             {openSections.includes(id) && (

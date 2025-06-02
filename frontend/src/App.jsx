@@ -2,7 +2,7 @@ import "./App.css";
 import { Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import HomePage from "./pages/HomePage";
-import SignupPage from "./pages/SignupPage";
+import SignupPage from "./pages/SignUpPage";
 import LoginPage from "./pages/LoginPage";
 import GenreSelectionPage from "./pages/GenreSelectionPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
@@ -19,6 +19,7 @@ import {
   UserValidationContext,
 } from "../src/context/UserValidationProvider "; // Fixed space and added provider import
 import FooterGuest from "./components/FooterGuest";
+import { Toaster } from "react-hot-toast";
 
 // Define FooterSelector first since it's used in App
 function FooterSelector() {
@@ -45,6 +46,7 @@ function AppContent() {
         <Route path="/movie/:movieTitle" element={<MovieDetailPage />} />
         <Route path="/new-released" element={<NewReleasedPage />} />
       </Routes>
+      <Toaster />
       <FooterSelector />
     </>
   );

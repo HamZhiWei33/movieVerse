@@ -1,5 +1,38 @@
+// import express from "express";
+// const app = express();
+// app.listen(5001, () => {
+//   console.log("Server is running on port 5001");
+// });
+
 import express from "express";
+import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
+import { connectDB } from "./lib/db.js";
+import authRoutes from "./routes/auth.route.js";
+import rankingRoutes from "./routes/ranking.routes.js";
+import cors from "cors";
+import { fetchAndStorePopularMovies } from "./lib/tmdb.js";
+
+dotenv.config();
 const app = express();
-app.listen(5001, () => {
-  console.log("Server is running on port 5001");
+const PORT = process.env.PORT || 5001;
+
+// Middleware - extracting data from the request body
+app.use(express.json());
+app.use(cookieParser());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
+
+// Routes
+app.use("/api/auth", authRoutes);
+app.use("/api/rankings", rankingRoutes);
+
+app.listen(PORT, async () => {
+  console.log("Server is running on port:" + PORT);
+  await connectDB();
+  await fetchAndStorePopularMovies(); // Fetch TMDB data
 });
