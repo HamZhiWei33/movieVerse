@@ -6,12 +6,13 @@ import SearchIcon from "@mui/icons-material/Search";
 import MenuIcon from "@mui/icons-material/Menu";
 import useIsMobile from "../store/useIsMobile";
 import { UserValidationContext } from "../context/UserValidationProvider ";
-
+import { useAuthStore } from "../store/useAuthStore";
 const Navbar = () => {
   const isMobile = useIsMobile();
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
-  const { isValidateUser, logout } = useContext(UserValidationContext);
+  // const { isValidateUser, logout } = useContext(UserValidationContext);
+  const { authUser, logout } = useAuthStore();
   // const guestRoutes = [
   //   "/login",
   //   "/signup",
@@ -27,15 +28,18 @@ const Navbar = () => {
 
   return (
     <header role="banner">
-      <div className={`navbar ${isValidateUser?"validate":""}`}>
-        <div className={`logo ${isValidateUser?"validate":""}`} aria-label="Go to homepage">
+      <div className={`navbar ${authUser ? "validate" : ""}`}>
+        <div
+          className={`logo ${authUser ? "validate" : ""}`}
+          aria-label="Go to homepage"
+        >
           <NavLink to="/">
             <img src="logo.gif" alt="App logo" width={300} height={50} />
           </NavLink>
         </div>
         <button
           id="menu-button"
-          className={`menu-button ${isValidateUser?"validate":""}`}
+          className={`menu-button ${authUser ? "validate" : ""}`}
           onClick={toggleMenu}
           aria-label="Toggle navigation menu"
           aria-expanded={menuOpen}
@@ -52,7 +56,7 @@ const Navbar = () => {
             aria-hidden="true"
           ></div>
         )}
-        {isValidateUser && (
+        {authUser && (
           <div className="search-bar" role="search" aria-label="Site search">
             <input
               id="searchInput"
@@ -73,11 +77,13 @@ const Navbar = () => {
           }}
         >
           <nav
-            className={`nav-links ${isValidateUser?"validate":""} ${menuOpen ? "open" : ""}`}
+            className={`nav-links ${authUser ? "validate" : ""} ${
+              menuOpen ? "open" : ""
+            }`}
             role="navigation"
             aria-label="Main navigation"
           >
-            {!isValidateUser ? (
+            {!authUser ? (
               <ul>
                 <li>
                   <NavLink to="/login" end aria-label="Login page">
@@ -124,7 +130,7 @@ const Navbar = () => {
             )}
           </nav>
 
-          {!isMobile && isValidateUser && (
+          {!isMobile && authUser && (
             <NavLink to="/login" aria-label="Logout">
               <div
                 className="logout-btn"
