@@ -10,10 +10,10 @@ export const signup = async (req, res) => {
     if (!name || !email || !password) {
       return res.status(400).json({ message: "Please fill all fields" });
     }
-    if (password.length < 6) {
+    if (password.length < 8) {
       return res
         .status(400)
-        .json({ message: "Password should be at least 6 characters long" });
+        .json({ message: "Password should be at least 8 characters long" });
     }
     // check if user already exists
     const user = await User.findOne({ email });
@@ -97,19 +97,22 @@ export const logout = (req, res) => {
 
 export const updateProfile = async (req, res) => {
   try {
-    const { profilePic } = req.body;
+    const { name, gender, profilePic } = req.body;
     const userId = req.user._id;
 
-    if (!profilePic) {
-      return res.status(400).json({ message: "Profile pic is required" });
+    const updateData = {};
+
+    if (name) updateData.name = name;
+    if (gender) updateData.gender = gender;
+
+    if (profilePic) {
+      const uploadResponse = await cloudinary.uploader.upload(profilePic);
+      updateData.profilePic = uploadResponse.secure_url;
     }
 
-    const uploadResponse = await cloudinary.uploader.upload(profilePic);
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      { profilePic: uploadResponse.secure_url },
-      { new: true }
-    );
+    const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
+      new: true,
+    });
 
     res.status(200).json(updatedUser);
   } catch (error) {
@@ -123,7 +126,7 @@ export const checkAuth = (req, res) => {
     if (!req.user) {
       return res.status(401).json({ message: "Unauthorized" }); // Explicit 401 for no user
     }
-    // res.status(200).json(req.user);
+    res.status(200).json(req.user);
   } catch (error) {
     console.log("Error in checkAuth controller", error.message);
     res.status(500).json({ message: "Internal Server Error" });
