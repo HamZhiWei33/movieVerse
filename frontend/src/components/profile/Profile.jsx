@@ -1,38 +1,57 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import "../../styles/profile/profile.css";
 import { RiEditLine } from "react-icons/ri";
-import { FaCamera } from "react-icons/fa";
-import { FaCheck } from "react-icons/fa";
-import { FaTimes } from "react-icons/fa";
+import { FaCamera, FaCheck, FaTimes } from "react-icons/fa";
 import { UserValidationContext } from "../../context/UserValidationProvider ";
 import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../../store/useAuthStore";
+import InsertButton from "./InsertButton";
+import InsertReviewButton from "./InsertReviewButton";
 
 const Profile = () => {
-  const { logout } = React.useContext(UserValidationContext);
+  const { logout } = useContext(UserValidationContext);
   const navigate = useNavigate();
+  const { authUser, updateProfile, isUpdatingProfile } = useAuthStore();
 
-  const [name, setName] = useState(
-    () => localStorage.getItem("profileName") || "u1"
-  );
-  const [tempName, setTempName] = useState(name); // temp value while editing
+  // Local states synced with authUser
+  const [name, setName] = useState("");
+  const [tempName, setTempName] = useState("");
   const [isEditingName, setIsEditingName] = useState(false);
-  const [gender, setGender] = useState(() =>
-    localStorage.getItem("profileGender" || "-")
-  );
-  const [tempGender, setTempGender] = useState(gender);
-  const [isEditingGender, setIsEditingGender] = useState(false);
-  const [selectedImg, setSelectedImg] = useState(() => {
-    const storedImg = localStorage.getItem("profileImg");
-    return storedImg ? storedImg : "/profile/placeholder_avatar.svg";
-  });
-  console.log(
-    "Stored image in localStorage:",
-    localStorage.getItem("profileImg")
-  );
 
-  const startEditing = () => {
-    setTempName(name); // reset temp value to current
-    setIsEditingName(true);
+  const [gender, setGender] = useState("");
+  const [tempGender, setTempGender] = useState("");
+  const [isEditingGender, setIsEditingGender] = useState(false);
+
+  const [selectedImg, setSelectedImg] = useState(null);
+
+  useEffect(() => {
+    if (authUser) {
+      setName(authUser.name || "");
+      setTempName(authUser.name || "");
+      setGender(authUser.gender || "");
+      setTempGender(authUser.gender || "");
+      setSelectedImg(authUser.profilePic || null);
+    }
+  }, [authUser]);
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+
+    reader.onload = async () => {
+      const base64Image = reader.result;
+      setSelectedImg(base64Image);
+      await updateProfile({ profilePic: base64Image });
+    };
+  };
+
+  const confirmEditing = async () => {
+    setName(tempName);
+    setIsEditingName(false);
+    await updateProfile({ name: tempName });
   };
 
   const cancelEditing = () => {
@@ -40,40 +59,15 @@ const Profile = () => {
     setIsEditingName(false);
   };
 
-  const confirmEditing = () => {
-    setName(tempName);
-    localStorage.setItem("profileName", tempName);
-    setIsEditingName(false);
-  };
-  const startGenderEdit = () => {
-    setTempGender(gender);
-    setIsEditingGender(true);
+  const confirmGenderEdit = async () => {
+    setGender(tempGender);
+    setIsEditingGender(false);
+    await updateProfile({ gender: tempGender });
   };
 
   const cancelGenderEdit = () => {
     setTempGender(gender);
     setIsEditingGender(false);
-  };
-
-  const confirmGenderEdit = () => {
-    setGender(tempGender);
-    localStorage.setItem("profileGender", tempGender);
-    setIsEditingGender(false);
-  };
-  const handleImageUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-
-    reader.readAsDataURL(file);
-
-    reader.onload = async () => {
-      const base64Image = reader.result;
-      setSelectedImg(base64Image);
-      localStorage.setItem("profileImg", base64Image); // Save to localStorage
-      // await updateProfile({ profilePic: base64Image });
-    };
   };
 
   const handlePasswordChange = () => {
@@ -86,10 +80,8 @@ const Profile = () => {
       "Are you sure you want to delete your account? This action cannot be undone."
     );
     if (confirmation) {
-      alert("Account deletion confirmed.");
       logout();
       navigate("/");
-      console.log("Account deletion confirmed");
     }
   };
 
@@ -98,21 +90,23 @@ const Profile = () => {
       <div className="profile-header">
         <h1 id="profile-heading">Profile</h1>
       </div>
+
       <div className="profile-container">
         {/* Profile Image */}
         <figure className="left" aria-label="Profile image section">
           <div className="profile-image">
-            <div>
-              <img
-                src={selectedImg}
-                alt="profile picture"
-                height={100}
-                aria-describedby="image-instruction"
-              />
-            </div>
-
+            <img
+              src={
+                selectedImg ||
+                authUser?.profilePic ||
+                "/profile/placeholder_avatar.svg"
+              }
+              alt="profile picture"
+              height={100}
+              aria-describedby="image-instruction"
+            />
             <label htmlFor="avatar-upload" className="custom-file-upload">
-              <FaCamera aria-hidden="true" />
+              <FaCamera />
               <input
                 id="avatar-upload"
                 type="file"
@@ -120,24 +114,11 @@ const Profile = () => {
                 onChange={handleImageUpload}
                 aria-label="Select an image to upload"
               />
-              {/* <input
-                id="avatar-upload"
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                disabled={isUpdatingProfile}
-              /> */}
             </label>
           </div>
-          <p className="image-upload-message" id="image-instruction">
-            Click the camera icon to update photo
-          </p>
-          {/* <p className="text-sm text-zinc-400">
-            {isUpdatingProfile
-              ? "Uploading..."
-              : "Click the camera icon to update photo"}
-          </p> */}
+          <p id="image-instruction">Click the camera icon to update photo</p>
         </figure>
+
         {/* Profile Info */}
         <div
           className="right"
@@ -146,7 +127,7 @@ const Profile = () => {
         >
           <div className="profile-content">
             {/* Name */}
-            <div className="profile-row" role="group">
+            <div className="profile-row">
               <div className="profile-info">
                 {isEditingName ? (
                   <>
@@ -163,115 +144,114 @@ const Profile = () => {
                       onClick={confirmEditing}
                       aria-label="Confirm name change"
                     >
-                      <FaCheck aria-hidden="true" />
+                      <FaCheck />
                     </button>
                     <button
                       className="edit-icon cancel"
                       onClick={cancelEditing}
                       aria-label="Cancel name change"
                     >
-                      <FaTimes aria-hidden="true" />
+                      <FaTimes />
                     </button>
                   </>
                 ) : (
                   <>
-                    <h3 className="profile-name">{name}</h3>
+                    <h3 className="profile-name">{name || "-"}</h3>
                     <button
                       className="edit-icon edit"
-                      onClick={startEditing}
+                      onClick={() => setIsEditingName(true)}
                       aria-label="Edit name"
                     >
-                      <RiEditLine aria-hidden="true" />
+                      <RiEditLine />
                     </button>
                   </>
                 )}
               </div>
             </div>
+
             {/* Gender */}
-            <div className="profile-row" role="group" aria-label="gender-label">
+            <div className="profile-row">
               <div className="profile-info">
-                <label className="profile-label" id="gender-label">
-                  Gender
-                </label>
+                <label className="profile-label">Gender</label>
                 {isEditingGender ? (
                   <>
                     <select
                       className="profile-select"
                       value={tempGender}
                       onChange={(e) => setTempGender(e.target.value)}
-                      aria-label="Select gender"
                     >
                       <option value="">-</option>
-                      <option value="Male">Male</option>
-                      <option value="Female">Female</option>
+                      <option value="male">male</option>
+                      <option value="female">female</option>
                     </select>
                     <button
                       className="edit-icon confirm"
                       onClick={confirmGenderEdit}
-                      aria-label="Confirm gender change"
                     >
-                      <FaCheck aria-hidden="true" />
+                      <FaCheck />
                     </button>
                     <button
                       className="edit-icon cancel"
                       onClick={cancelGenderEdit}
-                      aria-label="Cancel gender change"
                     >
-                      <FaTimes aria-hideen="true" />
+                      <FaTimes />
                     </button>
                   </>
                 ) : (
                   <>
                     <span className="profile-value gender">
-                      {gender === "" ? "-" : gender}
+                      {gender || "-"}
                     </span>
                     <button
                       className="edit-icon edit"
-                      onClick={startGenderEdit}
-                      aria-label="Edit gender"
+                      onClick={() => setIsEditingGender(true)}
                     >
-                      <RiEditLine aria-hidden="true" />
+                      <RiEditLine />
                     </button>
                   </>
                 )}
               </div>
             </div>
-            {/* Email */}
-            <div className="profile-row" role="group" aria-label="email-label">
-              <div className="profile-info">
-                <label className="profile-label" id="email-label">
-                  Email
-                </label>
 
-                <span className="profile-value">u1@gmail.com</span>
+            {/* Email */}
+            <div className="profile-row">
+              <div className="profile-info">
+                <label className="profile-label">Email</label>
+                <span className="profile-value">
+                  {authUser?.email || "@gmail.com"}
+                </span>
               </div>
             </div>
+
             {/* Manage */}
-            <div className="profile-row" role="group" aria-label="manage-label">
-              <ul className="manage-container" aria-label="manage-lists">
-                <li className="manage-item" aria-labelledby="change-password">
+            <div className="profile-row">
+              <ul className="manage-container">
+                <li className="manage-item">
                   <button
                     type="button"
                     className="btn-change-password"
-                    id="change-password"
                     onClick={handlePasswordChange}
                   >
                     Change Password
                   </button>
                 </li>
-                <li className="manage-item" aria-labelledby="delete-account">
+                <li className="manage-item">
                   <button
                     type="button"
                     className="btn-delete-account"
-                    id="delete-account"
-                    aria-describedby="delete-warning"
                     onClick={handleAccountDelete}
                   >
                     Delete Account
-                    <span id="delete-warning" className="sr-only">
+                    <span className="sr-only">
                       Warning: This action cannot be undone
                     </span>
                   </button>
+                </li>
+                <li>
+                  <InsertButton />
+                </li>
+                <li>
+                  <InsertReviewButton />
                 </li>
               </ul>
             </div>
