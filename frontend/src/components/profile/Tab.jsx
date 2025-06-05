@@ -7,11 +7,11 @@ import "../../styles/profile/tab.css";
 import { useLocation } from "react-router-dom";
 // import { ReviewList } from "./constant";
 // import { movies } from "../../constant.js";
-import { reviews } from "../../constant.js";
+// import { reviews } from "../../constant.js";
 
-const currentUserId = "U2";
+// const currentUserId = "U2";
 
-const userReviews = reviews.filter((review) => review.userId === currentUserId);
+// const userReviews = reviews.filter((review) => review.userId === currentUserId);
 
 // const tabList = ["Overview", "WatchList", "Review", "Manage"];
 const tabList = ["Overview", "WatchList", "Review"];
@@ -99,7 +99,7 @@ const Tab = () => {
       case "WatchList":
         return <TabWatchlist />;
       case "Review":
-        return <TabReview reviews={userReviews} />;
+        return <TabReview />;
       // case "Manage":
       //   return <TabManage />;
       default:

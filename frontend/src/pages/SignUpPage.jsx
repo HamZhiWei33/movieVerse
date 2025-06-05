@@ -33,7 +33,7 @@ const SignupPage = () => {
       toast.error("Username is required");
       return false;
     }
-    if (formData.name.length < 3) {
+    if (formData.name.length < 3 {
       toast.error("Username must be at least 3 characters");
       return false;
     }
