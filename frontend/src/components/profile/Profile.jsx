@@ -7,11 +7,12 @@ import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../store/useAuthStore";
 import InsertButton from "./InsertButton";
 import InsertReviewButton from "./InsertReviewButton";
-
+import LikeMovieButton from "./LikeMovieButton";
 const Profile = () => {
   const { logout } = useContext(UserValidationContext);
   const navigate = useNavigate();
-  const { authUser, updateProfile, isUpdatingProfile } = useAuthStore();
+  const { authUser, updateProfile, isUpdatingProfile, deleteAccount } =
+    useAuthStore();
 
   // Local states synced with authUser
   const [name, setName] = useState("");
@@ -75,13 +76,28 @@ const Profile = () => {
     navigate("/forgot_password");
   };
 
-  const handleAccountDelete = () => {
+  // const handleAccountDelete = () => {
+  //   const confirmation = window.confirm(
+  //     "Are you sure you want to delete your account? This action cannot be undone."
+  //   );
+  //   if (confirmation) {
+  //     logout();
+  //     navigate("/");
+  //   }
+  // };
+
+  const handleDeleteAccount = async () => {
     const confirmation = window.confirm(
       "Are you sure you want to delete your account? This action cannot be undone."
     );
     if (confirmation) {
-      logout();
-      navigate("/");
+      try {
+        await deleteAccount();
+        logout();
+        navigate("/");
+      } catch (error) {
+        console.error("Error deleting account:", error);
+      }
     }
   };
 
@@ -241,7 +257,7 @@ const Profile = () => {
                   <button
                     type="button"
                     className="btn-delete-account"
-                    onClick={handleAccountDelete}
+                    onClick={handleDeleteAccount}
                   >
                     Delete Account
                     <span className="sr-only">
@@ -254,6 +270,9 @@ const Profile = () => {
                 </li>
                 <li>
                   <InsertReviewButton />
+                </li>
+                <li>
+                  <LikeMovieButton />
                 </li>
               </ul>
             </div>
