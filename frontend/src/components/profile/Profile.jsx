@@ -95,26 +95,28 @@ const Profile = () => {
         {/* Profile Image */}
         <figure className="left" aria-label="Profile image section">
           <div className="profile-image">
-            <img
-              src={
-                selectedImg ||
-                authUser?.profilePic ||
-                "/profile/placeholder_avatar.svg"
-              }
-              alt="profile picture"
-              height={100}
-              aria-describedby="image-instruction"
-            />
-            <label htmlFor="avatar-upload" className="custom-file-upload">
-              <FaCamera />
-              <input
-                id="avatar-upload"
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                aria-label="Select an image to upload"
+            <div>
+              <img
+                src={
+                  selectedImg ||
+                  authUser?.profilePic ||
+                  "/profile/placeholder_avatar.svg"
+                }
+                alt="profile picture"
+                height={100}
+                aria-describedby="image-instruction"
               />
-            </label>
+              <label htmlFor="avatar-upload" className="custom-file-upload">
+                <FaCamera />
+                <input
+                  id="avatar-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  aria-label="Select an image to upload"
+                />
+              </label>
+            </div>
           </div>
           <p id="image-instruction">Click the camera icon to update photo</p>
         </figure>

@@ -35,15 +35,16 @@ function AppContent() {
     checkAuth();
   }, []);
 
+  useEffect(() => {
+    console.log("Auth User:", authUser);
+  }, [authUser]);
+
   return (
     <>
       <ScrollToTopOnNavigate />
       <Navbar />
       <Routes>
-        <Route
-          path="/"
-          element={authUser ? <HomePage /> : <Navigate to="/login" />}
-        />
+        <Route path="/" element={<HomePage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/genre_selection" element={<GenreSelectionPage />} />
@@ -57,7 +58,7 @@ function AppContent() {
       </Routes>
       <Toaster />
       {/* <FooterSelector /> */}
-      <Footer />
+      {isCheckingAuth ? null : authUser ? <Footer /> : <FooterGuest />}
     </>
   );
 }

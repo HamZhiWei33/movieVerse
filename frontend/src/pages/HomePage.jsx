@@ -13,13 +13,23 @@ import { useContext, useEffect } from "react";
 import RecommendationSection from "../components/home/RecommendationSection.jsx";
 import useScrollToHash from "../store/useScrollToHash.js";
 import useGuestUser from "../store/useGuestUser.js";
+import { useAuthStore } from "../store/useAuthStore.js";
+import useWatchlistStore from "../store/useWatchlistStore.js";
 const HomePage = () => {
-  const userId = "U1";
-  const { isValidateUser } = useContext(UserValidationContext);
-  const watchlist = getMovieObject(userId);
+  // const userId = "U1";
+  // const { isValidateUser } = useContext(UserValidationContext);
+  // const watchlist = getMovieObject(userId);
+  const { authUser } = useAuthStore();
+  const { watchlist, fetchWatchlist } = useWatchlistStore();
+
+  // Fetch watchlist movies
+  useEffect(() => {
+    fetchWatchlist();
+  }, []);
 
   useScrollToHash();
-  useGuestUser(isValidateUser);
+
+  useGuestUser(authUser);
 
   return (
     <div
@@ -27,11 +37,10 @@ const HomePage = () => {
       role="main"
       aria-label="MovieVerse home page"
     >
-      {isValidateUser ? <HeroBanner /> : <HomeRanking />}
+      {authUser ? <HeroBanner /> : <HomeRanking />}
 
       <div className="hero-section-container">
-
-        {isValidateUser && (
+        {authUser && (
           <HeroSection
             title="Watchlist"
             moviesType={"watchlist"}
@@ -39,11 +48,7 @@ const HomePage = () => {
           />
         )}
 
-        <HeroSection
-          title="Ranking"
-          moviesType={"ranking"}
-          items={genres}
-        />
+        <HeroSection title="Ranking" moviesType={"ranking"} items={genres} />
 
         <HeroSection
           title="New Released"
