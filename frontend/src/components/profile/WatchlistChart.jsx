@@ -1,42 +1,82 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Doughnut } from "react-chartjs-2";
 import { Chart, ArcElement, Tooltip, Legend } from "chart.js";
-import { getWatchlistObject } from "./overview.js";
 import useIsMobile from "../../store/useIsMobile";
+import { useAuthStore } from "../../store/useAuthStore.js";
 
 Chart.register(ArcElement, Tooltip, Legend);
 
 const WatchlistChart = ({ userId }) => {
   const isMobile = useIsMobile();
+  const fetchWatchlistGenres = useAuthStore(
+    (state) => state.fetchWatchlistGenres
+  );
+  const [genreStats, setGenreStats] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const genreStats = getWatchlistObject(userId) || [];
+  useEffect(() => {
+    if (!userId) return;
+
+    const fetchData = async () => {
+      setLoading(true);
+      const genres = await fetchWatchlistGenres(userId);
+      setGenreStats(genres);
+      setLoading(false);
+    };
+
+    fetchData();
+  }, [userId, fetchWatchlistGenres]);
+
+  if (loading) {
+    return (
+      <div style={{ textAlign: "center", color: "white", padding: "2rem" }}>
+        Loading chart...
+      </div>
+    );
+  }
+
   const totalCount = genreStats.reduce((sum, item) => sum + item.count, 0);
+  const isEmpty = genreStats.length === 0 || totalCount === 0;
 
-  const chartData = {
-    labels: genreStats.map(
-      (item) =>
-        `${item.genre} (${Math.round((item.count / totalCount) * 100)}%)`
-    ),
-    datasets: [
-      {
-        label: "Liked Genres",
-        data: genreStats.map((item) => item.count),
-        backgroundColor: [
-          "rgba(0, 114, 114, 0.88)",
-          "rgba(0, 171, 171, 0.88)",
-          "rgba(206, 255, 255, 0.88)",
-          "rgba(109, 229, 201, 0.88)",
-          "rgba(65, 197, 166, 0.88)",
-          "rgba(65, 188, 197, 0.88)",
-          "rgba(53, 127, 170, 0.88)",
-          "rgba(5, 68, 146, 0.88)",
-          "rgba(14, 52, 99, 0.88)",
-          "rgba(5, 68, 146, 0.88)",
+  const chartData = isEmpty
+    ? {
+        labels: ["No Data"],
+        datasets: [
+          {
+            label: "No Watchlist Data",
+            data: [1],
+            backgroundColor: ["#888"],
+            borderWidth: 1,
+          },
         ],
-        borderWidth: 1,
-      },
-    ],
-  };
+      }
+    : {
+        labels: genreStats.map((item) => {
+          const percentage = totalCount
+            ? Math.round((item.count / totalCount) * 100)
+            : 0;
+          return `${item.genre} (${percentage}%)`;
+        }),
+        datasets: [
+          {
+            label: "Watchlist Genres",
+            data: genreStats.map((item) => item.count),
+            backgroundColor: [
+              "rgba(0, 114, 114, 0.88)",
+              "rgba(0, 171, 171, 0.88)",
+              "rgba(206, 255, 255, 0.88)",
+              "rgba(109, 229, 201, 0.88)",
+              "rgba(65, 197, 166, 0.88)",
+              "rgba(65, 188, 197, 0.88)",
+              "rgba(53, 127, 170, 0.88)",
+              "rgba(5, 68, 146, 0.88)",
+              "rgba(14, 52, 99, 0.88)",
+              "rgba(5, 68, 146, 0.88)",
+            ],
+            borderWidth: 1,
+          },
+        ],
+      };
 
   const chartOptions = {
     plugins: {
@@ -49,52 +89,41 @@ const WatchlistChart = ({ userId }) => {
           boxWidth: 10,
           padding: isMobile ? 8 : 20,
           color: "white",
-          font: {
-            size: isMobile ? 10 : 14,
-            // weight: "bold",
-            // color: "white",
-          },
+          font: { size: isMobile ? 10 : 14 },
           maxHeight: isMobile ? 60 : 300,
           maxWidth: isMobile ? undefined : 120,
         },
       },
       tooltip: {
+        enabled: !isEmpty,
         callbacks: {
           label: function (context) {
-            const label = context.label || "";
             const value = context.raw || 0;
-            const percentage = Math.round((value / totalCount) * 100);
-            return `${label}: ${value} (${percentage}%)`;
+            const label = context.label || "";
+            const percentage = totalCount
+              ? Math.round((value / totalCount) * 100)
+              : 0;
+            return isEmpty
+              ? "No Watchlist Data"
+              : `${label}: ${value} (${percentage}%)`;
           },
         },
       },
-      datalabels: {
-        color: "#fff",
-        formatter: (value) => {
-          const percentage = ((value / totalCount) * 100).toFixed(1);
-          return `${percentage}%`;
-        },
-        font: {
-          weight: "bold",
-          size: isMobile ? 8 : 14,
-        },
-      },
-      animation: {
-        animateRotate: true,
-        animateScale: true,
-        duration: 2000,
-        easing: "easeOutBounce",
-        delay: 500,
-      },
-      hover: {
-        mode: "nearest",
-        intersect: true,
-      },
-      transitions: {
-        active: {
-          duration: 2000,
-        },
-      },
+      datalabels: isEmpty
+        ? false
+        : {
+            color: "#fff",
+            formatter: (value) => {
+              const percentage = totalCount
+                ? ((value / totalCount) * 100).toFixed(1)
+                : 0;
+              return `${percentage}%`;
+            },
+            font: {
+              weight: "bold",
+              size: isMobile ? 8 : 14,
+            },
+          },
     },
     cutout: isMobile ? "40%" : "60%",
     responsive: true,
@@ -114,17 +143,17 @@ const WatchlistChart = ({ userId }) => {
       <h2
         style={{
           textAlign: "center",
-          marginBottom: "10px",
+          marginBottom: "20px",
           color: "#fff",
           fontSize: isMobile ? "1rem" : "1.5rem",
           fontWeight: "bold",
         }}
       >
-        WatchList
+        Watchlist
       </h2>
       <div
         style={{
-          height: isMobile ? "300px" : "400px",
+          height: isMobile ? "350px" : "400px",
           position: "relative",
         }}
       >
