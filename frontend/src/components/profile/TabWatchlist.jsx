@@ -42,19 +42,17 @@ const TabWatchlist = () => {
   return (
     <div id="watchlist">
       {Array.isArray(watchlist) &&
-        watchlist.length >
-          0(
-            watchlist.map((movie) => (
-              <WatchList
-                key={movie._id}
-                movie={{
-                  ...movie,
-                  genre: movie.genre.map((id) => genreMap[id] || "Unknown"),
-                }}
-                allReviews={[]} // replace with actual reviews if needed
-              />
-            ))
-          )}
+        watchlist.length > 0 &&
+        watchlist.map((movie) => (
+          <WatchList
+            key={movie._id}
+            movie={{
+              ...movie,
+              genre: movie.genre.map((id) => genreMap[id] || "Unknown"),
+            }}
+            allReviews={[]} // replace with actual reviews if needed
+          />
+        ))}
     </div>
   );
 };
