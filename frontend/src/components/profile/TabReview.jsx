@@ -10,9 +10,6 @@ const TabReview = () => {
     fetchUserReviews();
   }, []);
 
-  if (isLoading) return <p>Loading reviews...</p>;
-  if (error) return <p>Error: {error}</p>;
-
   if (!Array.isArray(userReviews) || userReviews.length === 0) {
     return (
       <section className="review-section" aria-label="profile-review">
