@@ -123,4 +123,72 @@ export const useAuthStore = create((set, get) => ({
   disconnectSocket: () => {
     if (get().socket?.connected) get().socket.disconnect();
   },
+
+  deleteAccount: async () => {
+    try {
+      const userId = get().authUser?._id;
+      if (!userId) throw new Error("User ID not found");
+
+      await axiosInstance.delete(`users/${userId}`);
+      set({ authUser: null });
+      toast.success("Account deleted successfully");
+      get().disconnectSocket();
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      toast.error(error?.response?.data?.message || "Account deletion failed");
+    }
+  },
+
+  fetchLikedGenres: async (passedUserId) => {
+    const userId = passedUserId || get().authUser?._id;
+    console.log("Final userId used:", userId);
+    if (!userId) {
+      toast.error("User not logged in");
+      return [];
+    }
+
+    try {
+      const res = await axiosInstance.get(`/users/${userId}/liked-genres`);
+      return res.data;
+    } catch (error) {
+      console.error("Failed to fetch liked genres:", error);
+      toast.error("Failed to load genre statistics");
+      return [];
+    }
+  },
+
+  fetchReviewGenres: async (passedUserId) => {
+    const userId = passedUserId || get().authUser?._id;
+    console.log("Final userId used:", userId);
+    if (!userId) {
+      toast.error("User not logged in");
+      return [];
+    }
+
+    try {
+      const res = await axiosInstance.get(`/users/${userId}/review-genres`);
+      return res.data;
+    } catch (error) {
+      console.error("Failed to fetch review genres:", error);
+      toast.error("Failed to load genre statistics");
+      return [];
+    }
+  },
+  fetchWatchlistGenres: async (passedUserId) => {
+    const userId = passedUserId || get().authUser?._id;
+    console.log("Final userId used:", userId);
+    if (!userId) {
+      toast.error("User not logged in");
+      return [];
+    }
+
+    try {
+      const res = await axiosInstance.get(`/users/${userId}/watchlist-genres`);
+      return res.data;
+    } catch (error) {
+      console.error("Failed to fetch watchlist genres:", error);
+      toast.error("Failed to load genre statistics");
+      return [];
+    }
+  },
 }));
