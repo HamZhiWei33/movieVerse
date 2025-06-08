@@ -4,7 +4,7 @@ const InsertButton = () => {
   const handleInsert = async () => {
     try {
       const res = await axiosInstance.post("/users/watchlist", {
-        movieId: "6833551d0ef5ba229388e29d",
+        movieId: "6833551d0ef5ba229388e29e",
       });
       console.log("Inserted:", res.data);
     } catch (err) {
