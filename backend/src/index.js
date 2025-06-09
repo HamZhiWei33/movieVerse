@@ -10,6 +10,8 @@ import cookieParser from "cookie-parser";
 import { connectDB } from "./lib/db.js";
 import authRoutes from "./routes/auth.route.js";
 import rankingRoutes from "./routes/ranking.routes.js";
+import movieRoutes from "./routes/movie.route.js";
+import reviewRoutes from "./routes/review.route.js";
 import cors from "cors";
 import { fetchAndStorePopularMovies } from "./lib/tmdb.js";
 
@@ -30,6 +32,8 @@ app.use(
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/rankings", rankingRoutes);
+app.use("/api/movies", movieRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 app.listen(PORT, async () => {
   console.log("Server is running on port:" + PORT);

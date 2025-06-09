@@ -5,7 +5,6 @@ import ReviewStars from "./ReviewStars";
 import { IoTime } from "react-icons/io5";
 import { FaPlay } from "react-icons/fa6";
 import "../../styles/directory/MovieCardList.css";
-import { genres } from '../../constant';
 
 const MovieCardList = ({
   movie,
@@ -23,7 +22,7 @@ const MovieCardList = ({
 
   const handleCardClick = () => {
     navigate(`/movie/${encodeURIComponent(movie.title)}`, {
-      state: { movieData: movie }, // Pass entire movie object
+      state: { movieData: movie }, 
     });
   };
 
@@ -44,17 +43,6 @@ const MovieCardList = ({
     }
   };
 
-  const formatDuration = (minutes) => {
-    if (!minutes || isNaN(minutes)) return 'N/A';
-
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-
-    return hours > 0
-      ? `${hours}h ${mins > 0 ? `${mins}min` : ''}`.trim()
-      : `${mins}min`;
-  };
-
   const calculateAverageRating = () => {
     if (!Array.isArray(allReviews) || allReviews.length === 0) return 0;
 
@@ -71,11 +59,6 @@ const MovieCardList = ({
   };
 
   const averageRating = calculateAverageRating();
-
-  const getGenreName = (id) => {
-    const genreObj = genres.find(g => g.id === id);
-    return genreObj ? genreObj.name : String(id);
-  };
 
   return (
     <article
@@ -98,9 +81,9 @@ const MovieCardList = ({
           showNumber={showRatingNumber}
         />
         <div className="genre-tags">
-          {movie.genre.map((id, index) => (
+          {movie.genreNames?.map((name, index) => (
             <span key={index} className="genre-tag">
-              {getGenreName(id)}
+              {name}
             </span>
           ))}
         </div>
@@ -109,7 +92,7 @@ const MovieCardList = ({
             <span className="duration-icon">
               <IoTime />
             </span>
-            {formatDuration(movie.duration)}
+            {movie.duration}
           </div>
           {!showBottomInteractiveIcon && (
             <div

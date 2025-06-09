@@ -8,16 +8,22 @@ import ReviewCard from "../components/directory/ReviewCard";
 import UserReviewForm from "../components/directory/UserReviewForm";
 import "../styles/movieDetail.css";
 import RatingBarChart from '../components/directory/RatingBarChart';
-import { movies, reviews, users, likes, genres as genreData } from '../constant';
 
 const MovieDetailPage = () => {
     const { state } = useLocation();
-    const { movieTitle } = useParams();
+    const { id } = useParams();
     const navigate = useNavigate();
 
-    const movie = state?.movieData || movies.find(m =>
-        m.title === decodeURIComponent(movieTitle)
-    );
+    // If we have the movie in state, use it; otherwise fetch it from the server:
+    const [movie, setMovie] = useState(state || null);
+    useEffect(() => {
+        if (!movie) {
+        fetch(`/api/movies/${id}`)
+            .then(res => res.json())
+            .then(json => setMovie(json.data))
+            .catch(() => navigate('/not-found'));
+        }
+    }, [id, movie, navigate]);
 
     const [liked, setLiked] = useState(false);
     const [watchlisted, setWatchlisted] = useState(false);

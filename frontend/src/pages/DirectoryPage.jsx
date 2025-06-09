@@ -1,35 +1,92 @@
 import MovieCard from "../components/directory/MovieCard";
 import MovieCardList from "../components/directory/MovieCardList";
-import { useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import "../styles/directory.css";
 import ViewDropdown from "../components/directory/ViewDropdown";
 import { FaListUl } from "react-icons/fa";
 import "../styles/sidebar.css";
 import Sidebar from "../components/Sidebar";
-import { movies as movieData, genres as genreData, reviews } from "../constant";
-
-// Extract unique regions from movie data
-const regions = [...new Set(movieData.map((movie) => movie.region))];
-
-// Extract unique years from movie data
-const years = [...new Set(movieData.map((movie) => movie.year.toString()))];
-
-// Map genre IDs to names
-const genreMap = genreData.reduce((map, genre) => {
-  map[genre.id] = genre.name;
-  return map;
-}, {});
-
-// Get genre names for display
-const genres = genreData.map((genre) => genre.name);
+// import { movies as movieData, genres as genreData, reviews } from "../constant";
+import {
+  fetchMovies,
+  fetchGenres,
+  fetchReviews,
+  fetchFilterOptions,
+} from "../services/movieService";
 
 const DirectoryPage = () => {
+  const [movies, setMovies] = useState([]);
+  const [genres, setGenres] = useState([]);
+  const [regions, setRegions] = useState([]);
+  const [years, setYears] = useState([]);
+  const [reviews, setReviews] = useState([]);
+
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [selectedRegions, setSelectedRegions] = useState([]);
   const [selectedYears, setSelectedYears] = useState([]);
   const [likedMovies, setLikedMovies] = useState([]);
   const [addToWatchlistMovies, setAddToWatchlistMovies] = useState([]);
   const [view, setView] = useState("grid");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const MOVIES_PER_PAGE = 100;
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        // Fetch filters separately ONCE
+        if (genres.length === 0 || regions.length === 0 || years.length === 0) {
+          const filterOptions = await fetchFilterOptions();
+          setGenres(filterOptions.genres);
+          setRegions(filterOptions.regions);
+          setYears(filterOptions.years);
+        }
+
+        // Send filters to backend
+        const filters = {
+          genres: selectedGenres.join(','),
+          regions: selectedRegions.join(','),
+          years: selectedYears.join(',')
+        };
+
+        const response = await fetchMovies(currentPage, MOVIES_PER_PAGE, filters);
+
+        setMovies(response.data);
+        setTotalPages(response.pages);
+
+      } catch (err) {
+        console.error("Failed to fetch data:", err);
+        setError("Failed to load data. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [currentPage, selectedGenres, selectedRegions, selectedYears]);
+
+  // Map genre IDs to names for filtering and display
+  const genreMap = useMemo(() => {
+    return genres.reduce((map, genre) => {
+      map[genre.id] = genre.name;
+      return map;
+    }, {});
+  }, [genres]);
+
+  // Map region codes to names for filtering and display
+  const regionMap = useMemo(() => {
+    return regions.reduce((map, region) => {
+      map[region.code] = region.name;
+      return map;
+    }, {});
+  }, [regions]);
 
   const toggleFilter = (value, selected, setSelected) => {
     setSelected((prev) =>
@@ -37,49 +94,69 @@ const DirectoryPage = () => {
     );
   };
 
-  const toggleLike = (title) => {
+  const toggleLike = (id) => {
     setLikedMovies((prev) =>
-      prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title]
+      prev.includes(id) ? prev.filter((t) => t !== id) : [...prev, id]
     );
   };
 
-  const toggleAddToWatchlist = (title) => {
+  const toggleAddToWatchlist = (id) => {
     setAddToWatchlistMovies((prev) =>
-      prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title]
+      prev.includes(id) ? prev.filter((t) => t !== id) : [...prev, id]
     );
   };
 
-  const filteredMovies = useMemo(() => {
-    return movieData.filter((movie) => {
-      // Convert genre IDs to names for filtering
-      const movieGenreNames = movie.genre.map((id) => genreMap[id]);
+  // Filter movies by selected filters
+  const sortedAndFilteredMovies = useMemo(() => {
+    const filtered = movies.filter((movie) => {
+      const genreName = movie.genre.map((id) => genreMap[id]);
+      const regionName = regionMap[movie.region];
 
       const genreMatch =
         selectedGenres.length === 0 ||
-        selectedGenres.some((g) => movieGenreNames.includes(g));
+        selectedGenres.some((g) => genreName.includes(g));
       const regionMatch =
-        selectedRegions.length === 0 || selectedRegions.includes(movie.region);
+        selectedRegions.length === 0 ||
+        selectedRegions.includes(movie.region);
       const yearMatch =
         selectedYears.length === 0 ||
-        selectedYears.includes(movie.year.toString());
+        selectedYears.some(year => year.toString() === movie.year.toString());
+
       return genreMatch && regionMatch && yearMatch;
     });
-  }, [selectedGenres, selectedRegions, selectedYears]);
 
-  const renderButtons = (items, selected, setSelected, label) => (
+    // Sort by year (descending)
+    return [...filtered].sort((a, b) => b.year - a.year);
+  }, [movies, selectedGenres, selectedRegions, selectedYears, genreMap]);
+
+  // Paginate the filtered results
+  const paginatedMovies = useMemo(() => {
+    const startIndex = (currentPage - 1) * MOVIES_PER_PAGE;
+    return sortedAndFilteredMovies.slice(startIndex, startIndex + MOVIES_PER_PAGE);
+  }, [sortedAndFilteredMovies, currentPage]);
+
+  const displayedMovies = paginatedMovies;
+
+  const renderButtons = (items, selected, setSelected) => (
     <div className="filter-group">
-      {items.map((item, index) => (
-        <button
-          key={index}
-          className={`filter-button ${selected.includes(item) ? "active" : ""}`}
-          onClick={() => toggleFilter(item, selected, setSelected)}
-          aria-pressed={selected.includes(item)}
-        >
-          {item}
-        </button>
-      ))}
+      {items.map((item, index) => {
+        const label = item.label || item;
+        const value = item.value || item;
+
+        return (
+          <button
+            key={index}
+            className={`filter-button ${selected.includes(value) ? "active" : ""}`}
+            onClick={() => toggleFilter(value, selected, setSelected)}
+            aria-pressed={selected.includes(value)}
+          >
+            {label}
+          </button>
+        );
+      })}
     </div>
   );
+
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const toggleSidebar = () => {
@@ -135,14 +212,14 @@ const DirectoryPage = () => {
               <section id="genre">
                 <fieldset>
                   <legend>Genre</legend>
-                  {renderButtons(genres, selectedGenres, setSelectedGenres)}
+                  {renderButtons(genres.map(g => g.name), selectedGenres, setSelectedGenres)}
                 </fieldset>
               </section>
 
               <section id="region">
                 <fieldset>
                   <legend>Region</legend>
-                  {renderButtons(regions, selectedRegions, setSelectedRegions)}
+                  {renderButtons(regions.map(r => ({ label: r.name, value: r.code })), selectedRegions, setSelectedRegions)}
                 </fieldset>
               </section>
 
@@ -158,38 +235,37 @@ const DirectoryPage = () => {
             {(selectedGenres.length > 0 ||
               selectedRegions.length > 0 ||
               selectedYears.length > 0) && (
-              <div className="clear-filters-container">
-                <button
-                  className={`clear-filters-button ${
-                    selectedGenres.length ||
-                    selectedRegions.length ||
-                    selectedYears.length
+                <div className="clear-filters-container">
+                  <button
+                    className={`clear-filters-button ${selectedGenres.length ||
+                      selectedRegions.length ||
+                      selectedYears.length
                       ? "active"
                       : ""
-                  }`}
-                  onClick={() => {
-                    setSelectedGenres([]);
-                    setSelectedRegions([]);
-                    setSelectedYears([]);
-                  }}
-                  aria-label="Clear all filters"
-                >
-                  Clear all
-                </button>
-              </div>
-            )}
+                      }`}
+                    onClick={() => {
+                      setSelectedGenres([]);
+                      setSelectedRegions([]);
+                      setSelectedYears([]);
+                    }}
+                    aria-label="Clear all filters"
+                  >
+                    Clear all
+                  </button>
+                </div>
+              )}
           </div>
 
           <section className={`movie-container ${view}`}>
-            {filteredMovies.length > 0 ? (
+            {displayedMovies.length > 0 ? (
               view === "grid" ? (
                 <div className="movie-grid">
-                  {filteredMovies.map((movie) => (
+                  {displayedMovies.map((movie) => (
                     <MovieCard
                       key={movie.id}
                       movie={{
                         ...movie,
-                        year: movie.year.toString(), // Ensure year is string
+                        year: movie.year.toString(),
                       }}
                       liked={likedMovies.includes(movie.id)}
                       addedToWatchlist={addToWatchlistMovies.includes(movie.id)}
@@ -201,28 +277,61 @@ const DirectoryPage = () => {
                 </div>
               ) : (
                 <div className="movie-list">
-                  {filteredMovies.map((movie) => (
-                    <MovieCardList
-                      key={movie.id}
-                      movie={{
-                        ...movie,
-                        year: movie.year.toString(), // Ensure year is string
-                      }}
-                      liked={likedMovies.includes(movie.id)}
-                      addedToWatchlist={addToWatchlistMovies.includes(movie.id)}
-                      onLike={() => toggleLike(movie.id)}
-                      onAddToWatchlist={() => toggleAddToWatchlist(movie.id)}
-                      allReviews={reviews}
-                    />
-                  ))}
+                  {displayedMovies.map((movie) => {
+                    // Map genre IDs to names
+                    const genreNames = movie.genre?.map(id => genreMap[id]) || [];
+
+                    // Map region code to region name
+                    const regionName = regionMap[movie.region] || movie.region;
+
+                    // Prepare transformed movie
+                    const transformedMovie = {
+                      ...movie,
+                      year: movie.year.toString(),
+                      genreNames,
+                      regionName,
+                    };
+
+                    return (
+                      <MovieCardList
+                        key={movie.id}
+                        movie={transformedMovie}
+                        liked={likedMovies.includes(movie.id)}
+                        addedToWatchlist={addToWatchlistMovies.includes(movie.id)}
+                        onLike={() => toggleLike(movie.id)}
+                        onAddToWatchlist={() => toggleAddToWatchlist(movie.id)}
+                        allReviews={reviews}
+                      />
+                    );
+                  })}
+
                 </div>
               )
             ) : (
               <div className="no-results">
-                <p>No movies match your filters. </p>
+                <p>No movies match your filters.</p>
               </div>
             )}
+
           </section>
+          <div className="pagination-controls">
+            <button
+              onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
+              disabled={currentPage === 1 || loading}
+            >
+              Previous
+            </button>
+
+            <span>Page {currentPage} of {totalPages}</span>
+
+            <button
+              onClick={() => setCurrentPage(p => p + 1)}
+              disabled={currentPage >= totalPages || loading}
+            >
+              Next
+            </button>
+          </div>
+
         </div>
       </div>
     </main>
