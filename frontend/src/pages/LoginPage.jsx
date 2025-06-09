@@ -4,21 +4,33 @@ import React, { useState, useContext } from "react";
 import FormField from "../components/general/FormField";
 import { UserValidationContext } from "../context/UserValidationProvider ";
 import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../store/useAuthStore";
+import toast from "react-hot-toast";
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login } = useContext(UserValidationContext);
+  // const { login } = useContext(UserValidationContext);
   const navigate = useNavigate();
-  const handleSubmit = (e) => {
+  const { login, isLoggingIn } = useAuthStore();
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Fake authentication logic
-    if (email === "u1@gmail.com" && password === "u1") {
-      login(); // update context
-      localStorage.setItem("profileImg", "/profile/my_avatar.png"); // optional
-      navigate("/");
-    } else {
-      alert("Invalid credentials");
+    // if (email === "u1@gmail.com" && password === "u1") {
+    //   login(); // update context
+    //   localStorage.setItem("profileImg", "/profile/my_avatar.png"); // optional
+    //   navigate("/");
+    // } else {
+    //   alert("Invalid credentials");
+    // }
+    try {
+      const user = await login({ email, password });
+      console.log("Login success, navigating to home...");
+
+      toast.success(`Welcome back, ${user.name}!`);
+      navigate("/"); // Redirect to home page after successful login
+    } catch (err) {
+      toast.error(err.message || "Login failed");
     }
   };
 
@@ -42,8 +54,8 @@ const LoginPage = () => {
           <a id="forgotPwLink" href="/forgot_password">
             Forgot Password?
           </a>
-          <button className="submitButton" type="submit">
-            Login
+          <button className="submitButton" type="submit" disabled={isLoggingIn}>
+            {isLoggingIn ? "Logging in..." : "Login"}
           </button>
         </form>
         <p>

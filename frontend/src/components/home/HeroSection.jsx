@@ -12,7 +12,7 @@ import { useMemo, useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import useHorizontalScroll from "../../store/useHorizontalScroll";
 import ReviewStars from "../directory/ReviewStars";
-
+import useGenreStore from "../../store/useGenreStore";
 const HeroSection = ({ title, moviesType, items }) => {
   const [cardPerRow, setCardPerRow] = useState(1);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -20,6 +20,7 @@ const HeroSection = ({ title, moviesType, items }) => {
   const [likedMovies, setLikedMovies] = useState([]);
   const [addToWatchlistMovies, setAddToWatchlistMovies] = useState([]);
   const movieList = moviesType === "recommendation" ? displayed : items;
+  const { genreMap, fetchGenres } = useGenreStore();
 
   var ariaLabel;
   if (moviesType === "watchlist") {
@@ -78,10 +79,10 @@ const HeroSection = ({ title, moviesType, items }) => {
 
   useHorizontalScroll(containerRef);
 
-  const genreMap = genres.reduce((map, genre) => {
-    map[genre.id] = genre.name;
-    return map;
-  }, {});
+  // const genreMap = genres.reduce((map, genre) => {
+  //   map[genre.id] = genre.name;
+  //   return map;
+  // }, {});
 
   const calculateAverageRating = (movieId) => {
     const movieReviews = reviews.filter((review) => review.movieId === movieId);
@@ -147,6 +148,11 @@ const HeroSection = ({ title, moviesType, items }) => {
     return () => observer.disconnect();
   }, []);
 
+  // Fetch genres from your genre model
+  useEffect(() => {
+    fetchGenres();
+  }, []);
+
   return (
     <section
       className="hero-section"
@@ -204,11 +210,11 @@ const HeroSection = ({ title, moviesType, items }) => {
                   <div className="spacer" />
                 )}
                 <MovieCard
-                  key={index}
+                  key={movie._id}
                   role="listitem"
                   movie={{
                     ...movie,
-                    genre: (movie.genre || []).map((id) => genreMap[id]),
+                    genre: movie.genre.map((id) => genreMap[id] || "Unknown"),
                     year: movie.year.toString(),
                   }}
                   liked={likedMovies.includes(movie.id)}

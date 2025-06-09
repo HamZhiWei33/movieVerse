@@ -1,0 +1,31 @@
+// routes/userRoutes.js
+import express from "express";
+import {
+  getUserProfile,
+  updateUserProfile,
+  getUserWatchlist,
+  addToWatchlist,
+  removeFromWatchlist,
+  getUserReviews,
+  deleteAccount,
+} from "../controllers/user.controller.js";
+import { protectRoute } from "../middleware/auth.middleware.js";
+import {
+  getUserLikedGenres,
+  getUserReviewGenres,
+  getUserWatchlistGenres,
+} from "../controllers/user.controller.js";
+const router = express.Router();
+
+router.get("/watchlist", protectRoute, getUserWatchlist);
+router.get("/review", protectRoute, getUserReviews);
+router.post("/watchlist", protectRoute, addToWatchlist);
+router.delete("/watchlist/:movieId", protectRoute, removeFromWatchlist);
+router.get("/:id", getUserProfile);
+router.put("/:id", updateUserProfile);
+router.delete("/:id", protectRoute, deleteAccount);
+router.get("/:id/liked-genres", protectRoute, getUserLikedGenres);
+router.get("/:id/review-genres", protectRoute, getUserReviewGenres);
+router.get("/:id/watchlist-genres", protectRoute, getUserWatchlistGenres);
+
+export default router;

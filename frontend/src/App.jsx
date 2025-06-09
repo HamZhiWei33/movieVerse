@@ -1,5 +1,5 @@
 import "./App.css";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import HomePage from "./pages/HomePage";
 import SignupPage from "./pages/SignUpPage";
@@ -20,7 +20,7 @@ import {
 } from "../src/context/UserValidationProvider "; // Fixed space and added provider import
 import FooterGuest from "./components/FooterGuest";
 import { Toaster } from "react-hot-toast";
-
+import { useAuthStore } from "./store/useAuthStore";
 // Define FooterSelector first since it's used in App
 function FooterSelector() {
   const { isValidateUser } = useContext(UserValidationContext);
@@ -29,6 +29,16 @@ function FooterSelector() {
 
 function AppContent() {
   const { isValidatedUser } = useContext(UserValidationContext);
+  const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  useEffect(() => {
+    console.log("Auth User:", authUser);
+  }, [authUser]);
+
   return (
     <>
       <ScrollToTopOnNavigate />
@@ -47,7 +57,8 @@ function AppContent() {
         <Route path="/new-released" element={<NewReleasedPage />} />
       </Routes>
       <Toaster />
-      <FooterSelector />
+      {/* <FooterSelector /> */}
+      {isCheckingAuth ? null : authUser ? <Footer /> : <FooterGuest />}
     </>
   );
 }

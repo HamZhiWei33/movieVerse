@@ -15,13 +15,14 @@ export const useAuthStore = create((set, get) => ({
   socket: null,
 
   checkAuth: async () => {
+    set({ isCheckingAuth: true });
     try {
       const res = await axiosInstance.get("/auth/check");
-      set({ authUser: res.data });
-      get().connectSocket();
+      set({ authUser: res.data, isCheckingAuth: false });
+      // get().connectSocket();
     } catch (error) {
       console.error("Error in checking auth:", error);
-      set({ authUser: null });
+      set({ authUser: null, isCheckingAuth: false });
     } finally {
       set({ isCheckingAuth: false });
     }
@@ -50,6 +51,57 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
+  login: async (data) => {
+    set({ isLoggingIn: true });
+    try {
+      const res = await axiosInstance.post("/auth/login", {
+        email: data.email,
+        password: data.password,
+      });
+
+      console.log("Login response:", res.data);
+      set({ authUser: res.data });
+      toast.success("Login successful!");
+      // get().connectSocket(); // connect to socket after successful login
+      return res.data;
+    } catch (error) {
+      console.error("Login error:", error.response?.data);
+      toast.error(error.response?.data?.message || "Login failed");
+      throw error;
+    } finally {
+      set({ isLoggingIn: false });
+    }
+  },
+
+  updateProfile: async (data) => {
+    set({ isUpdatingProfile: true });
+    try {
+      const userId = get().authUser?._id;
+      if (!userId) throw new Error("User ID not found");
+
+      const res = await axiosInstance.put(`users/${userId}`, data);
+      set({ authUser: res.data });
+
+      toast.success("Profile updated successfully");
+    } catch (error) {
+      console.log("error in update profile:", error);
+      toast.error(error?.response?.data?.message || "Profile update failed");
+    } finally {
+      set({ isUpdatingProfile: false });
+    }
+  },
+
+  logout: async () => {
+    try {
+      await axiosInstance.post("/auth/logout");
+      set({ authUser: null });
+      toast.success("Logged out successfully");
+      get().disconnectSocket();
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  },
+
   connectSocket: () => {
     const { authUser } = get();
     // if (!authUser || get().socket?.connected) return;
@@ -70,5 +122,73 @@ export const useAuthStore = create((set, get) => ({
 
   disconnectSocket: () => {
     if (get().socket?.connected) get().socket.disconnect();
+  },
+
+  deleteAccount: async () => {
+    try {
+      const userId = get().authUser?._id;
+      if (!userId) throw new Error("User ID not found");
+
+      await axiosInstance.delete(`users/${userId}`);
+      set({ authUser: null });
+      toast.success("Account deleted successfully");
+      get().disconnectSocket();
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      toast.error(error?.response?.data?.message || "Account deletion failed");
+    }
+  },
+
+  fetchLikedGenres: async (passedUserId) => {
+    const userId = passedUserId || get().authUser?._id;
+    console.log("Final userId used:", userId);
+    if (!userId) {
+      toast.error("User not logged in");
+      return [];
+    }
+
+    try {
+      const res = await axiosInstance.get(`/users/${userId}/liked-genres`);
+      return res.data;
+    } catch (error) {
+      console.error("Failed to fetch liked genres:", error);
+      toast.error("Failed to load genre statistics");
+      return [];
+    }
+  },
+
+  fetchReviewGenres: async (passedUserId) => {
+    const userId = passedUserId || get().authUser?._id;
+    console.log("Final userId used:", userId);
+    if (!userId) {
+      toast.error("User not logged in");
+      return [];
+    }
+
+    try {
+      const res = await axiosInstance.get(`/users/${userId}/review-genres`);
+      return res.data;
+    } catch (error) {
+      console.error("Failed to fetch review genres:", error);
+      toast.error("Failed to load genre statistics");
+      return [];
+    }
+  },
+  fetchWatchlistGenres: async (passedUserId) => {
+    const userId = passedUserId || get().authUser?._id;
+    console.log("Final userId used:", userId);
+    if (!userId) {
+      toast.error("User not logged in");
+      return [];
+    }
+
+    try {
+      const res = await axiosInstance.get(`/users/${userId}/watchlist-genres`);
+      return res.data;
+    } catch (error) {
+      console.error("Failed to fetch watchlist genres:", error);
+      toast.error("Failed to load genre statistics");
+      return [];
+    }
   },
 }));

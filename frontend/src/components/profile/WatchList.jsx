@@ -4,6 +4,7 @@ import { IoTime } from "react-icons/io5";
 import { GoHeartFill } from "react-icons/go";
 import "../../styles/profile/watchlist.css";
 import { getGenreNamebyId, convertDuration } from "./watchlist.js";
+import { axiosInstance } from "../../lib/axios";
 
 const WatchList = ({
   movie,
@@ -19,16 +20,29 @@ const WatchList = ({
     });
   };
 
-  const handleRemoveClick = (e) => {
+  const handleRemoveClick = async (e) => {
     e.stopPropagation();
-    alert("Remove from watchlist");
+    console.log("Trying to remove:", movie._id);
+    try {
+      const res = await axiosInstance.delete(`/users/watchlist/${movie._id}`);
+      console.log(res.data.message);
+      // You probably want to refresh the watchlist here
+      alert("Removed from watchlist!");
+    } catch (err) {
+      console.error(
+        "Failed to remove movie:",
+        err.response?.data || err.message
+      );
+    }
   };
 
   const calculateAverageRating = () => {
     if (!Array.isArray(allReviews) || allReviews.length === 0) return 0;
 
     // Filter reviews for this specific movie ID
-    const movieReviews = allReviews.filter((review) => review.movieId === movie.id);
+    const movieReviews = allReviews.filter(
+      (review) => review.movieId === movie.id
+    );
 
     if (movieReviews.length === 0) return 0;
 
@@ -43,7 +57,6 @@ const WatchList = ({
 
     return parseFloat(average.toFixed(1));
   };
-
 
   const averageRating = calculateAverageRating();
 
@@ -76,7 +89,8 @@ const WatchList = ({
               <span className="duration-icon">
                 <IoTime />
               </span>
-              {convertDuration(movie.duration)}
+              {/* {convertDuration(movie.duration)} */}
+              {movie.duration}
             </div>
             <div className="like-tag">
               <span className="like-icon">
@@ -87,7 +101,11 @@ const WatchList = ({
           </div>
         </div>
         <div className="remove-watchlist-container">
-          <button className="remove-watchlist-btn" onClick={handleRemoveClick}>
+          <button
+            className="remove-watchlist-btn"
+            onClick={(e) => handleRemoveClick(e, movie._id)}
+            aria-label={`Remove ${movie.title} from watchlist`}
+          >
             Remove
           </button>
         </div>

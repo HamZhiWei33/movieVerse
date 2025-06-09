@@ -10,6 +10,10 @@ import cookieParser from "cookie-parser";
 import { connectDB } from "./lib/db.js";
 import authRoutes from "./routes/auth.route.js";
 import rankingRoutes from "./routes/ranking.routes.js";
+import userRoutes from "./routes/user.route.js";
+import genreRoutes from "./routes/genre.route.js";
+import ratingRoutes from "./routes/rating.route.js";
+import likeRoutes from "./routes/like.route.js";
 import movieRoutes from "./routes/movie.route.js";
 import reviewRoutes from "./routes/review.route.js";
 import cors from "cors";
@@ -32,6 +36,10 @@ app.use(
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/rankings", rankingRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/genres", genreRoutes);
+app.use("/api/rating", ratingRoutes);
+app.use("/api/likes", likeRoutes);
 app.use("/api/movies", movieRoutes);
 app.use("/api/reviews", reviewRoutes);
 

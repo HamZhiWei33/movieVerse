@@ -233,4 +233,6 @@ export const filterMovies = async (req, res) => {
 };
 
 // - getTopRatedMovies(req, res)
+
+// tzw
 // - getNewReleases(req, res)

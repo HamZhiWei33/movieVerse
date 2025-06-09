@@ -47,8 +47,8 @@ const MovieCardList = ({
     if (!Array.isArray(allReviews) || allReviews.length === 0) return 0;
 
     const validRatings = allReviews
-      .map(r => Number(r.rating))
-      .filter(r => !isNaN(r));
+      .map((r) => Number(r.rating))
+      .filter((r) => !isNaN(r));
 
     if (validRatings.length === 0) return 0;
 
@@ -122,23 +122,25 @@ const MovieCardList = ({
             )}
 
             {/* Only show Cast section if there are valid actors */}
-            {movie.actors && movie.actors.filter(actor => actor.trim() !== "").length > 0 && (
-              <div className="cast-row">
-                <span className="cast-label">Cast</span>
-                <div className="actors-list">
-                  {movie.actors.map((actor, index) => (
-                    actor.trim() !== "" && (
-                      <span key={index} className="actor-item">
-                        {actor}
-                      </span>
-                    )
-                  ))}
+            {movie.actors &&
+              movie.actors.filter((actor) => actor.trim() !== "").length >
+                0 && (
+                <div className="cast-row">
+                  <span className="cast-label">Cast</span>
+                  <div className="actors-list">
+                    {movie.actors.map(
+                      (actor, index) =>
+                        actor.trim() !== "" && (
+                          <span key={index} className="actor-item">
+                            {actor}
+                          </span>
+                        )
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
           </div>
         )}
-
 
         <p className="clamp-text">{movie.description}</p>
         {showBottomInteractiveIcon && (
