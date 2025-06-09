@@ -13,6 +13,7 @@ import rankingRoutes from "./routes/ranking.routes.js";
 import userRoutes from "./routes/user.route.js";
 import genreRoutes from "./routes/genre.route.js";
 import ratingRoutes from "./routes/rating.route.js";
+import likeRoutes from "./routes/like.route.js";
 import cors from "cors";
 import { fetchAndStorePopularMovies } from "./lib/tmdb.js";
 
@@ -36,6 +37,7 @@ app.use("/api/rankings", rankingRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/genres", genreRoutes);
 app.use("/api/rating", ratingRoutes);
+app.use("/api/likes", likeRoutes);
 app.listen(PORT, async () => {
   console.log("Server is running on port:" + PORT);
   await connectDB();

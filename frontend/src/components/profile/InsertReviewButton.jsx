@@ -6,9 +6,9 @@ const InsertReviewButton = () => {
       const res = await axiosInstance.post(
         "/rating",
         {
-          movieId: "6833551d0ef5ba229388e29a",
+          movieId: "6833551d0ef5ba229388e29c",
           rating: 4.5,
-          review: "Great movie, really enjoyed it!",
+          review: "Best movie!",
         },
         {
           withCredentials: true, // Required if token is stored in cookies

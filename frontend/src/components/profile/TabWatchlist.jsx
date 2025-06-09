@@ -32,10 +32,17 @@ const TabWatchlist = () => {
   useEffect(() => {
     fetchWatchlist();
   }, []);
-
+  if (!Array.isArray(watchlist) || watchlist.length === 0) {
+    return (
+      <section className="watchlist-section" aria-label="profile-review">
+        <p className="no-watchlist">No watchlist available</p>
+      </section>
+    );
+  }
   return (
     <div id="watchlist">
-      {Array.isArray(watchlist) && watchlist.length > 0 ? (
+      {Array.isArray(watchlist) &&
+        watchlist.length > 0 &&
         watchlist.map((movie) => (
           <WatchList
             key={movie._id}
@@ -45,10 +52,7 @@ const TabWatchlist = () => {
             }}
             allReviews={[]} // replace with actual reviews if needed
           />
-        ))
-      ) : (
-        <p>No movies in watchlist.</p>
-      )}
+        ))}
     </div>
   );
 };
