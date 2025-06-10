@@ -6,62 +6,94 @@ import { GrFormPreviousLink, GrFormNextLink } from "react-icons/gr";
 import MovieCardList from "../components/directory/MovieCardList";
 import ReviewCard from "../components/directory/ReviewCard";
 import UserReviewForm from "../components/directory/UserReviewForm";
-import "../styles/movieDetail.css";
 import RatingBarChart from '../components/directory/RatingBarChart';
+import "../styles/movieDetail.css";
+import {
+    fetchMovieById,
+    fetchReviews,
+    getCurrentUser,
+    submitReview,
+} from "../services/movieService";
 
 const MovieDetailPage = () => {
     const { state } = useLocation();
-    const { id } = useParams();
+    const { movieId } = useParams();
     const navigate = useNavigate();
 
-    // If we have the movie in state, use it; otherwise fetch it from the server:
-    const [movie, setMovie] = useState(state || null);
-    useEffect(() => {
-        if (!movie) {
-        fetch(`/api/movies/${id}`)
-            .then(res => res.json())
-            .then(json => setMovie(json.data))
-            .catch(() => navigate('/not-found'));
-        }
-    }, [id, movie, navigate]);
-
-    const [liked, setLiked] = useState(false);
-    const [watchlisted, setWatchlisted] = useState(false);
+    const [movie, setMovie] = useState(state?.movie || null);
     const [movieReviews, setMovieReviews] = useState([]);
     const [reviewUsers, setReviewUsers] = useState({});
-    const [likeCount, setLikeCount] = useState(0);
+    const [currentUser, setCurrentUser] = useState(null);
+    const [userReview, setUserReview] = useState(null);
 
     const [currentPage, setCurrentPage] = useState(0);
     const reviewsPerPage = 4;
 
+    const reviewFormRef = useRef(null);
+
     useEffect(() => {
-        if (!movie) return;
+        const loadData = async () => {
+            try {
+                // Always fetch user
+                const user = await getCurrentUser();
+                setCurrentUser(user);
 
-        // Get reviews for this movie
-        const movieReviews = reviews.filter(review => review.movieId === movie.id);
-        setMovieReviews(movieReviews);
+                // Always fetch movie from backend, not from state
+                const movieData = await fetchMovieById(movieId);
+                setMovie(movieData);
 
-        // Get users who reviewed this movie
-        const usersMap = {};
-        movieReviews.forEach(review => {
-            const user = users.find(u => u.id === review.userId);
-            if (user) {
-                usersMap[review.userId] = user;
+                const reviews = await fetchReviews(movieId);
+                setMovieReviews(reviews);
+
+                // Map review user info
+                const userMap = {};
+                reviews.forEach(r => {
+                    if (r.user) {
+                        userMap[r.user.id] = r.user;
+                    }
+                });
+                setReviewUsers(userMap);
+
+                const existing = reviews.find(r => r.userId === user.id);
+                setUserReview(existing || null);
+
+                setCurrentPage(0);
+
+            } catch (err) {
+                console.error("Error loading movie detail page", err);
             }
-        });
-        setReviewUsers(usersMap);
+        };
 
-        // Get like count for this movie
-        setLikeCount(movie.likes || 0);
+        loadData();
 
-        const currentUserId = "U1";
-        const userLiked = likes.some(like => like.movieId === movie.id && like.userId === currentUserId);
-        setLiked(userLiked);
-    }, [movie]);
+        // Clean up: reset state to avoid flickering old data
+        return () => {
+            setMovie(null);
+            setMovieReviews([]);
+            setReviewUsers({});
+            setUserReview(null);
+            setCurrentPage(0);
+        };
+
+    }, [movieId]);
+
+    const handleReviewSubmit = async (data) => {
+        try {
+            const response = await submitReview(movieId, data, Boolean(userReview));
+            console.log("Review saved:", response);
+
+            // Refresh reviews
+            const updatedReviews = await fetchReviews(movieId);
+            setMovieReviews(updatedReviews);
+
+            const updatedReview = updatedReviews.find(r => r.userId === currentUser.id);
+            setUserReview(updatedReview);
+        } catch (err) {
+            console.error("Failed to submit review", err);
+        }
+    };
 
     if (!movie) return <div>Movie not found</div>;
-
-    const reviewFormRef = useRef(null);
 
     const totalPages = Math.ceil(movieReviews.length / reviewsPerPage);
     const start = currentPage * reviewsPerPage;
@@ -79,20 +111,14 @@ const MovieDetailPage = () => {
                 <MovieCardList
                     movie={{
                         ...movie,
-                        genre: movie.genre, // Pass the entire genre object
                         reviewCount: movieReviews.length,
+                        likeCount: movie.likeCount,     
+                        liked: movie.liked,             
+                        watchlisted: movie.watchlisted
                     }}
-                    liked={liked}
-                    addedToWatchlist={watchlisted}
-                    onLike={() => {
-                        setLikeCount(prevCount => liked ? prevCount - 1 : prevCount + 1);
-                        setLiked(prev => !prev);
-                    }}
-                    onAddToWatchlist={() => setWatchlisted(prev => !prev)}
                     showRatingNumber={true}
                     showBottomInteractiveIcon={true}
                     showCastInfo={true}
-                    likeCount={likeCount}
                     allReviews={movieReviews}
                 />
 
@@ -108,17 +134,15 @@ const MovieDetailPage = () => {
                     <div className="review-list">
                         {currentReviews.length > 0 ? (
                             currentReviews.map((review) => {
-                                // Find the user who wrote this review
-                                const user = users.find(u => u.id === review.userId);
-
+                                const user = review.user || reviewUsers[review.userId] || {};
                                 return (
                                     <ReviewCard
                                         key={review.id}
-                                        name={user?.username || 'Anonymous'}
+                                        name={user.username || 'Anonymous'}
                                         date={new Date(review.createdAt).toLocaleDateString()}
                                         rating={review.rating}
                                         reviewText={review.review}
-                                        profilePic={user?.profilePic}
+                                        profilePic={user.profilePic}
                                     />
                                 );
                             })
@@ -146,16 +170,13 @@ const MovieDetailPage = () => {
                         </div>
                     )}
                 </div>
+
                 <div ref={reviewFormRef}>
                     <UserReviewForm
                         movie={movie}
-                        existingReview={"I loved the visuals!"} // Load user's review if exists
-                        existingRating={0} // Load user's rating if exists
-                        onSubmit={(data) => {
-                            console.log("Review submitted:", data);
-                            // Save to backend here
-                            // Refresh the reviews
-                        }}
+                        existingReview={userReview?.review || ""}
+                        existingRating={userReview?.rating || 0}
+                        onSubmit={handleReviewSubmit}
                     />
                 </div>
             </div>

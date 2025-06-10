@@ -11,19 +11,21 @@
   transform: translateX(-100%);
   position: fixed;
   top: 0;
-  left: 0;
+  left: -250px;
   height: 100vh;
-  background-color: #f2f2f2;
+  background-color: #1D1D1D;
   overflow-y: auto;
   z-index: 1002;
 }
 
 .sidebar-container.open {
   transform: translateX(0);
+  left: 0;
 }
 
 .sidebar-container.closed {
   transform: translateX(-100%);
+  left: -250px;
 }
 
 .sidebar-overlay {
@@ -73,7 +75,7 @@
 }
 
 .sidebar .section-title {
-  color: #000;
+  color: white;
   text-decoration: none;
   font-weight: 600;
   font-size: 1.1rem;
@@ -103,7 +105,7 @@
   gap: 0.5rem;
   cursor: pointer;
   font-size: 0.9rem;
-  color: #555;
+  color: #BFBFBF;
 }
 
 .sidebar-filter-item input {
@@ -111,5 +113,5 @@
 }
 
 .sidebar-filter-item:hover {
-  color: #000;
+  color: white;
 }

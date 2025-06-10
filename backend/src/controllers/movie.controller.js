@@ -1,33 +1,29 @@
 import Movie from "../models/movie.model.js";
 import Genre from "../models/genre.model.js";
 import Region from "../models/region.model.js";
+import Like from "../models/like.model.js";
+import Watchlist from "../models/watchlist.model.js";
 import Review from "../models/review.model.js";
 
 // @desc    Get all movies with optional pagination
 // @route   GET /api/movies
 // @access  Public
-// movie.controller.js
 export const getAllMovies = async (req, res) => {
   try {
     const { page = 1, limit = 100, genres, regions, years } = req.query;
     const skip = (page - 1) * limit;
 
-    // Build filter query
     const query = {};
-    
     if (genres) {
       query.genre = { $in: genres.split(',').map(Number) };
     }
-    
     if (regions) {
       query.region = { $in: regions.split(',') };
     }
-    
     if (years) {
       query.year = { $in: years.split(',').map(Number) };
     }
 
-    // Only include movies with trailerUrl
     query.trailerUrl = { $exists: true, $ne: "" };
 
     const [movies, total] = await Promise.all([
@@ -39,23 +35,49 @@ export const getAllMovies = async (req, res) => {
       Movie.countDocuments(query)
     ]);
 
+    const movieIds = movies.map(m => m._id.toString());
+    const user = req.user;
+
+    const likes = await Like.find({ movieId: { $in: movieIds } });
+
+    const likeMap = {};
+    const userLikedSet = new Set();
+    const watchlistSet = new Set(user?.watchlist?.map(id => id.toString()) || []);
+
+    likes.forEach(like => {
+      const id = like.movieId.toString();
+      likeMap[id] = (likeMap[id] || 0) + 1;
+      if (user && like.userId.toString() === user._id.toString()) {
+        userLikedSet.add(id);
+      }
+    });
+
+    const enrichedMovies = movies.map(m => {
+      const id = m._id.toString();
+      return {
+        ...m,
+        likeCount: likeMap[id] || 0,
+        liked: userLikedSet.has(id),
+        watchlisted: watchlistSet.has(id)
+      };
+    });
+
     res.status(200).json({
       success: true,
-      count: movies.length,
+      count: enrichedMovies.length,
       total,
       pages: Math.ceil(total / limit),
-      currentPage: page,
-      data: movies
+      currentPage: Number(page),
+      data: enrichedMovies
     });
   } catch (error) {
     console.error("Error getting all movies:", error);
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
-      message: "Failed to fetch movies." 
+      message: "Failed to fetch movies."
     });
   }
 };
-
 
 // @desc    Get single movie by ID with reviews
 // @route   GET /api/movies/:id
@@ -63,33 +85,44 @@ export const getAllMovies = async (req, res) => {
 export const getMovieById = async (req, res) => {
   try {
     const movie = await Movie.findById(req.params.id)
-      .select('title posterUrl rating year genre description region duration trailerUrl')
+      .select('title posterUrl rating year genre description region duration trailerUrl director actors')
       .lean();
 
     if (!movie) {
-      return res.status(404).json({ 
-        success: false,
-        message: "Movie not found." 
-      });
+      return res.status(404).json({ success: false, message: "Movie not found." });
     }
 
-    // Get reviews for this movie
-    const reviews = await Review.find({ movieId: movie._id })
-      .select('rating review')
+    // Genre names
+    const genres = await Genre.find({ id: { $in: movie.genre } })
+      .select("name -_id")
+      .sort({ name: 1 })
       .lean();
+
+    // Like count
+    const likes = await Like.find({ movieId: movie._id }).lean();
+    const likeCount = likes.length;
+
+    const user = req.user;
+    const movieIdStr = movie._id.toString();
+
+    const liked = user ? likes.some(like => like.userId.toString() === user._id.toString()) : false;
+    const watchlisted = user?.watchlist?.some(id => id.toString() === movieIdStr) || false;
 
     res.status(200).json({
       success: true,
       data: {
         ...movie,
-        reviews
+        genre: genres.map(g => g.name),
+        likeCount,
+        liked,
+        watchlisted
       }
     });
   } catch (error) {
     console.error("Error fetching movie by ID:", error);
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
-      message: "Failed to fetch movie." 
+      message: "Failed to fetch movie."
     });
   }
 };

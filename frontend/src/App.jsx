@@ -53,7 +53,7 @@ function AppContent() {
         <Route path="/directory" element={<DirectoryPage />} />
         <Route path="/ranking" element={<RankingPage />} />
         <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/movie/:movieTitle" element={<MovieDetailPage />} />
+        <Route path="/movie/:movieId" element={<MovieDetailPage />} />
         <Route path="/new-released" element={<NewReleasedPage />} />
       </Routes>
       <Toaster />

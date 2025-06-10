@@ -6,11 +6,8 @@ import ViewDropdown from "../components/directory/ViewDropdown";
 import { FaListUl } from "react-icons/fa";
 import "../styles/sidebar.css";
 import Sidebar from "../components/Sidebar";
-// import { movies as movieData, genres as genreData, reviews } from "../constant";
 import {
   fetchMovies,
-  fetchGenres,
-  fetchReviews,
   fetchFilterOptions,
 } from "../services/movieService";
 
@@ -179,19 +176,28 @@ const DirectoryPage = () => {
         >
           <Sidebar
             sections={[
-              { id: "genre", title: "Genre" },
-              { id: "region", title: "Region" },
-              { id: "year", title: "Year" },
+              {
+                id: "genre",
+                title: "Genre",
+                items: genres.map((g) => ({ label: g.name, value: g.name })),
+                selected: selectedGenres,
+                setSelected: setSelectedGenres,
+              },
+              {
+                id: "region",
+                title: "Region",
+                items: regions.map((r) => ({ label: r.name, value: r.code })),
+                selected: selectedRegions,
+                setSelected: setSelectedRegions,
+              },
+              {
+                id: "year",
+                title: "Year",
+                items: years.map((y) => ({ label: y, value: y })),
+                selected: selectedYears,
+                setSelected: setSelectedYears,
+              },
             ]}
-            selectedGenres={selectedGenres}
-            setSelectedGenres={setSelectedGenres}
-            selectedRegions={selectedRegions}
-            setSelectedRegions={setSelectedRegions}
-            selectedYears={selectedYears}
-            setSelectedYears={setSelectedYears}
-            genres={genres}
-            regions={regions}
-            years={years}
           />
         </div>
         {/* Overlay to close sidebar */}
@@ -267,8 +273,9 @@ const DirectoryPage = () => {
                         ...movie,
                         year: movie.year.toString(),
                       }}
-                      liked={likedMovies.includes(movie.id)}
-                      addedToWatchlist={addToWatchlistMovies.includes(movie.id)}
+                      liked={movie.liked}
+                      likeCount={movie.likeCount || 0}
+                      addedToWatchlist={movie.watchlisted}
                       onLike={() => toggleLike(movie.id)}
                       onAddToWatchlist={() => toggleAddToWatchlist(movie.id)}
                       allReviews={reviews}
@@ -288,18 +295,21 @@ const DirectoryPage = () => {
                     const transformedMovie = {
                       ...movie,
                       year: movie.year.toString(),
-                      genreNames,
-                      regionName,
+                      genre: genreNames,
+                      region: regionName,
+                      director: movie.director,
+                      actors: movie.actors,
                     };
 
                     return (
                       <MovieCardList
-                        key={movie.id}
+                        key={movie.id || movie._id}
                         movie={transformedMovie}
-                        liked={likedMovies.includes(movie.id)}
-                        addedToWatchlist={addToWatchlistMovies.includes(movie.id)}
-                        onLike={() => toggleLike(movie.id)}
-                        onAddToWatchlist={() => toggleAddToWatchlist(movie.id)}
+                        liked={movie.liked}
+                        likeCount={movie.likeCount || 0}
+                        addedToWatchlist={movie.watchlisted}
+                        onLike={() => toggleLike(movie._id || movie.id)}
+                        onAddToWatchlist={() => toggleAddToWatchlist(movie._id || movie.id)}
                         allReviews={reviews}
                       />
                     );

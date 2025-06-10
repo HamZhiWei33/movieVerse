@@ -3,20 +3,30 @@ import User from "../models/user.model.js";
 
 export const protectRoute = async (req, res, next) => {
   try {
-    console.log("Cookies: ", req.cookies); // log the cookie
+    // Extract token from Authorization header or cookies
+    let token;
 
-    const token = req.cookies.jwt;
+    // Priority: Authorization header
+    if (req.headers.authorization && req.headers.authorization.startsWith("Bearer ")) {
+      token = req.headers.authorization.split(" ")[1];
+    } else if (req.cookies?.jwt) {
+      // Fallback to cookie
+      token = req.cookies.jwt;
+    }
+
     if (!token) {
-      console.log("No token found");
+      console.log("No token provided in header or cookie");
       return res.status(401).json({ message: "No token" });
     }
 
+    // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (!decoded) {
+    if (!decoded || !decoded.userId) {
       console.log("Invalid token");
       return res.status(401).json({ message: "Invalid token" });
     }
 
+    // Find user by ID
     const user = await User.findById(decoded.userId).select("-password");
     if (!user) {
       console.log("User not found");
@@ -27,6 +37,6 @@ export const protectRoute = async (req, res, next) => {
     next();
   } catch (err) {
     console.error("Auth middleware error:", err.message);
-    res.status(500).json({ message: "Server error" });
+    return res.status(401).json({ message: "Unauthorized" });
   }
 };

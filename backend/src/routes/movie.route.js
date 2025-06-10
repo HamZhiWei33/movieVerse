@@ -1,8 +1,8 @@
 import express from "express";
+import { protectRoute } from "../middleware/auth.middleware.js";
 import {
   getAllMovies,
   getMovieById,
-  filterMovies,
   getFilterOptions,
   getAllGenres,
   getAllRegions,
@@ -11,13 +11,10 @@ import {
 const router = express.Router();
 
 // Get all movies
-router.get("/", getAllMovies);
+router.get("/", protectRoute, getAllMovies);
 
 // Get all distinct filters
 router.get("/filters", getFilterOptions);
-
-// Get filtered movies
-router.get("/filter", filterMovies);
 
 // Get all genre
 router.get("/genres", getAllGenres);
@@ -26,6 +23,6 @@ router.get("/genres", getAllGenres);
 router.get("/regions", getAllRegions);
 
 // Get movies by id
-router.get("/:id", getMovieById);
+router.get("/:id", protectRoute, getMovieById);
 
 export default router;

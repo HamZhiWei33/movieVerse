@@ -250,6 +250,10 @@ legend {
   .movie-container.list .movie-list {
     grid-template-columns: repeat(1, 1fr);
   }
+
+  .movie-container.list .movie-list .movie-card-list .movie-details-container-list .duration-and-icons-container {
+    flex-direction: row !important;
+  }
 }
 
 /* Phone (2 columns per section) */

@@ -5,41 +5,82 @@ import ReviewStars from "./ReviewStars";
 import { IoTime } from "react-icons/io5";
 import { FaPlay } from "react-icons/fa6";
 import "../../styles/directory/MovieCardList.css";
+import {
+  likeMovie,
+  unlikeMovie,
+  hasUserLikedMovie,
+  fetchMovieLikes,
+  fetchWatchlistStatus,
+  addToWatchlist,
+  removeFromWatchlist
+} from "../../services/movieService";
+import { useState, useEffect } from "react";
 
 const MovieCardList = ({
   movie,
-  liked,
-  addedToWatchlist,
-  onLike,
-  onAddToWatchlist,
   showRatingNumber = false,
   showBottomInteractiveIcon = false,
   showCastInfo = false,
-  likeCount = 0,
   allReviews,
 }) => {
   const navigate = useNavigate();
+  const [liked, setLiked] = useState(movie.liked ?? false);
+  const [likeCount, setLikeCount] = useState(movie.likeCount ?? 0);
+  const [watchlisted, setWatchlisted] = useState(movie.watchlisted ?? false);
+  const [loadingLike, setLoadingLike] = useState(false);
+  const [loadingWatchlist, setLoadingWatchlist] = useState(false);
 
   const handleCardClick = () => {
-    navigate(`/movie/${encodeURIComponent(movie.title)}`, {
-      state: { movieData: movie }, 
+    navigate(`/movie/${movie._id}`, {
+      state: { movie },
     });
   };
 
-  const handleLikeClick = (e) => {
+  const handleLikeClick = async (e) => {
     e.stopPropagation();
-    onLike();
+    if (loadingLike) return;
+
+    setLoadingLike(true);
+    try {
+      if (liked) {
+        await unlikeMovie(movie._id);
+      } else {
+        await likeMovie(movie._id);
+      }
+
+      const likesData = await fetchMovieLikes(movie._id);
+      setLikeCount(likesData.count || 0);
+      setLiked(!liked);
+    } catch (error) {
+      console.error("Error updating like:", error);
+    } finally {
+      setLoadingLike(false);
+    }
   };
 
-  const handleAddToWatchlistClick = (e) => {
+  const handleAddToWatchlistClick = async (e) => {
     e.stopPropagation();
-    onAddToWatchlist();
+    if (loadingWatchlist) return;
+
+    setLoadingWatchlist(true);
+    try {
+      if (watchlisted) {
+        await removeFromWatchlist(movie._id);
+      } else {
+        await addToWatchlist(movie._id);
+      }
+      setWatchlisted(!watchlisted);
+    } catch (error) {
+      console.error("Error updating watchlist:", error);
+    } finally {
+      setLoadingWatchlist(false);
+    }
   };
 
   const handlePlayTrailerClick = (e) => {
     e.stopPropagation();
     if (movie.trailerUrl) {
-      window.open(movie.trailerUrl, "_blank"); // Opens in new tab
+      window.open(movie.trailerUrl, "_blank");
     }
   };
 
@@ -58,6 +99,7 @@ const MovieCardList = ({
     return average === 0 ? 0 : parseFloat(average.toFixed(1));
   };
 
+  console.log(movie);
   const averageRating = calculateAverageRating();
 
   return (
@@ -81,7 +123,7 @@ const MovieCardList = ({
           showNumber={showRatingNumber}
         />
         <div className="genre-tags">
-          {movie.genreNames?.map((name, index) => (
+          {movie.genre?.map((name, index) => (
             <span key={index} className="genre-tag">
               {name}
             </span>
@@ -100,31 +142,28 @@ const MovieCardList = ({
               onClick={(e) => e.stopPropagation()}
             >
               <div className="iteractive-icon" onClick={handleLikeClick}>
-                <LikeIcon liked={liked} />
+                <LikeIcon liked={liked} disabled={loadingLike} />
               </div>
               <div
                 className="iteractive-icon"
                 onClick={handleAddToWatchlistClick}
               >
-                <AddToWatchlistIcon addedToWatchlist={addedToWatchlist} />
+                <AddToWatchlistIcon addedToWatchlist={watchlisted} disabled={loadingWatchlist} />
               </div>
             </div>
           )}
         </div>
         {showCastInfo && (
           <div className="cast-info">
-            {/* Only show Director section if there is a director */}
             {movie.director && (
               <div className="cast-row">
                 <span className="cast-label">Director</span>
                 <span className="director-item">{movie.director}</span>
               </div>
             )}
-
-            {/* Only show Cast section if there are valid actors */}
             {movie.actors &&
               movie.actors.filter((actor) => actor.trim() !== "").length >
-                0 && (
+              0 && (
                 <div className="cast-row">
                   <span className="cast-label">Cast</span>
                   <div className="actors-list">
@@ -153,14 +192,14 @@ const MovieCardList = ({
               Watch Trailer
             </button>
             <div className="iteractive-icon" onClick={handleLikeClick}>
-              <LikeIcon liked={liked} />
+              <LikeIcon liked={liked} disabled={loadingLike} />
               <span className="like-count">{likeCount}</span>
             </div>
             <div
               className="iteractive-icon"
               onClick={handleAddToWatchlistClick}
             >
-              <AddToWatchlistIcon addedToWatchlist={addedToWatchlist} />
+              <AddToWatchlistIcon addedToWatchlist={watchlisted} disabled={loadingWatchlist} />
             </div>
           </div>
         )}

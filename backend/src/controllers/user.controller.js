@@ -14,6 +14,21 @@ import {
   getReviewedGenresAggregation,
   getWatchlistGenresAggregation,
 } from "../lib/genreAnalytics.js";
+
+export const getCurrentUser = (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    res.status(200).json(req.user); // req.user is populated by protectRoute
+  } catch (err) {
+    console.error("getCurrentUser error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
 // @desc    Get user profile
 // @route   GET /api/users/:id
 // @access  Private
@@ -69,8 +84,12 @@ export const getUserWatchlist = async (req, res) => {
 };
 
 export const addToWatchlist = async (req, res) => {
-  const userId = req.user._id; // authenticated user
-  const { movieId } = req.body; // movie _id from frontend
+  const userId = req.user?._id;
+  const { movieId } = req.params;
+
+  if (!userId || !movieId) {
+    return res.status(400).json({ message: "User ID and Movie ID are required." });
+  }
 
   try {
     // Check if movie exists
@@ -81,38 +100,52 @@ export const addToWatchlist = async (req, res) => {
 
     // Add to user's watchlist if not already there
     const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
     if (user.watchlist.includes(movieId)) {
-      return res.status(400).json({ message: "Movie already in watchlist" });
+      return res.status(200).json({ watchlisted: true, message: "Movie already in watchlist." });
     }
 
     user.watchlist.push(movieId);
     await user.save();
 
-    res
-      .status(200)
-      .json({ message: "Movie added to watchlist", watchlist: user.watchlist });
+    return res.status(201).json({ watchlisted: true, message: "Movie added to watchlist." });
   } catch (err) {
     console.error("Error adding to watchlist:", err);
-    res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
 export const removeFromWatchlist = async (req, res) => {
+  const userId = req.user?._id;
+  const { movieId } = req.params;
+
+  if (!userId || !movieId) {
+    return res.status(400).json({ message: "User ID and Movie ID are required." });
+  }
+
   try {
-    const userId = req.user._id; // Ensure user is authenticated
-    const movieId = req.params.movieId;
-    console.log("Removing movieId:", movieId);
     const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
-    if (!user) return res.status(404).json({ message: "User not found" });
+    // Check if movie is in watchlist
+    const wasInWatchlist = user.watchlist.includes(movieId);
+    if (!wasInWatchlist) {
+      return res.status(200).json({ watchlisted: false, message: "Movie not in watchlist." });
+    }
 
+    // Remove movie from watchlist
     user.watchlist = user.watchlist.filter((id) => id.toString() !== movieId);
-
     await user.save();
 
-    res.status(200).json({ message: "Movie removed from watchlist" });
+    return res.status(200).json({ watchlisted: false, message: "Movie removed from watchlist." });
   } catch (err) {
-    res.status(500).json({ message: "Error removing movie from watchlist" });
+    console.error("Error removing movie from watchlist:", err);
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
