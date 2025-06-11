@@ -65,15 +65,6 @@ const MovieCard = ({ movie, children, allReviews }) => {
     }
   };
 
-  const calculateAverageRating = () => {
-    const movieReviews = (allReviews ?? []).filter(
-      (review) => review.movieId === movie.id || review.movieId === movie._id
-    );
-    if (movieReviews.length === 0) return 0;
-    const sum = movieReviews.reduce((acc, review) => acc + Number(review.rating), 0);
-    return (sum / movieReviews.length).toFixed(1);
-  };
-
   return (
     <article
       className="movie-card"
@@ -88,7 +79,9 @@ const MovieCard = ({ movie, children, allReviews }) => {
         />
         <div className="hover-overlay">
           <div className="top-right">
-            <span className="rating">{calculateAverageRating()}</span>
+            <span className="rating">{movie.rating && movie.rating > 0
+              ? movie.rating.toFixed(1)
+              : "0"}</span>
           </div>
           <div className="bottom-icons" onClick={(e) => e.stopPropagation()}>
             <LikeIcon liked={liked} onClick={handleLikeClick} disabled={loading} />

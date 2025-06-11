@@ -40,7 +40,7 @@ const UserReviewForm = ({
 
   const handlePost = () => {
     if (isModified && reviewText.trim()) {
-      onSubmit({ movieId: movie.id, reviewText, rating });
+      onSubmit({ movieId: movie.id, review: reviewText, rating });
       // Don't reset modified state here - let parent handle the state update
     }
   };

@@ -8,11 +8,10 @@ import ReviewCard from "../components/directory/ReviewCard";
 import UserReviewForm from "../components/directory/UserReviewForm";
 import RatingBarChart from '../components/directory/RatingBarChart';
 import "../styles/movieDetail.css";
+import useRatingStore from "../store/useRatingStore";
 import {
     fetchMovieById,
-    fetchReviews,
     getCurrentUser,
-    submitReview,
 } from "../services/movieService";
 
 const MovieDetailPage = () => {
@@ -21,44 +20,43 @@ const MovieDetailPage = () => {
     const navigate = useNavigate();
 
     const [movie, setMovie] = useState(state?.movie || null);
-    const [movieReviews, setMovieReviews] = useState([]);
-    const [reviewUsers, setReviewUsers] = useState({});
     const [currentUser, setCurrentUser] = useState(null);
-    const [userReview, setUserReview] = useState(null);
 
     const [currentPage, setCurrentPage] = useState(0);
     const reviewsPerPage = 4;
 
     const reviewFormRef = useRef(null);
 
+    const {
+        reviewsByMovie,
+        userReview,
+        user,
+        fetchUserReview,
+        fetchReviewsByMovie,
+        addReview,
+        updateReview,
+        setUser,
+        setMovieData,
+    } = useRatingStore();
+
+    const movieReviews = reviewsByMovie[movieId] || [];
+    const existingReview = userReview[movieId] || null;
+
     useEffect(() => {
         const loadData = async () => {
             try {
-                // Always fetch user
-                const user = await getCurrentUser();
-                setCurrentUser(user);
+                const userData = await getCurrentUser();
+                setCurrentUser(userData);
+                setUser(userData);
 
-                // Always fetch movie from backend, not from state
                 const movieData = await fetchMovieById(movieId);
                 setMovie(movieData);
+                setMovieData(movieData);
 
-                const reviews = await fetchReviews(movieId);
-                setMovieReviews(reviews);
-
-                // Map review user info
-                const userMap = {};
-                reviews.forEach(r => {
-                    if (r.user) {
-                        userMap[r.user.id] = r.user;
-                    }
-                });
-                setReviewUsers(userMap);
-
-                const existing = reviews.find(r => r.userId === user.id);
-                setUserReview(existing || null);
+                await fetchReviewsByMovie(movieId);
+                await fetchUserReview(movieId);
 
                 setCurrentPage(0);
-
             } catch (err) {
                 console.error("Error loading movie detail page", err);
             }
@@ -66,28 +64,26 @@ const MovieDetailPage = () => {
 
         loadData();
 
-        // Clean up: reset state to avoid flickering old data
         return () => {
             setMovie(null);
-            setMovieReviews([]);
-            setReviewUsers({});
-            setUserReview(null);
             setCurrentPage(0);
         };
-
     }, [movieId]);
 
     const handleReviewSubmit = async (data) => {
         try {
-            const response = await submitReview(movieId, data, Boolean(userReview));
-            console.log("Review saved:", response);
+            if (existingReview) {
+                await updateReview(movieId, data);
+            } else {
+                await addReview(movieId, data);
+            }
 
-            // Refresh reviews
-            const updatedReviews = await fetchReviews(movieId);
-            setMovieReviews(updatedReviews);
+            const updatedMovie = await fetchMovieById(movieId);
+            setMovie(updatedMovie);
+            setMovieData(updatedMovie);
 
-            const updatedReview = updatedReviews.find(r => r.userId === currentUser.id);
-            setUserReview(updatedReview);
+            await fetchReviewsByMovie(movieId);
+            await fetchUserReview(movieId);
         } catch (err) {
             console.error("Failed to submit review", err);
         }
@@ -112,8 +108,8 @@ const MovieDetailPage = () => {
                     movie={{
                         ...movie,
                         reviewCount: movieReviews.length,
-                        likeCount: movie.likeCount,     
-                        liked: movie.liked,             
+                        likeCount: movie.likeCount,
+                        liked: movie.liked,
                         watchlisted: movie.watchlisted
                     }}
                     showRatingNumber={true}
@@ -130,19 +126,19 @@ const MovieDetailPage = () => {
                             onClick={() => reviewFormRef.current?.scrollIntoView({ behavior: 'smooth' })}
                         ><IoAdd className="add-icon" />Add Your Review</button>
                     </div>
-                    <RatingBarChart movieReviews={movieReviews} />
+                    <RatingBarChart movieId={movieId} />
                     <div className="review-list">
                         {currentReviews.length > 0 ? (
                             currentReviews.map((review) => {
-                                const user = review.user || reviewUsers[review.userId] || {};
+                                const user = review.user || {};
                                 return (
                                     <ReviewCard
-                                        key={review.id}
-                                        name={user.username || 'Anonymous'}
-                                        date={new Date(review.createdAt).toLocaleDateString()}
+                                        key={review._id}
+                                        name={review.userId?.name ?? "Anonymous"}
+                                        date={new Date(review.createdAt).toLocaleDateString("en-GB")}
                                         rating={review.rating}
                                         reviewText={review.review}
-                                        profilePic={user.profilePic}
+                                        profilePic={review.userId?.profilePic}
                                     />
                                 );
                             })
@@ -173,9 +169,10 @@ const MovieDetailPage = () => {
 
                 <div ref={reviewFormRef}>
                     <UserReviewForm
+                        key={`${movieId}-${existingReview?.updatedAt || existingReview?.createdAt || "new"}`}
                         movie={movie}
-                        existingReview={userReview?.review || ""}
-                        existingRating={userReview?.rating || 0}
+                        existingReview={existingReview?.review || ""}
+                        existingRating={existingReview?.rating || 0}
                         onSubmit={handleReviewSubmit}
                     />
                 </div>

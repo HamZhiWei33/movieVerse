@@ -1,9 +1,12 @@
 import Rating from '@mui/material/Rating';
 import StarIcon from '@mui/icons-material/Star';
 import '../../styles/directory/RatingBarChart.css';
+import useRatingStore from '../../store/useRatingStore';
 
-const RatingBarChart = ({ movieReviews = [] }) => {
-    // Defensive: always default to empty array
+const RatingBarChart = ({ movieId}) => {
+    const { reviewsByMovie, getAverageRatingByMovieId } = useRatingStore();
+    const movieReviews = reviewsByMovie[movieId] || [];
+    const average = getAverageRatingByMovieId(movieId);
 
     const calculateRatingBreakdown = () => {
         const breakdown = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
@@ -16,19 +19,12 @@ const RatingBarChart = ({ movieReviews = [] }) => {
         return breakdown;
     };
 
-    const calculateAverageRating = () => {
-        if (!Array.isArray(movieReviews) || movieReviews.length === 0) return 0;
-        const sum = movieReviews.reduce((acc, review) => acc + review.rating, 0);
-        return sum / movieReviews.length;
-    };
-
     const breakdown = calculateRatingBreakdown();
-    const average = calculateAverageRating();
     const totalRatings = movieReviews.length;
 
     return (
         <div className="rating-breakdown-container">
-            <div className="average-score">{average === 0 ? "0" : average.toFixed(1)}</div>
+            <div className="average-score">{average.toFixed(1)}</div>
             <div className="bar-section">
                 {[5, 4, 3, 2, 1].map((star) => {
                     const percentage = totalRatings > 0 ? (breakdown[star] / totalRatings) : 0;

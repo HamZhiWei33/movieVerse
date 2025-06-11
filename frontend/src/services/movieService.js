@@ -43,31 +43,6 @@ export const fetchFilterOptions = async () => {
   }
 };
 
-export const fetchReviews = async () => {
-  try {
-    const response = await axiosInstance.get("/users/review");
-    return response.data.data || response.data;
-  } catch (error) {
-    console.error("Failed to fetch user reviews", error);
-    throw error;
-  }
-};
-
-export const submitReview = async (data, isEdit = false) => {
-  try {
-    const method = isEdit ? "put" : "post";
-    const response = await axiosInstance({
-      method,
-      url: "/users/review",
-      data,
-    });
-    return response.data;
-  } catch (error) {
-    console.error("Failed to submit review", error);
-    throw error;
-  }
-};
-
 export const fetchMovieLikes = async (id) => {
   try {
     const response = await axiosInstance.get(`/likes/${id}`);

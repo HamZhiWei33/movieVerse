@@ -30,6 +30,10 @@ const MovieCardList = ({
   const [loadingLike, setLoadingLike] = useState(false);
   const [loadingWatchlist, setLoadingWatchlist] = useState(false);
 
+  const averageRating = movie.rating && movie.rating > 0
+    ? Number(movie.rating.toFixed(1))
+    : 0;
+
   const handleCardClick = () => {
     navigate(`/movie/${movie._id}`, {
       state: { movie },
@@ -84,23 +88,7 @@ const MovieCardList = ({
     }
   };
 
-  const calculateAverageRating = () => {
-    if (!Array.isArray(allReviews) || allReviews.length === 0) return 0;
-
-    const validRatings = allReviews
-      .map((r) => Number(r.rating))
-      .filter((r) => !isNaN(r));
-
-    if (validRatings.length === 0) return 0;
-
-    const sum = validRatings.reduce((acc, rating) => acc + rating, 0);
-    const average = sum / validRatings.length;
-
-    return average === 0 ? 0 : parseFloat(average.toFixed(1));
-  };
-
   console.log(movie);
-  const averageRating = calculateAverageRating();
 
   return (
     <article
