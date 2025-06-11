@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import LikeIcon from "./LikeIcon";
 import AddToWatchlistIcon from "./AddToWatchlistIcon";
 import ReviewStars from "./ReviewStars";
@@ -14,7 +15,7 @@ import {
   addToWatchlist,
   removeFromWatchlist
 } from "../../services/movieService";
-import { useState, useEffect } from "react";
+import usePreviousScrollStore from "../../store/usePreviousScrollStore";
 
 const MovieCardList = ({
   movie,
@@ -24,6 +25,7 @@ const MovieCardList = ({
   allReviews,
 }) => {
   const navigate = useNavigate();
+  const { setPreviousScrollPosition } = usePreviousScrollStore();
   const [liked, setLiked] = useState(movie.liked ?? false);
   const [likeCount, setLikeCount] = useState(movie.likeCount ?? 0);
   const [watchlisted, setWatchlisted] = useState(movie.watchlisted ?? false);
@@ -35,7 +37,8 @@ const MovieCardList = ({
     : 0;
 
   const handleCardClick = () => {
-    navigate(`/movie/${movie._id}`, {
+    setPreviousScrollPosition(window.scrollY); // save scroll position before navigating
+    navigate(`/directory/${movie._id}`, {
       state: { movie },
     });
   };

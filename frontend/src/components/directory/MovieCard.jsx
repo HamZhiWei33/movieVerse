@@ -10,8 +10,10 @@ import {
   removeFromWatchlist,
   fetchMovieLikes
 } from "../../services/movieService";
+import usePreviousScrollStore from "../../store/usePreviousScrollStore";
 
 const MovieCard = ({ movie, children, allReviews }) => {
+  const { setPreviousScrollPosition } = usePreviousScrollStore();
   const navigate = useNavigate();
   const [liked, setLiked] = useState(movie.liked ?? false);
   const [likeCount, setLikeCount] = useState(movie.likeCount ?? 0);
@@ -20,6 +22,7 @@ const MovieCard = ({ movie, children, allReviews }) => {
   const [watchlistLoading, setWatchlistLoading] = useState(false);
 
   const handleCardClick = () => {
+    setPreviousScrollPosition(window.scrollY); // save scroll position before navigating
     navigate(`/movie/${movie._id}`, {
       state: { movie },
     });

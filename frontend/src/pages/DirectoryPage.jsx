@@ -1,15 +1,14 @@
 import MovieCard from "../components/directory/MovieCard";
 import MovieCardList from "../components/directory/MovieCardList";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
+import { useNavigationType, useSearchParams, useLocation } from "react-router-dom";
 import "../styles/directory.css";
 import ViewDropdown from "../components/directory/ViewDropdown";
 import { FaListUl } from "react-icons/fa";
 import "../styles/sidebar.css";
 import Sidebar from "../components/Sidebar";
-import {
-  fetchMovies,
-  fetchFilterOptions,
-} from "../services/movieService";
+import { fetchMovies, fetchFilterOptions } from "../services/movieService";
+import usePreviousScrollStore from "../store/usePreviousScrollStore";
 
 const DirectoryPage = () => {
   const [movies, setMovies] = useState([]);
@@ -23,14 +22,21 @@ const DirectoryPage = () => {
   const [selectedYears, setSelectedYears] = useState([]);
   const [likedMovies, setLikedMovies] = useState([]);
   const [addToWatchlistMovies, setAddToWatchlistMovies] = useState([]);
-  const [view, setView] = useState("grid");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialView = searchParams.get("view") || "grid";
+  const [view, setView] = useState(initialView);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const MOVIES_PER_PAGE = 100;
+  const { previousScrollPosition } = usePreviousScrollStore();
+  const navigationType = useNavigationType();
+  const location = useLocation();
+  const routeHistory = useRef([]);
 
+  useEffect(() => {
+    searchParams.set("view", view);
+    setSearchParams(searchParams);
+  }, [view]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -53,11 +59,9 @@ const DirectoryPage = () => {
           years: selectedYears.join(',')
         };
 
-        const response = await fetchMovies(currentPage, MOVIES_PER_PAGE, filters);
-
+        // Fetch all movies at once (remove pagination parameters)
+        const response = await fetchMovies(1, 1000, filters); // Large limit to get all movies
         setMovies(response.data);
-        setTotalPages(response.pages);
-
       } catch (err) {
         console.error("Failed to fetch data:", err);
         setError("Failed to load data. Please try again later.");
@@ -67,7 +71,16 @@ const DirectoryPage = () => {
     };
 
     fetchData();
-  }, [currentPage, selectedGenres, selectedRegions, selectedYears]);
+  }, [selectedGenres, selectedRegions, selectedYears]);
+
+  // Scroll restoration AFTER movies are loaded
+  useEffect(() => {
+    if (!loading && movies.length > 0) {
+      // Restore scroll only when data is ready
+      console.log("Scroll");
+      window.scrollTo(0, previousScrollPosition);
+    }
+  }, [navigationType, movies, loading]);
 
   // Map genre IDs to names for filtering and display
   const genreMap = useMemo(() => {
@@ -104,8 +117,8 @@ const DirectoryPage = () => {
   };
 
   // Filter movies by selected filters
-  const sortedAndFilteredMovies = useMemo(() => {
-    const filtered = movies.filter((movie) => {
+  const filteredMovies = useMemo(() => {
+    return movies.filter((movie) => {
       const genreName = movie.genre.map((id) => genreMap[id]);
       const regionName = regionMap[movie.region];
 
@@ -120,19 +133,8 @@ const DirectoryPage = () => {
         selectedYears.some(year => year.toString() === movie.year.toString());
 
       return genreMatch && regionMatch && yearMatch;
-    });
-
-    // Sort by year (descending)
-    return [...filtered].sort((a, b) => b.year - a.year);
+    }).sort((a, b) => b.year - a.year); // Sort by year (descending)
   }, [movies, selectedGenres, selectedRegions, selectedYears, genreMap]);
-
-  // Paginate the filtered results
-  const paginatedMovies = useMemo(() => {
-    const startIndex = (currentPage - 1) * MOVIES_PER_PAGE;
-    return sortedAndFilteredMovies.slice(startIndex, startIndex + MOVIES_PER_PAGE);
-  }, [sortedAndFilteredMovies, currentPage]);
-
-  const displayedMovies = paginatedMovies;
 
   const renderButtons = (items, selected, setSelected) => (
     <div className="filter-group">
@@ -154,7 +156,6 @@ const DirectoryPage = () => {
     </div>
   );
 
-
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const toggleSidebar = () => {
     setIsSidebarOpen((prev) => !prev);
@@ -171,9 +172,7 @@ const DirectoryPage = () => {
       </div>
       <div className="layout-container">
         {/* Sidebar with toggle functionality */}
-        <div
-          className={`sidebar-container ${isSidebarOpen ? "open" : "closed"}`}
-        >
+        <div className={`sidebar-container ${isSidebarOpen ? "open" : "closed"}`}>
           <Sidebar
             sections={[
               {
@@ -202,11 +201,7 @@ const DirectoryPage = () => {
         </div>
         {/* Overlay to close sidebar */}
         {isSidebarOpen && (
-          <div
-            className="sidebar-overlay"
-            onClick={toggleSidebar}
-            aria-hidden="true"
-          ></div>
+          <div className="sidebar-overlay" onClick={toggleSidebar} aria-hidden="true"></div>
         )}
         {/* Main content area */}
         <div className="content-area">
@@ -236,46 +231,48 @@ const DirectoryPage = () => {
                 </fieldset>
               </section>
 
-              <ViewDropdown setView={setView} />
+              <ViewDropdown view={view} setView={setView} />
             </section>
-            {(selectedGenres.length > 0 ||
-              selectedRegions.length > 0 ||
-              selectedYears.length > 0) && (
-                <div className="clear-filters-container">
-                  <button
-                    className={`clear-filters-button ${selectedGenres.length ||
-                      selectedRegions.length ||
-                      selectedYears.length
+            {(selectedGenres.length > 0 || selectedRegions.length > 0 || selectedYears.length > 0) && (
+              <div className="clear-filters-container">
+                <button
+                  className={`clear-filters-button ${
+                    selectedGenres.length || selectedRegions.length || selectedYears.length
                       ? "active"
                       : ""
-                      }`}
-                    onClick={() => {
-                      setSelectedGenres([]);
-                      setSelectedRegions([]);
-                      setSelectedYears([]);
-                    }}
-                    aria-label="Clear all filters"
-                  >
-                    Clear all
-                  </button>
-                </div>
-              )}
+                  }`}
+                  onClick={() => {
+                    setSelectedGenres([]);
+                    setSelectedRegions([]);
+                    setSelectedYears([]);
+                  }}
+                  aria-label="Clear all filters"
+                >
+                  Clear all
+                </button>
+              </div>
+            )}
           </div>
 
           <section className={`movie-container ${view}`}>
-            {displayedMovies.length > 0 ? (
+            {loading ? (
+              <div className="loading-message">
+                <p>Loading movies...</p>
+              </div>
+            ) : filteredMovies.length > 0 ? (
               view === "grid" ? (
                 <div className="movie-grid">
-                  {displayedMovies.map((movie) => (
+                  {filteredMovies.map((movie) => (
                     <MovieCard
                       key={movie.id}
                       movie={{
                         ...movie,
+                        genre: movie.genre?.map(id => genreMap[id]) || [],
                         year: movie.year.toString(),
                       }}
-                      liked={movie.liked}
+                      liked={likedMovies.includes(movie.id)}
                       likeCount={movie.likeCount || 0}
-                      addedToWatchlist={movie.watchlisted}
+                      addedToWatchlist={addToWatchlistMovies.includes(movie.id)}
                       onLike={() => toggleLike(movie.id)}
                       onAddToWatchlist={() => toggleAddToWatchlist(movie.id)}
                       allReviews={reviews}
@@ -284,14 +281,10 @@ const DirectoryPage = () => {
                 </div>
               ) : (
                 <div className="movie-list">
-                  {displayedMovies.map((movie) => {
-                    // Map genre IDs to names
+                  {filteredMovies.map((movie) => {
                     const genreNames = movie.genre?.map(id => genreMap[id]) || [];
-
-                    // Map region code to region name
                     const regionName = regionMap[movie.region] || movie.region;
 
-                    // Prepare transformed movie
                     const transformedMovie = {
                       ...movie,
                       year: movie.year.toString(),
@@ -305,16 +298,15 @@ const DirectoryPage = () => {
                       <MovieCardList
                         key={movie.id || movie._id}
                         movie={transformedMovie}
-                        liked={movie.liked}
+                        liked={likedMovies.includes(movie.id || movie._id)}
                         likeCount={movie.likeCount || 0}
-                        addedToWatchlist={movie.watchlisted}
-                        onLike={() => toggleLike(movie._id || movie.id)}
-                        onAddToWatchlist={() => toggleAddToWatchlist(movie._id || movie.id)}
+                        addedToWatchlist={addToWatchlistMovies.includes(movie.id || movie._id)}
+                        onLike={() => toggleLike(movie.id || movie._id)}
+                        onAddToWatchlist={() => toggleAddToWatchlist(movie.id || movie._id)}
                         allReviews={reviews}
                       />
                     );
                   })}
-
                 </div>
               )
             ) : (
@@ -322,26 +314,7 @@ const DirectoryPage = () => {
                 <p>No movies match your filters.</p>
               </div>
             )}
-
           </section>
-          <div className="pagination-controls">
-            <button
-              onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
-              disabled={currentPage === 1 || loading}
-            >
-              Previous
-            </button>
-
-            <span>Page {currentPage} of {totalPages}</span>
-
-            <button
-              onClick={() => setCurrentPage(p => p + 1)}
-              disabled={currentPage >= totalPages || loading}
-            >
-              Next
-            </button>
-          </div>
-
         </div>
       </div>
     </main>

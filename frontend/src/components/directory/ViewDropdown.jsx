@@ -1,11 +1,9 @@
 import { useState } from "react";
-import { FaCaretUp, FaCaretDown } from "react-icons/fa";
-import { FaTh, FaList } from "react-icons/fa";
+import { FaCaretUp, FaCaretDown, FaTh, FaList } from "react-icons/fa";
 import "../../styles/directory/ViewDropdown.css";
 
-const ViewDropdown = ({setView}) => {
+const ViewDropdown = ({ view, setView }) => {
   const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState("grid");
 
   const views = [
     { id: "grid", icon: <FaTh /> },
@@ -13,32 +11,29 @@ const ViewDropdown = ({setView}) => {
   ];
 
   const handleSelect = (id) => {
-    setSelected(id);
     setView(id);
     setOpen(false);
-  }
+  };
 
   return (
     <div className="view-dropdown-wrapper">
       <div className={`view-dropdown ${open ? "active" : ""}`}>
         <button className="view-button" onClick={() => setOpen(!open)}>
-          {views.find((v) => v.id === selected)?.icon}
+          {views.find((v) => v.id === view)?.icon}
           <span>View</span>
           {open ? <FaCaretUp /> : <FaCaretDown />}
         </button>
 
         {open && (
           <div className="dropdown-menu inside-border">
-            {views.map((view) => (
+            {views.map((v) => (
               <div
-                key={view.id}
-                onClick={() => handleSelect(view.id)}
-                className={`dropdown-item ${
-                  selected === view.id ? "active" : ""
-                }`}
+                key={v.id}
+                onClick={() => handleSelect(v.id)}
+                className={`dropdown-item ${view === v.id ? "active" : ""}`}
               >
-                {selected === view.id && <span className="indicator" />}
-                {view.icon}
+                {view === v.id && <span className="indicator" />}
+                {v.icon}
               </div>
             ))}
           </div>

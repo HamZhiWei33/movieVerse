@@ -21,6 +21,8 @@ const MovieDetailPage = () => {
 
     const [movie, setMovie] = useState(state?.movie || null);
     const [currentUser, setCurrentUser] = useState(null);
+    const [loading, setLoading] = useState(!state?.movie);
+    const [error, setError] = useState(null);
 
     const [currentPage, setCurrentPage] = useState(0);
     const reviewsPerPage = 4;
@@ -49,26 +51,44 @@ const MovieDetailPage = () => {
                 setCurrentUser(userData);
                 setUser(userData);
 
-                const movieData = await fetchMovieById(movieId);
-                setMovie(movieData);
-                setMovieData(movieData);
+                if (!movie) {
+                    setLoading(true);
+                    const movieData = await fetchMovieById(movieId);
+                    setMovie(movieData);
+                    setMovieData(movieData);
+                } else {
+                    setMovieData(movie);
+                }
 
                 await fetchReviewsByMovie(movieId);
                 await fetchUserReview(movieId);
-
                 setCurrentPage(0);
+                setLoading(false);
             } catch (err) {
                 console.error("Error loading movie detail page", err);
+                setError("Failed to load movie details.");
+                setLoading(false);
             }
         };
 
         loadData();
 
         return () => {
-            setMovie(null);
             setCurrentPage(0);
         };
     }, [movieId]);
+
+    const location = useLocation();
+    const routeHistory = useRef([]);
+
+    useEffect(() => {
+        routeHistory.current.push(location.pathname);
+        console.log("Route stack:", routeHistory.current);
+    }, [location]);
+
+    const handleBack = () => {
+        navigate(-1, { state: { scrollPosition: window.scrollY } });
+    };
 
     const handleReviewSubmit = async (data) => {
         try {
@@ -89,7 +109,13 @@ const MovieDetailPage = () => {
         }
     };
 
-    if (!movie) return <div>Movie not found</div>;
+    if (loading) {
+        return <div className="loading">Loading movie details...</div>;
+    }
+
+    if (error || !movie) {
+        return <div className="error">{error || "Movie not found."}</div>;
+    }
 
     const totalPages = Math.ceil(movieReviews.length / reviewsPerPage);
     const start = currentPage * reviewsPerPage;
@@ -98,7 +124,7 @@ const MovieDetailPage = () => {
     return (
         <main className="movie-detail-page">
             <div className="back-button-container">
-                <button onClick={() => navigate(-1)} className="back-button">
+                <button onClick={handleBack} className="back-button">
                     <IoIosArrowBack className="back-icon" />Back
                 </button>
             </div>
@@ -123,7 +149,9 @@ const MovieDetailPage = () => {
                         <h3>Reviews</h3>
                         <button
                             className="review-button"
-                            onClick={() => reviewFormRef.current?.scrollIntoView({ behavior: 'smooth' })}
+                            onClick={() =>
+                                reviewFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                            }
                         ><IoAdd className="add-icon" />Add Your Review</button>
                     </div>
                     <RatingBarChart movieId={movieId} />
