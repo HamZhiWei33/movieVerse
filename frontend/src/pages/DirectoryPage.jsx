@@ -7,10 +7,14 @@ import ViewDropdown from "../components/directory/ViewDropdown";
 import { FaListUl } from "react-icons/fa";
 import "../styles/sidebar.css";
 import Sidebar from "../components/Sidebar";
-import { fetchMovies, fetchFilterOptions } from "../services/movieService";
 import usePreviousScrollStore from "../store/usePreviousScrollStore";
+import useMovieStore from "../store/useMovieStore";
 
 const DirectoryPage = () => {
+  const {
+    fetchMovies,
+    fetchFilterOptions
+  } = useMovieStore();
   const [movies, setMovies] = useState([]);
   const [genres, setGenres] = useState([]);
   const [regions, setRegions] = useState([]);

@@ -9,12 +9,13 @@ import UserReviewForm from "../components/directory/UserReviewForm";
 import RatingBarChart from '../components/directory/RatingBarChart';
 import "../styles/movieDetail.css";
 import useRatingStore from "../store/useRatingStore";
-import {
-    fetchMovieById,
-    getCurrentUser,
-} from "../services/movieService";
+import useMovieStore from "../store/useMovieStore";
 
 const MovieDetailPage = () => {
+    const {
+        fetchMovieById,
+        getCurrentUser
+    } = useMovieStore();
     const { state } = useLocation();
     const { movieId } = useParams();
     const navigate = useNavigate();

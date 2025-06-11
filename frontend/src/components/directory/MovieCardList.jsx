@@ -6,16 +6,8 @@ import ReviewStars from "./ReviewStars";
 import { IoTime } from "react-icons/io5";
 import { FaPlay } from "react-icons/fa6";
 import "../../styles/directory/MovieCardList.css";
-import {
-  likeMovie,
-  unlikeMovie,
-  hasUserLikedMovie,
-  fetchMovieLikes,
-  fetchWatchlistStatus,
-  addToWatchlist,
-  removeFromWatchlist
-} from "../../services/movieService";
 import usePreviousScrollStore from "../../store/usePreviousScrollStore";
+import useMovieStore from '../../store/useMovieStore';
 
 const MovieCardList = ({
   movie,
@@ -24,6 +16,15 @@ const MovieCardList = ({
   showCastInfo = false,
   allReviews,
 }) => {
+  const {
+    likeMovie,
+    unlikeMovie,
+    hasUserLikedMovie,
+    fetchMovieLikes,
+    fetchWatchlistStatus,
+    addToWatchlist,
+    removeFromWatchlist
+  } = useMovieStore();
   const navigate = useNavigate();
   const { setPreviousScrollPosition } = usePreviousScrollStore();
   const [liked, setLiked] = useState(movie.liked ?? false);

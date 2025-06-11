@@ -3,16 +3,17 @@ import { useState } from "react";
 import LikeIcon from "./LikeIcon";
 import AddToWatchlistIcon from "./AddToWatchlistIcon";
 import "../../styles/directory/MovieCard.css";
-import {
-  likeMovie,
-  unlikeMovie,
-  addToWatchlist,
-  removeFromWatchlist,
-  fetchMovieLikes
-} from "../../services/movieService";
 import usePreviousScrollStore from "../../store/usePreviousScrollStore";
+import useMovieStore from '../../store/useMovieStore';
 
 const MovieCard = ({ movie, children, allReviews }) => {
+  const {
+    likeMovie,
+    unlikeMovie,
+    addToWatchlist,
+    removeFromWatchlist,
+    fetchMovieLikes
+  } = useMovieStore();
   const { setPreviousScrollPosition } = usePreviousScrollStore();
   const navigate = useNavigate();
   const [liked, setLiked] = useState(movie.liked ?? false);
