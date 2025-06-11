@@ -1,8 +1,9 @@
-import { create } from "zustand";
+import { create } from 'zustand';
 
 const usePreviousScrollStore = create((set) => ({
   previousScrollPosition: 0,
-  setPreviousScrollPosition: (pos) => set({ previousScrollPosition: pos }),
+  setPreviousScrollPosition: (position) => set({ previousScrollPosition: position }),
+  clearScrollPosition: () => set({ previousScrollPosition: 0 }),
 }));
 
 export default usePreviousScrollStore;

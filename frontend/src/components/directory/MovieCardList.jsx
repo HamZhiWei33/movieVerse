@@ -38,7 +38,7 @@ const MovieCardList = ({
 
   const handleCardClick = () => {
     setPreviousScrollPosition(window.scrollY); // save scroll position before navigating
-    navigate(`/directory/${movie._id}`, {
+    navigate(`/movie/${movie._id}`, {
       state: { movie },
     });
   };

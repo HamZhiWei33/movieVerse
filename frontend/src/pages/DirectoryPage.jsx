@@ -28,7 +28,7 @@ const DirectoryPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const { previousScrollPosition } = usePreviousScrollStore();
+  const { previousScrollPosition, clearScrollPosition } = usePreviousScrollStore();
   const navigationType = useNavigationType();
   const location = useLocation();
   const routeHistory = useRef([]);
@@ -73,14 +73,15 @@ const DirectoryPage = () => {
     fetchData();
   }, [selectedGenres, selectedRegions, selectedYears]);
 
-  // Scroll restoration AFTER movies are loaded
   useEffect(() => {
-    if (!loading && movies.length > 0) {
-      // Restore scroll only when data is ready
-      console.log("Scroll");
-      window.scrollTo(0, previousScrollPosition);
-    }
-  }, [navigationType, movies, loading]);
+  if (!loading && movies.length > 0 && previousScrollPosition > 0) {
+    console.log("Restoring scroll to", previousScrollPosition);
+    window.scrollTo(0, previousScrollPosition);
+
+    // Clear the position after restoring to prevent reuse
+    clearScrollPosition();
+  }
+}, [navigationType, movies, loading]);
 
   // Map genre IDs to names for filtering and display
   const genreMap = useMemo(() => {
