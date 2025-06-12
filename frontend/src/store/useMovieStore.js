@@ -14,7 +14,6 @@ const useMovieStore = create((set, get) => ({
     error: null,
     watchlistMap: {},
 
-    // Actions
     fetchMovies: async (page = 1, limit = 100, filters = {}) => {
         set({ loading: true, error: null });
         try {
@@ -69,8 +68,13 @@ const useMovieStore = create((set, get) => ({
         set({ loading: true, error: null });
         try {
             const response = await axiosInstance.get(`/likes/${id}`);
+            const { liked, likeCount } = response.data;
+
             set(state => ({
-                likes: { ...state.likes, [id]: response.data },
+                likes: {
+                    ...state.likes,
+                    [id]: { liked, likeCount }
+                },
                 loading: false
             }));
             return response.data;
@@ -81,31 +85,61 @@ const useMovieStore = create((set, get) => ({
     },
 
     likeMovie: async (movieId) => {
-        set({ loading: true, error: null });
+        const state = get();
+        const previous = state.likes[movieId];
+        // Optimistic update
+        set({
+            likes: {
+                ...state.likes,
+                [movieId]: {
+                    liked: true,
+                    likeCount: (previous?.likeCount || 0) + 1,
+                }
+            }
+        });
+
         try {
             const response = await axiosInstance.post(`/likes/${movieId}`);
-            set(state => ({
-                likes: { ...state.likes, [movieId]: response.data },
-                loading: false
-            }));
             return response.data;
         } catch (error) {
-            set({ error: error.message, loading: false });
+            // Rollback if error
+            set({
+                likes: {
+                    ...state.likes,
+                    [movieId]: previous || { liked: false, likeCount: 0 },
+                },
+                error: error.message
+            });
             throw error;
         }
     },
 
     unlikeMovie: async (movieId) => {
-        set({ loading: true, error: null });
+        const state = get();
+        const previous = state.likes[movieId];
+        // Optimistic update
+        set({
+            likes: {
+                ...state.likes,
+                [movieId]: {
+                    liked: false,
+                    likeCount: Math.max((previous?.likeCount || 1) - 1, 0),
+                }
+            }
+        });
+
         try {
             const response = await axiosInstance.delete(`/likes/${movieId}`);
-            set(state => ({
-                likes: { ...state.likes, [movieId]: response.data },
-                loading: false
-            }));
             return response.data;
         } catch (error) {
-            set({ error: error.message, loading: false });
+            // Rollback if error
+            set({
+                likes: {
+                    ...state.likes,
+                    [movieId]: previous || { liked: true, likeCount: 1 },
+                },
+                error: error.message
+            });
             throw error;
         }
     },
@@ -124,16 +158,17 @@ const useMovieStore = create((set, get) => ({
         set({ loading: true, error: null });
         try {
             const response = await axiosInstance.get("/users/watchlist");
-            const watchlistMap = response.data.reduce((map, movie) => {
-                map[movie._id] = true;
-                return map;
-            }, {});
+            const watchlistMap = {};
+            const watchlist = response.data.map(movie => {
+                watchlistMap[movie._id] = true;
+                return movie;
+            });
             set({
-                watchlist: response.data,
+                watchlist,
                 watchlistMap,
                 loading: false
             });
-            return response.data;
+            return watchlist;
         } catch (error) {
             set({ error: error.message, loading: false });
             throw error;
@@ -141,38 +176,58 @@ const useMovieStore = create((set, get) => ({
     },
 
     addToWatchlist: async (movieId) => {
-        set({ loading: true, error: null });
+        const state = get();
+        // Optimistic update
+        const movieStub = { _id: movieId }; // Minimal info to add to array
+        set({
+            watchlist: [...state.watchlist, movieStub],
+            watchlistMap: { ...state.watchlistMap, [movieId]: true }
+        });
+
         try {
             const response = await axiosInstance.post(`/users/watchlist/${movieId}`);
+            // Optionally replace the stub with full data
             set(state => ({
-                watchlist: [...state.watchlist, response.data],
-                watchlistMap: { ...state.watchlistMap, [movieId]: true },
-                loading: false
+                watchlist: state.watchlist.map(movie =>
+                    movie._id === movieId ? response.data : movie
+                )
             }));
             return response.data;
         } catch (error) {
-            set({ error: error.message, loading: false });
+            // Rollback if error
+            const filtered = state.watchlist.filter(movie => movie._id !== movieId);
+            const updatedMap = { ...state.watchlistMap };
+            delete updatedMap[movieId];
+            set({
+                watchlist: filtered,
+                watchlistMap: updatedMap,
+                error: error.message
+            });
             throw error;
         }
     },
 
     removeFromWatchlist: async (movieId) => {
-        set({ loading: true, error: null });
+        const state = get();
+        const previousWatchlist = [...state.watchlist];
+        // Optimistic update
+        set({
+            watchlist: state.watchlist.filter(movie => movie._id !== movieId),
+            watchlistMap: Object.fromEntries(
+                Object.entries(state.watchlistMap).filter(([id]) => id !== movieId)
+            )
+        });
+
         try {
             const response = await axiosInstance.delete(`/users/watchlist/${movieId}`);
-            set(state => {
-                const updatedWatchlist = state.watchlist.filter(movie => movie._id !== movieId);
-                const updatedMap = { ...state.watchlistMap };
-                delete updatedMap[movieId];
-                return {
-                    watchlist: updatedWatchlist,
-                    watchlistMap: updatedMap,
-                    loading: false
-                };
-            });
             return response.data;
         } catch (error) {
-            set({ error: error.message, loading: false });
+            // Rollback if error
+            set({
+                watchlist: previousWatchlist,
+                watchlistMap: { ...state.watchlistMap, [movieId]: true },
+                error: error.message
+            });
             throw error;
         }
     },
@@ -195,10 +250,13 @@ const useMovieStore = create((set, get) => ({
     },
 
     isInWatchlist: (movieId) => {
-        // Check both watchlist array and map for redundancy
         const state = get();
-        return state.watchlist.some(movie => movie._id === movieId) ||
-            !!state.watchlistMap[movieId];
+        return !!state.watchlistMap[movieId]; // Avoids double-checking watchlist array
+    },
+
+    getLikeCount: (movieId) => {
+        const likes = get().likes;
+        return likes[movieId]?.likeCount || 0;
     },
 
     // Utility functions

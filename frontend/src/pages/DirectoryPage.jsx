@@ -15,9 +15,7 @@ const DirectoryPage = () => {
     fetchMovies,
     fetchFilterOptions,
     isLiked,
-    isInWatchlist,
     toggleLike,
-    toggleWatchlist,
   } = useMovieStore();
 
   const [movies, setMovies] = useState([]);
@@ -25,7 +23,6 @@ const DirectoryPage = () => {
   const [regions, setRegions] = useState([]);
   const [years, setYears] = useState([]);
   const [reviews, setReviews] = useState([]);
-
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [selectedRegions, setSelectedRegions] = useState([]);
   const [selectedYears, setSelectedYears] = useState([]);
@@ -242,53 +239,30 @@ const DirectoryPage = () => {
                 <div className="movie-grid">
                   {filteredMovies.map((movie) => (
                     <MovieCard
+                      key={movie._id}
                       movie={movie}
                       liked={isLiked(movie._id)}
-                      addedToWatchlist={isInWatchlist(movie._id)}
-                      onLike={() => {
-                        isLiked(movie._id)
-                          ? unlikeMovie(movie._id)
-                          : likeMovie(movie._id);
-                      }}
-                      onAddToWatchlist={() => {
-                        isInWatchlist(movie._id)
-                          ? removeFromWatchlist(movie._id)
-                          : addToWatchlist(movie._id);
-                      }}
+                      likeCount={movie.likeCount}
+                      onLike={() => toggleLike(movie._id)}
                     />
                   ))}
                 </div>
               ) : (
                 <div className="movie-list">
                   {filteredMovies.map((movie) => {
-                    const genreNames = movie.genre?.map(id => genreMap[id]) || [];
-                    const regionName = regionMap[movie.region] || movie.region;
-
                     return (
                       <MovieCardList
-                        key={movie.id}
-                        movie={{
-                          ...movie,
-                          year: movie.year.toString(),
-                          genre: genreNames,
-                          region: regionName,
-                        }}
+                        key={movie._id}
+                        movie={movie}
+                        genres={movie.genre?.map(id => genreMap[id]) || []} 
                         liked={isLiked(movie._id)}
-                        addedToWatchlist={isInWatchlist(movie._id)}
-                        onLike={() => {
-                          isLiked(movie._id)
-                            ? unlikeMovie(movie._id)
-                            : likeMovie(movie._id);
-                        }}
-                        onAddToWatchlist={() => {
-                          isInWatchlist(movie._id)
-                            ? removeFromWatchlist(movie._id)
-                            : addToWatchlist(movie._id);
-                        }}
+                        likeCount={movie.likeCount}
+                        onLike={() => toggleLike(movie._id)}
                       />
                     );
                   })}
                 </div>
+
               )
             ) : (
               <div className="no-results">

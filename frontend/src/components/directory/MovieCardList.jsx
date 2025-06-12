@@ -11,6 +11,10 @@ import useMovieStore from "../../store/useMovieStore";
 
 const MovieCardList = ({
   movie,
+  liked: initialLiked = false,
+  likeCount: initialLikeCount = 0,
+  watchlisted: initialWatchlisted = false,
+  genres = [],
   showRatingNumber = false,
   showBottomInteractiveIcon = false,
   showCastInfo = false,
@@ -20,9 +24,8 @@ const MovieCardList = ({
     unlikeMovie,
     addToWatchlist,
     removeFromWatchlist,
+    fetchWatchlist,
     fetchMovieLikes,
-    likes,
-    watchlistMap,
   } = useMovieStore();
 
   const navigate = useNavigate();
@@ -31,11 +34,9 @@ const MovieCardList = ({
   const [loadingLike, setLoadingLike] = useState(false);
   const [loadingWatchlist, setLoadingWatchlist] = useState(false);
 
-  // Derive current like state from global store fallback to props
-  const likeData = likes[movie._id] || { count: movie.likeCount ?? 0 };
-  const isLiked = likeData.liked ?? movie.liked ?? false;
-  const likeCount = likeData.count ?? movie.likeCount ?? 0;
-  const isInWatchlist = watchlistMap[movie._id] ?? movie.watchlisted ?? false;
+  const [liked, setLiked] = useState(movie.liked || false);
+  const [likeCount, setLikeCount] = useState(movie.likeCount || 0);
+  const [isInWatchlist, setIsInWatchlist] = useState(movie.watchlisted || false);
 
   const averageRating =
     movie.rating && movie.rating > 0 ? Number(movie.rating.toFixed(1)) : 0;
@@ -43,7 +44,7 @@ const MovieCardList = ({
   const handleCardClick = () => {
     setPreviousScrollPosition(window.scrollY);
     navigate(`/movie/${movie._id}`, {
-      state: { movie },
+      state: { movie: { ...movie, liked, likeCount, watchlisted: isInWatchlist } },
     });
   };
 
@@ -53,8 +54,15 @@ const MovieCardList = ({
 
     setLoadingLike(true);
     try {
-      isLiked ? await unlikeMovie(movie._id) : await likeMovie(movie._id);
-      await fetchMovieLikes(movie._id);
+      if (liked) {
+        await unlikeMovie(movie._id);
+        setLikeCount(prev => prev - 1);
+      } else {
+        await likeMovie(movie._id);
+        setLikeCount(prev => prev + 1);
+      }
+      setLiked(!liked);
+      await fetchMovieLikes(movie._id); // Optionally refresh like data
     } catch (error) {
       console.error("Error updating like:", error);
     } finally {
@@ -68,9 +76,13 @@ const MovieCardList = ({
 
     setLoadingWatchlist(true);
     try {
-      isInWatchlist
-        ? await removeFromWatchlist(movie._id)
-        : await addToWatchlist(movie._id);
+      if (isInWatchlist) {
+        await removeFromWatchlist(movie._id);
+      } else {
+        await addToWatchlist(movie._id);
+      }
+      setIsInWatchlist(!isInWatchlist);
+      await fetchWatchlist();
     } catch (error) {
       console.error("Error updating watchlist:", error);
     } finally {
@@ -102,35 +114,22 @@ const MovieCardList = ({
           showNumber={showRatingNumber}
         />
         <div className="genre-tags">
-          {movie.genre?.map((name, index) => (
-            <span key={index} className="genre-tag">
-              {name}
-            </span>
+          {genres.map((genre, index) => (
+            <span key={index} className="genre-tag">{genre}</span>
           ))}
         </div>
         <div className="duration-and-icons-container">
           <div className="duration-tag">
-            <span className="duration-icon">
-              <IoTime />
-            </span>
+            <span className="duration-icon"><IoTime /></span>
             {movie.duration}
           </div>
           {!showBottomInteractiveIcon && (
-            <div
-              className="iteractive-icon-container"
-              onClick={(e) => e.stopPropagation()}
-            >
+            <div className="iteractive-icon-container" onClick={(e) => e.stopPropagation()}>
               <div className="iteractive-icon" onClick={handleLikeClick}>
-                <LikeIcon liked={isLiked} disabled={loadingLike} />
+                <LikeIcon liked={liked} disabled={loadingLike} />
               </div>
-              <div
-                className="iteractive-icon"
-                onClick={handleAddToWatchlistClick}
-              >
-                <AddToWatchlistIcon
-                  addedToWatchlist={isInWatchlist}
-                  disabled={loadingWatchlist}
-                />
+              <div className="iteractive-icon" onClick={handleAddToWatchlistClick}>
+                <AddToWatchlistIcon addedToWatchlist={isInWatchlist} disabled={loadingWatchlist} />
               </div>
             </div>
           )}
@@ -151,9 +150,7 @@ const MovieCardList = ({
                   {movie.actors.map(
                     (actor, index) =>
                       actor.trim() !== "" && (
-                        <span key={index} className="actor-item">
-                          {actor}
-                        </span>
+                        <span key={index} className="actor-item">{actor}</span>
                       )
                   )}
                 </div>
@@ -165,26 +162,17 @@ const MovieCardList = ({
         <p className="clamp-text">{movie.description}</p>
 
         {showBottomInteractiveIcon && (
-          <div
-            className="bottom-iteractive-icon-container"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="bottom-iteractive-icon-container" onClick={(e) => e.stopPropagation()}>
             <button className="main-button" onClick={handlePlayTrailerClick}>
               <FaPlay className="play-icon" />
               Watch Trailer
             </button>
             <div className="iteractive-icon" onClick={handleLikeClick}>
-              <LikeIcon liked={isLiked} disabled={loadingLike} />
+              <LikeIcon liked={liked} disabled={loadingLike} />
               <span className="like-count">{likeCount}</span>
             </div>
-            <div
-              className="iteractive-icon"
-              onClick={handleAddToWatchlistClick}
-            >
-              <AddToWatchlistIcon
-                addedToWatchlist={isInWatchlist}
-                disabled={loadingWatchlist}
-              />
+            <div className="iteractive-icon" onClick={handleAddToWatchlistClick}>
+              <AddToWatchlistIcon addedToWatchlist={isInWatchlist} disabled={loadingWatchlist} />
             </div>
           </div>
         )}

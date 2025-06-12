@@ -12,51 +12,59 @@ const MovieCard = ({ movie, children }) => {
     unlikeMovie,
     addToWatchlist,
     removeFromWatchlist,
-    fetchMovieLikes,
-    likes,
-    watchlistMap
   } = useMovieStore();
+
   const { setPreviousScrollPosition } = usePreviousScrollStore();
   const navigate = useNavigate();
 
-  const [loading, setLoading] = useState(false);
-  const [watchlistLoading, setWatchlistLoading] = useState(false);
-  const likeData = likes[movie._id] || { count: movie.likeCount ?? 0 };
-  const isLiked = likeData.liked ?? movie.liked ?? false;
-  const likeCount = likeData.count ?? movie.likeCount ?? 0;
-  const isInWatchlist = watchlistMap[movie._id] ?? movie.watchlisted ?? false;
+  const [loadingLike, setLoadingLike] = useState(false);
+  const [loadingWatchlist, setLoadingWatchlist] = useState(false);
+  const [liked, setLiked] = useState(movie.liked || false);
+  const [likeCount, setLikeCount] = useState(movie.likeCount || 0);
+  const [isInWatchlist, setIsInWatchlist] = useState(movie.watchlisted || false);
 
   const handleCardClick = () => {
     setPreviousScrollPosition(window.scrollY);
-    navigate(`/movie/${movie._id}`, { state: { movie } });
+    navigate(`/movie/${movie._id}`); // No need to pass full state
   };
 
   const handleLikeClick = async (e) => {
     e.stopPropagation();
-    if (loading) return;
-    setLoading(true);
+    if (loadingLike) return;
+
+    setLoadingLike(true);
     try {
-      isLiked ? await unlikeMovie(movie._id) : await likeMovie(movie._id);
-      await fetchMovieLikes(movie._id);
+      if (liked) {
+        await unlikeMovie(movie._id);
+        setLikeCount(prev => prev - 1);
+      } else {
+        await likeMovie(movie._id);
+        setLikeCount(prev => prev + 1);
+      }
+      setLiked(!liked);
     } catch (error) {
       console.error("Error updating like:", error);
     } finally {
-      setLoading(false);
+      setLoadingLike(false);
     }
   };
 
-  const handleWatchlistClick = async (e) => {
+  const handleAddToWatchlistClick = async (e) => {
     e.stopPropagation();
-    if (watchlistLoading) return;
-    setWatchlistLoading(true);
+    if (loadingWatchlist) return;
+
+    setLoadingWatchlist(true);
     try {
-      isInWatchlist
-        ? await removeFromWatchlist(movie._id)
-        : await addToWatchlist(movie._id);
+      if (isInWatchlist) {
+        await removeFromWatchlist(movie._id);
+      } else {
+        await addToWatchlist(movie._id);
+      }
+      setIsInWatchlist(!isInWatchlist);
     } catch (error) {
       console.error("Error updating watchlist:", error);
     } finally {
-      setWatchlistLoading(false);
+      setLoadingWatchlist(false);
     }
   };
 
@@ -71,11 +79,11 @@ const MovieCard = ({ movie, children }) => {
             </span>
           </div>
           <div className="bottom-icons" onClick={(e) => e.stopPropagation()}>
-            <LikeIcon liked={isLiked} onClick={handleLikeClick} disabled={loading} />
+            <LikeIcon liked={liked} onClick={handleLikeClick} disabled={loadingLike} />
             <AddToWatchlistIcon
               addedToWatchlist={isInWatchlist}
-              onClick={handleWatchlistClick}
-              disabled={watchlistLoading}
+              onClick={handleAddToWatchlistClick}
+              disabled={loadingWatchlist}
             />
           </div>
         </div>
