@@ -16,12 +16,20 @@ export const useAuthStore = create((set, get) => ({
 
   checkAuth: async () => {
     set({ isCheckingAuth: true });
+
+    const token = localStorage.getItem("token");
+    if (token) {
+      axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    }
+    
     try {
       const res = await axiosInstance.get("/auth/check");
       set({ authUser: res.data, isCheckingAuth: false });
       // get().connectSocket();
     } catch (error) {
       console.error("Error in checking auth:", error);
+      localStorage.removeItem("token");
+      delete axiosInstance.defaults.headers.common["Authorization"];
       set({ authUser: null, isCheckingAuth: false });
     } finally {
       set({ isCheckingAuth: false });
@@ -38,6 +46,9 @@ export const useAuthStore = create((set, get) => ({
         password: data.password,
       });
       console.log("Signup response:", res.data);
+      const { token } = res.data;
+      localStorage.setItem("token", token);
+      axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       set({ authUser: res.data });
       toast.success("Signup successful!");
       //   get().connectSocket();
@@ -60,6 +71,11 @@ export const useAuthStore = create((set, get) => ({
       });
 
       console.log("Login response:", res.data);
+
+      const { token } = res.data;
+      localStorage.setItem("token", token);
+      axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
       set({ authUser: res.data });
       toast.success("Login successful!");
       // get().connectSocket(); // connect to socket after successful login
@@ -94,6 +110,10 @@ export const useAuthStore = create((set, get) => ({
   logout: async () => {
     try {
       await axiosInstance.post("/auth/logout");
+
+      localStorage.removeItem("token");
+      delete axiosInstance.defaults.headers.common["Authorization"];
+
       set({ authUser: null });
       toast.success("Logged out successfully");
       get().disconnectSocket();

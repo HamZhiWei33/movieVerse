@@ -1,14 +1,15 @@
-import moongose from "mongoose";
-const watchlistSchema = new moongose.Schema(
+import mongoose from "mongoose";
+const watchlistSchema = new mongoose.Schema(
   {
     userId: {
-      type: moongose.Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
+      unique: true, // one watchlist per user
     },
     movies: [
       {
-        type: moongose.Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "Movie",
         required: true,
       },
@@ -16,3 +17,6 @@ const watchlistSchema = new moongose.Schema(
   },
   { timestamps: true }
 );
+
+const Watchlist = mongoose.model("Watchlist", watchlistSchema);
+export default Watchlist;
