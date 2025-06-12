@@ -1,7 +1,7 @@
 import MovieCard from "../components/directory/MovieCard";
 import MovieCardList from "../components/directory/MovieCardList";
-import { useEffect, useState, useMemo, useRef } from "react";
-import { useNavigationType, useSearchParams, useLocation } from "react-router-dom";
+import { useEffect, useState, useMemo } from "react";
+import { useNavigationType, useSearchParams } from "react-router-dom";
 import "../styles/directory.css";
 import ViewDropdown from "../components/directory/ViewDropdown";
 import { FaListUl } from "react-icons/fa";
@@ -13,8 +13,13 @@ import useMovieStore from "../store/useMovieStore";
 const DirectoryPage = () => {
   const {
     fetchMovies,
-    fetchFilterOptions
+    fetchFilterOptions,
+    isLiked,
+    isInWatchlist,
+    toggleLike,
+    toggleWatchlist,
   } = useMovieStore();
+
   const [movies, setMovies] = useState([]);
   const [genres, setGenres] = useState([]);
   const [regions, setRegions] = useState([]);
@@ -24,8 +29,6 @@ const DirectoryPage = () => {
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [selectedRegions, setSelectedRegions] = useState([]);
   const [selectedYears, setSelectedYears] = useState([]);
-  const [likedMovies, setLikedMovies] = useState([]);
-  const [addToWatchlistMovies, setAddToWatchlistMovies] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const initialView = searchParams.get("view") || "grid";
   const [view, setView] = useState(initialView);
@@ -34,8 +37,6 @@ const DirectoryPage = () => {
 
   const { previousScrollPosition, clearScrollPosition } = usePreviousScrollStore();
   const navigationType = useNavigationType();
-  const location = useLocation();
-  const routeHistory = useRef([]);
 
   useEffect(() => {
     searchParams.set("view", view);
@@ -48,7 +49,6 @@ const DirectoryPage = () => {
       setError(null);
 
       try {
-        // Fetch filters separately ONCE
         if (genres.length === 0 || regions.length === 0 || years.length === 0) {
           const filterOptions = await fetchFilterOptions();
           setGenres(filterOptions.genres);
@@ -56,15 +56,13 @@ const DirectoryPage = () => {
           setYears(filterOptions.years);
         }
 
-        // Send filters to backend
         const filters = {
           genres: selectedGenres.join(','),
           regions: selectedRegions.join(','),
           years: selectedYears.join(',')
         };
 
-        // Fetch all movies at once (remove pagination parameters)
-        const response = await fetchMovies(1, 1000, filters); // Large limit to get all movies
+        const response = await fetchMovies(1, 1000, filters);
         setMovies(response.data);
       } catch (err) {
         console.error("Failed to fetch data:", err);
@@ -78,16 +76,12 @@ const DirectoryPage = () => {
   }, [selectedGenres, selectedRegions, selectedYears]);
 
   useEffect(() => {
-  if (!loading && movies.length > 0 && previousScrollPosition > 0) {
-    console.log("Restoring scroll to", previousScrollPosition);
-    window.scrollTo(0, previousScrollPosition);
+    if (!loading && movies.length > 0 && previousScrollPosition > 0) {
+      window.scrollTo(0, previousScrollPosition);
+      clearScrollPosition();
+    }
+  }, [navigationType, movies, loading]);
 
-    // Clear the position after restoring to prevent reuse
-    clearScrollPosition();
-  }
-}, [navigationType, movies, loading]);
-
-  // Map genre IDs to names for filtering and display
   const genreMap = useMemo(() => {
     return genres.reduce((map, genre) => {
       map[genre.id] = genre.name;
@@ -95,7 +89,6 @@ const DirectoryPage = () => {
     }, {});
   }, [genres]);
 
-  // Map region codes to names for filtering and display
   const regionMap = useMemo(() => {
     return regions.reduce((map, region) => {
       map[region.code] = region.name;
@@ -109,36 +102,25 @@ const DirectoryPage = () => {
     );
   };
 
-  const toggleLike = (id) => {
-    setLikedMovies((prev) =>
-      prev.includes(id) ? prev.filter((t) => t !== id) : [...prev, id]
-    );
-  };
-
-  const toggleAddToWatchlist = (id) => {
-    setAddToWatchlistMovies((prev) =>
-      prev.includes(id) ? prev.filter((t) => t !== id) : [...prev, id]
-    );
-  };
-
-  // Filter movies by selected filters
   const filteredMovies = useMemo(() => {
-    return movies.filter((movie) => {
-      const genreName = movie.genre.map((id) => genreMap[id]);
-      const regionName = regionMap[movie.region];
+    return movies
+      .filter((movie) => {
+        const genreName = movie.genre.map((id) => genreMap[id]);
+        const regionName = regionMap[movie.region];
 
-      const genreMatch =
-        selectedGenres.length === 0 ||
-        selectedGenres.some((g) => genreName.includes(g));
-      const regionMatch =
-        selectedRegions.length === 0 ||
-        selectedRegions.includes(movie.region);
-      const yearMatch =
-        selectedYears.length === 0 ||
-        selectedYears.some(year => year.toString() === movie.year.toString());
+        const genreMatch =
+          selectedGenres.length === 0 ||
+          selectedGenres.some((g) => genreName.includes(g));
+        const regionMatch =
+          selectedRegions.length === 0 ||
+          selectedRegions.includes(movie.region);
+        const yearMatch =
+          selectedYears.length === 0 ||
+          selectedYears.some(year => year.toString() === movie.year.toString());
 
-      return genreMatch && regionMatch && yearMatch;
-    }).sort((a, b) => b.year - a.year); // Sort by year (descending)
+        return genreMatch && regionMatch && yearMatch;
+      })
+      .sort((a, b) => b.year - a.year);
   }, [movies, selectedGenres, selectedRegions, selectedYears, genreMap]);
 
   const renderButtons = (items, selected, setSelected) => (
@@ -146,7 +128,6 @@ const DirectoryPage = () => {
       {items.map((item, index) => {
         const label = item.label || item;
         const value = item.value || item;
-
         return (
           <button
             key={index}
@@ -162,21 +143,17 @@ const DirectoryPage = () => {
   );
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const toggleSidebar = () => {
-    setIsSidebarOpen((prev) => !prev);
-  };
+  const toggleSidebar = () => setIsSidebarOpen(prev => !prev);
 
   return (
     <main className="directory-page">
       <div id="toggle-sidebar-container">
         <button onClick={toggleSidebar}>
-          <span>
-            <FaListUl id="sidebar-icon" />
-          </span>
+          <span><FaListUl id="sidebar-icon" /></span>
         </button>
       </div>
+
       <div className="layout-container">
-        {/* Sidebar with toggle functionality */}
         <div className={`sidebar-container ${isSidebarOpen ? "open" : "closed"}`}>
           <Sidebar
             sections={[
@@ -204,16 +181,17 @@ const DirectoryPage = () => {
             ]}
           />
         </div>
-        {/* Overlay to close sidebar */}
+
         {isSidebarOpen && (
           <div className="sidebar-overlay" onClick={toggleSidebar} aria-hidden="true"></div>
         )}
-        {/* Main content area */}
+
         <div className="content-area">
           <div className="top-bar">
             <div className="directory-header">
               <h2>Directory</h2>
             </div>
+
             <section className="filters">
               <section id="genre">
                 <fieldset>
@@ -238,14 +216,11 @@ const DirectoryPage = () => {
 
               <ViewDropdown view={view} setView={setView} />
             </section>
+
             {(selectedGenres.length > 0 || selectedRegions.length > 0 || selectedYears.length > 0) && (
               <div className="clear-filters-container">
                 <button
-                  className={`clear-filters-button ${
-                    selectedGenres.length || selectedRegions.length || selectedYears.length
-                      ? "active"
-                      : ""
-                  }`}
+                  className="clear-filters-button active"
                   onClick={() => {
                     setSelectedGenres([]);
                     setSelectedRegions([]);
@@ -261,26 +236,25 @@ const DirectoryPage = () => {
 
           <section className={`movie-container ${view}`}>
             {loading ? (
-              <div className="loading-message">
-                <p>Loading movies...</p>
-              </div>
+              <div className="loading-message"><p>Loading movies...</p></div>
             ) : filteredMovies.length > 0 ? (
               view === "grid" ? (
                 <div className="movie-grid">
                   {filteredMovies.map((movie) => (
                     <MovieCard
-                      key={movie.id}
-                      movie={{
-                        ...movie,
-                        genre: movie.genre?.map(id => genreMap[id]) || [],
-                        year: movie.year.toString(),
+                      movie={movie}
+                      liked={isLiked(movie._id)}
+                      addedToWatchlist={isInWatchlist(movie._id)}
+                      onLike={() => {
+                        isLiked(movie._id)
+                          ? unlikeMovie(movie._id)
+                          : likeMovie(movie._id);
                       }}
-                      liked={likedMovies.includes(movie.id)}
-                      likeCount={movie.likeCount || 0}
-                      addedToWatchlist={addToWatchlistMovies.includes(movie.id)}
-                      onLike={() => toggleLike(movie.id)}
-                      onAddToWatchlist={() => toggleAddToWatchlist(movie.id)}
-                      allReviews={reviews}
+                      onAddToWatchlist={() => {
+                        isInWatchlist(movie._id)
+                          ? removeFromWatchlist(movie._id)
+                          : addToWatchlist(movie._id);
+                      }}
                     />
                   ))}
                 </div>
@@ -290,25 +264,27 @@ const DirectoryPage = () => {
                     const genreNames = movie.genre?.map(id => genreMap[id]) || [];
                     const regionName = regionMap[movie.region] || movie.region;
 
-                    const transformedMovie = {
-                      ...movie,
-                      year: movie.year.toString(),
-                      genre: genreNames,
-                      region: regionName,
-                      director: movie.director,
-                      actors: movie.actors,
-                    };
-
                     return (
                       <MovieCardList
-                        key={movie.id || movie._id}
-                        movie={transformedMovie}
-                        liked={likedMovies.includes(movie.id || movie._id)}
-                        likeCount={movie.likeCount || 0}
-                        addedToWatchlist={addToWatchlistMovies.includes(movie.id || movie._id)}
-                        onLike={() => toggleLike(movie.id || movie._id)}
-                        onAddToWatchlist={() => toggleAddToWatchlist(movie.id || movie._id)}
-                        allReviews={reviews}
+                        key={movie.id}
+                        movie={{
+                          ...movie,
+                          year: movie.year.toString(),
+                          genre: genreNames,
+                          region: regionName,
+                        }}
+                        liked={isLiked(movie._id)}
+                        addedToWatchlist={isInWatchlist(movie._id)}
+                        onLike={() => {
+                          isLiked(movie._id)
+                            ? unlikeMovie(movie._id)
+                            : likeMovie(movie._id);
+                        }}
+                        onAddToWatchlist={() => {
+                          isInWatchlist(movie._id)
+                            ? removeFromWatchlist(movie._id)
+                            : addToWatchlist(movie._id);
+                        }}
                       />
                     );
                   })}
