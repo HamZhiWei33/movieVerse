@@ -16,10 +16,13 @@ const DirectoryPage = () => {
     fetchFilterOptions,
     isLiked,
     toggleLike,
+    loadMoreMovies,
+    hasMore,
+    isFetchingMore,
+    getState
   } = useMovieStore();
 
-  const [movies, setMovies] = useState([]);
-  const [genres, setGenres] = useState([]);
+  const movies = useMovieStore(state => state.movies); const [genres, setGenres] = useState([]);
   const [regions, setRegions] = useState([]);
   const [years, setYears] = useState([]);
   const [reviews, setReviews] = useState([]);
@@ -35,6 +38,8 @@ const DirectoryPage = () => {
   const { previousScrollPosition, clearScrollPosition } = usePreviousScrollStore();
   const navigationType = useNavigationType();
 
+  const [loadMoreRef, setLoadMoreRef] = useState(null);
+
   useEffect(() => {
     searchParams.set("view", view);
     setSearchParams(searchParams);
@@ -46,21 +51,23 @@ const DirectoryPage = () => {
       setError(null);
 
       try {
-        if (genres.length === 0 || regions.length === 0 || years.length === 0) {
+        // First load filter options if needed
+        const needsFilterOptions = genres.length === 0 || regions.length === 0 || years.length === 0;
+        if (needsFilterOptions) {
           const filterOptions = await fetchFilterOptions();
-          setGenres(filterOptions.genres);
-          setRegions(filterOptions.regions);
-          setYears(filterOptions.years);
+          setGenres(filterOptions.genres || []);
+          setRegions(filterOptions.regions || []);
+          setYears(filterOptions.years || []);
         }
 
+        // Then load movies with current filters
         const filters = {
           genres: selectedGenres.join(','),
           regions: selectedRegions.join(','),
           years: selectedYears.join(',')
         };
 
-        const response = await fetchMovies(1, 1000, filters);
-        setMovies(response.data);
+        await fetchMovies(1, 20, filters); // Reduced initial load to 20 for better UX
       } catch (err) {
         console.error("Failed to fetch data:", err);
         setError("Failed to load data. Please try again later.");
@@ -71,6 +78,65 @@ const DirectoryPage = () => {
 
     fetchData();
   }, [selectedGenres, selectedRegions, selectedYears]);
+
+  // Set up intersection observer for lazy loading
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      async ([entry]) => {
+        if (entry.isIntersecting && !isFetchingMore && hasMore) {
+          console.log('Loading more movies...');
+          try {
+            await loadMoreMovies();
+          } catch (error) {
+            console.error('Error loading more movies:', error);
+          }
+        }
+      },
+      {
+        threshold: 0.1,
+        rootMargin: '400px'
+      }
+    );
+
+    if (loadMoreRef) {
+      observer.observe(loadMoreRef);
+    }
+
+    return () => {
+      if (loadMoreRef) {
+        observer.unobserve(loadMoreRef);
+      }
+    };
+  }, [loadMoreRef, hasMore, isFetchingMore, loadMoreMovies]);
+
+  // Add debug effect
+  useEffect(() => {
+    console.log('Movie state updated:', {
+      count: movies.length,
+      page: getState().currentPage,
+      hasMore,
+      loading,
+      isFetchingMore
+    });
+  }, [movies, hasMore, loading, isFetchingMore]);
+
+  // Deduplicate movies when filters change
+  useEffect(() => {
+    const uniqueMovies = movies.reduce((acc, movie) => {
+      const existing = acc.find(m =>
+        m._id === movie._id ||
+        (m.tmdbId && movie.tmdbId && m.tmdbId === movie.tmdbId)
+      );
+      if (!existing) {
+        acc.push(movie);
+      }
+      return acc;
+    }, []);
+
+    if (uniqueMovies.length !== movies.length) {
+      useMovieStore.setState({ movies: uniqueMovies });
+    }
+  }, [movies, selectedGenres, selectedRegions, selectedYears]);
 
   useEffect(() => {
     if (!loading && movies.length > 0 && previousScrollPosition > 0) {
@@ -99,25 +165,37 @@ const DirectoryPage = () => {
     );
   };
 
+  // In your filteredMovies useMemo:
   const filteredMovies = useMemo(() => {
-    return movies
-      .filter((movie) => {
-        const genreName = movie.genre.map((id) => genreMap[id]);
-        const regionName = regionMap[movie.region];
+    if (!movies || movies.length === 0) return [];
 
-        const genreMatch =
-          selectedGenres.length === 0 ||
-          selectedGenres.some((g) => genreName.includes(g));
-        const regionMatch =
-          selectedRegions.length === 0 ||
-          selectedRegions.includes(movie.region);
-        const yearMatch =
-          selectedYears.length === 0 ||
-          selectedYears.some(year => year.toString() === movie.year.toString());
+    return movies.filter((movie) => {
+      // First ensure the movie has a trailer
+      if (!movie.trailerUrl) return false;
 
-        return genreMatch && regionMatch && yearMatch;
-      })
-      .sort((a, b) => b.year - a.year);
+      // Then apply other filters
+      if (selectedGenres.length === 0 &&
+          selectedRegions.length === 0 &&
+          selectedYears.length === 0) {
+        return true;
+      }
+
+      const genreMatch = selectedGenres.length === 0 ||
+        (movie.genre && movie.genre.some(id => {
+          const genreName = genreMap[id];
+          return genreName && selectedGenres.includes(genreName);
+        }));
+
+      const regionMatch = selectedRegions.length === 0 ||
+        (movie.region && selectedRegions.includes(movie.region));
+
+      const yearMatch = selectedYears.length === 0 ||
+        (movie.year != null && selectedYears.some(selectedYear =>
+          selectedYear.toString() === movie.year.toString()
+        ));
+
+      return genreMatch && regionMatch && yearMatch;
+    });
   }, [movies, selectedGenres, selectedRegions, selectedYears, genreMap]);
 
   const renderButtons = (items, selected, setSelected) => (
@@ -236,37 +314,70 @@ const DirectoryPage = () => {
               <div className="loading-message"><p>Loading movies...</p></div>
             ) : filteredMovies.length > 0 ? (
               view === "grid" ? (
-                <div className="movie-grid">
-                  {filteredMovies.map((movie) => (
-                    <MovieCard
-                      key={movie._id}
-                      movie={movie}
-                      liked={isLiked(movie._id)}
-                      likeCount={movie.likeCount}
-                      onLike={() => toggleLike(movie._id)}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="movie-list">
-                  {filteredMovies.map((movie) => {
-                    return (
-                      <MovieCardList
-                        key={movie._id}
+                <>
+                  <div className="movie-grid">
+                    {filteredMovies.map((movie) => (
+                      <MovieCard
+                        key={`${movie._id}-${movie.tmdbId || ''}`}
                         movie={movie}
-                        genres={movie.genre?.map(id => genreMap[id]) || []} 
                         liked={isLiked(movie._id)}
                         likeCount={movie.likeCount}
                         onLike={() => toggleLike(movie._id)}
                       />
-                    );
-                  })}
-                </div>
-
+                    ))}
+                  </div>
+                  <div ref={setLoadMoreRef} className="load-more-trigger">
+                    {isFetchingMore && <p>Loading more movies...</p>}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="movie-list">
+                    {filteredMovies.map((movie) => (
+                      <MovieCardList
+                        key={`${movie._id}-${movie.tmdbId || ''}`}
+                        movie={movie}
+                        genres={movie.genre?.map(id => genreMap[id]) || []}
+                        liked={isLiked(movie._id)}
+                        likeCount={movie.likeCount}
+                        onLike={() => toggleLike(movie._id)}
+                      />
+                    ))}
+                  </div>
+                  <div
+                    ref={setLoadMoreRef}
+                    className="load-more-trigger"
+                    style={{
+                      minHeight: '20px',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      padding: '20px'
+                    }}
+                  >
+                    {isFetchingMore ? (
+                      <div className="loading-spinner">Loading more movies...</div>
+                    ) : hasMore ? (
+                      <button onClick={loadMoreMovies}>Load More</button>
+                    ) : (
+                      <p>No more movies to load</p>
+                    )}
+                  </div>
+                </>
               )
             ) : (
               <div className="no-results">
                 <p>No movies match your filters.</p>
+                <button
+                  className="clear-filters-button"
+                  onClick={() => {
+                    setSelectedGenres([]);
+                    setSelectedRegions([]);
+                    setSelectedYears([]);
+                  }}
+                >
+                  Clear all filters
+                </button>
               </div>
             )}
           </section>

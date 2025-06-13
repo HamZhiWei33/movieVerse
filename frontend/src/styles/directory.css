@@ -371,3 +371,17 @@ legend {
 .pagination-controls span {
   font-weight: bold;
 }
+
+.load-more-trigger {
+  width: 100%;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 0;
+}
+
+.load-more-trigger p {
+  color: #666;
+  font-style: italic;
+}

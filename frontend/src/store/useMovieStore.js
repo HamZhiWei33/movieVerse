@@ -13,18 +13,106 @@ const useMovieStore = create((set, get) => ({
     loading: false,
     error: null,
     watchlistMap: {},
+    currentPage: 1,
+    hasMore: true,
+    isFetchingMore: false,
 
-    fetchMovies: async (page = 1, limit = 100, filters = {}) => {
+    getState: () => get(),
+
+    // In your useMovieStore.js
+    lastUsedFilters: {},
+
+    // Add this new method to your store
+    fetchMoviesFromTMDB: async (page = 1, limit = 20) => {
         set({ loading: true, error: null });
         try {
-            const response = await axiosInstance.get("/movies", {
-                params: { page, limit, ...filters },
+            const response = await axiosInstance.get("/movies/tmdb", {
+                params: { page, limit }
             });
-            set({ movies: response.data.data || response.data, loading: false });
-            return response.data;
+
+            const newMovies = response.data.data;
+            const hasMore = true; // TMDB has virtually infinite movies
+
+            return {
+                movies: newMovies,
+                hasMore,
+                currentPage: page
+            };
         } catch (error) {
             set({ error: error.message, loading: false });
             throw error;
+        }
+    },
+
+    fetchMovies: async (page = 1, limit = 20, filters = {}, append = false) => {
+        if (get().isFetchingMore) return;
+
+        set({
+            loading: page === 1,
+            isFetchingMore: page > 1,
+            error: null,
+            lastUsedFilters: filters
+        });
+
+        try {
+            const response = await axiosInstance.get("/movies", {
+                params: {
+                    page,
+                    limit,
+                    ...filters,
+                    fallback: 'true' // Enable TMDB fallback
+                },
+            });
+
+            const newMovies = response.data.data;
+
+            // Deduplicate movies by _id and tmdbId
+            const uniqueMovies = newMovies.reduce((acc, movie) => {
+                const existing = acc.find(m =>
+                    m._id === movie._id ||
+                    (m.tmdbId && movie.tmdbId && m.tmdbId === movie.tmdbId)
+                );
+                if (!existing) {
+                    acc.push(movie);
+                }
+                return acc;
+            }, append ? [...get().movies] : []);
+
+            const hasMore = response.data.pagination?.hasMore ?? true; // Default to true for TMDB fallback
+
+            set({
+                movies: uniqueMovies,
+                currentPage: page,
+                hasMore,
+                loading: false,
+                isFetchingMore: false
+            });
+
+            return { data: uniqueMovies };
+        } catch (error) {
+            set({
+                error: error.message,
+                loading: false,
+                isFetchingMore: false
+            });
+            throw error;
+        }
+    },
+
+    loadMoreMovies: async () => {
+        const state = get();
+        if (state.isFetchingMore || !state.hasMore) return;
+
+        try {
+            await state.fetchMovies(
+                state.currentPage + 1,
+                20, // Smaller batch size for better UX
+                state.lastUsedFilters,
+                true
+            );
+        } catch (error) {
+            console.error('Load more error:', error);
+            // Optionally retry or show error to user
         }
     },
 
