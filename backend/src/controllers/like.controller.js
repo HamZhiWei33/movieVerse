@@ -1,5 +1,6 @@
 import Like from "../models/like.model.js";
 import User from "../models/user.model.js";
+import mongoose from 'mongoose';
 
 export const likeMovie = async (req, res) => {
   const userId = req.user?.id;
@@ -63,6 +64,11 @@ export const getLikesForMovie = async (req, res) => {
 
   if (!movieId) {
     return res.status(400).json({ error: "Movie ID is required." });
+  }
+
+  // Validate ObjectId format
+  if (!mongoose.Types.ObjectId.isValid(movieId)) {
+    return res.status(400).json({ error: "Invalid movie ID format." });
   }
 
   try {

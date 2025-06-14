@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import { IoAdd } from "react-icons/io5";
 import { IoIosArrowBack } from "react-icons/io";
@@ -14,7 +14,10 @@ import useMovieStore from "../store/useMovieStore";
 const MovieDetailPage = () => {
     const {
         fetchMovieById,
-        getCurrentUser
+        getCurrentUser,
+        isLiked,
+        toggleLike,
+        fetchFilterOptions // Add this to your useMovieStore imports
     } = useMovieStore();
     const { state } = useLocation();
     const { movieId } = useParams();
@@ -24,6 +27,7 @@ const MovieDetailPage = () => {
     const [currentUser, setCurrentUser] = useState(null);
     const [loading, setLoading] = useState(!state?.movie);
     const [error, setError] = useState(null);
+    const [genres, setGenres] = useState([]); // This will store all available genres
 
     const [currentPage, setCurrentPage] = useState(0);
     const reviewsPerPage = 4;
@@ -45,16 +49,39 @@ const MovieDetailPage = () => {
     const movieReviews = reviewsByMovie[movieId] || [];
     const existingReview = userReview[movieId] || null;
 
+    // Create genre map from all available genres
+    const genreMap = useMemo(() => {
+        return genres.reduce((map, genre) => {
+            map[genre.id] = genre.name;
+            return map;
+        }, {});
+    }, [genres]);
+
+    // Get genre names for the current movie
+    const movieGenreNames = useMemo(() => {
+        if (!movie?.genre) return [];
+
+        return Array.isArray(movie.genre) ? movie.genre : [];
+    }, [movie]);
+
     useEffect(() => {
         const loadData = async () => {
             try {
+                setLoading(true);
+
+                // Fetch all available genres first
+                const filterOptions = await fetchFilterOptions();
+                console.log("Fetched genres:", filterOptions.genres);
+                setGenres(filterOptions.genres || []);
+
                 const userData = await getCurrentUser();
                 setCurrentUser(userData);
                 setUser(userData);
 
                 if (!movie) {
-                    setLoading(true);
                     const movieData = await fetchMovieById(movieId);
+                    console.log("Fetched movie:", movieData); // Add this
+                    console.log("Movie genres:", movieData.genre); // Add this
                     setMovie(movieData);
                     setMovieData(movieData);
                 } else {
@@ -78,14 +105,6 @@ const MovieDetailPage = () => {
             setCurrentPage(0);
         };
     }, [movieId]);
-
-    const location = useLocation();
-    const routeHistory = useRef([]);
-
-    useEffect(() => {
-        routeHistory.current.push(location.pathname);
-        console.log("Route stack:", routeHistory.current);
-    }, [location]);
 
     const handleBack = () => {
         navigate(-1, { state: { scrollPosition: window.scrollY } });
@@ -132,13 +151,19 @@ const MovieDetailPage = () => {
 
             <div className="detail-content-container">
                 <MovieCardList
-                    movie={{
-                        ...movie,
-                        reviewCount: movieReviews.length,
-                        likeCount: movie.likeCount,
-                        liked: movie.liked,
-                        watchlisted: movie.watchlisted
-                    }}
+                    // movie={{
+                    //     ...movie,
+                    //     reviewCount: movieReviews.length,
+                    //     likeCount: movie.likeCount,
+                    //     liked: movie.liked,
+                    //     watchlisted: movie.watchlisted
+                    // }}
+                    key={movie._id}
+                    movie={movie}
+                    genres={movieGenreNames}
+                    liked={isLiked(movie._id)}
+                    likeCount={movie.likeCount}
+                    onLike={() => toggleLike(movie._id)}
                     showRatingNumber={true}
                     showBottomInteractiveIcon={true}
                     showCastInfo={true}
