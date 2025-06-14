@@ -1,43 +1,72 @@
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import LikeIcon from "./LikeIcon";
 import AddToWatchlistIcon from "./AddToWatchlistIcon";
 import "../../styles/directory/MovieCard.css";
+import usePreviousScrollStore from "../../store/usePreviousScrollStore";
+import useMovieStore from '../../store/useMovieStore';
 
-const MovieCard = ({
-  movie,
-  liked,
-  addedToWatchlist,
-  onLike,
-  onAddToWatchlist,
-  children,
-  allReviews,
-}) => {
+const MovieCard = ({ movie, children, allReviews }) => {
+  const {
+    likeMovie,
+    unlikeMovie,
+    addToWatchlist,
+    removeFromWatchlist,
+    fetchMovieLikes
+  } = useMovieStore();
+  const { setPreviousScrollPosition } = usePreviousScrollStore();
   const navigate = useNavigate();
+  const [liked, setLiked] = useState(movie.liked ?? false);
+  const [likeCount, setLikeCount] = useState(movie.likeCount ?? 0);
+  const [watchlisted, setWatchlisted] = useState(movie.watchlisted ?? false);
+  const [loading, setLoading] = useState(false);
+  const [watchlistLoading, setWatchlistLoading] = useState(false);
 
   const handleCardClick = () => {
-    navigate(`/movie/${encodeURIComponent(movie.title)}`, {
-      state: { movieData: movie },
+    setPreviousScrollPosition(window.scrollY); // save scroll position before navigating
+    navigate(`/movie/${movie._id}`, {
+      state: { movie },
     });
   };
 
-  const handleLikeClick = (e) => {
+  const handleLikeClick = async (e) => {
     e.stopPropagation();
-    onLike();
+    if (loading) return;
+
+    setLoading(true);
+    try {
+      if (liked) {
+        await unlikeMovie(movie._id);
+      } else {
+        await likeMovie(movie._id);
+      }
+      const likesData = await fetchMovieLikes(movie._id);
+      setLikeCount(likesData.count ?? 0);
+      setLiked(!liked);
+    } catch (error) {
+      console.error("Error updating like:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleAddToWatchlistClick = (e) => {
+  const handleWatchlistClick = async (e) => {
     e.stopPropagation();
-    onAddToWatchlist();
-  };
+    if (watchlistLoading) return;
 
-  // Calculate average rating
-  const calculateAverageRating = () => {
-    const movieReviews = (allReviews ?? []).filter(
-      (review) => review.movieId === movie.id
-    );
-    if (movieReviews.length === 0) return 0;
-    const sum = movieReviews.reduce((acc, review) => acc + review.rating, 0);
-    return (sum / movieReviews.length).toFixed(1);
+    setWatchlistLoading(true);
+    try {
+      if (watchlisted) {
+        await removeFromWatchlist(movie._id);
+      } else {
+        await addToWatchlist(movie._id);
+      }
+      setWatchlisted(!watchlisted);
+    } catch (error) {
+      console.error("Error updating watchlist:", error);
+    } finally {
+      setWatchlistLoading(false);
+    }
   };
 
   return (
@@ -54,19 +83,22 @@ const MovieCard = ({
         />
         <div className="hover-overlay">
           <div className="top-right">
-            <span className="rating">{calculateAverageRating()}</span>
+            <span className="rating">{movie.rating && movie.rating > 0
+              ? movie.rating.toFixed(1)
+              : "0"}</span>
           </div>
           <div className="bottom-icons" onClick={(e) => e.stopPropagation()}>
-            <LikeIcon liked={liked} onClick={handleLikeClick} />
+            <LikeIcon liked={liked} onClick={handleLikeClick} disabled={loading} />
             <AddToWatchlistIcon
-              addedToWatchlist={addedToWatchlist}
-              onClick={handleAddToWatchlistClick}
+              addedToWatchlist={watchlisted}
+              onClick={handleWatchlistClick}
+              disabled={watchlistLoading}
             />
           </div>
         </div>
       </div>
       <p>{movie.title}</p>
-      {children} {/* Render children here */}
+      {children}
     </article>
   );
 };

@@ -62,6 +62,8 @@
   box-orient: vertical;
   /* Standard property (future) */
   padding-left: 0.3rem;
+  text-align: justify;
+  text-justify: inter-word;
 }
 
 .movie-card-list h3 {

@@ -6,15 +6,6 @@ import { FaAngleUp } from "react-icons/fa6";
 
 const Sidebar = ({
   sections,
-  selectedGenres,
-  setSelectedGenres,
-  selectedRegions,
-  setSelectedRegions,
-  selectedYears,
-  setSelectedYears,
-  genres,
-  regions,
-  years,
 }) => {
   const [openSections, setOpenSections] = useState([]);
 
@@ -32,14 +23,14 @@ const Sidebar = ({
 
   const renderFilterItems = (items, selected, setSelected) => (
     <div className="sidebar-filter-group">
-      {items.map((item) => (
-        <label key={item} className="sidebar-filter-item">
+      {items.map(({ label, value }) => (
+        <label key={value} className="sidebar-filter-item">
           <input
             type="checkbox"
-            checked={selected.includes(item)}
-            onChange={() => toggleFilter(item, selected, setSelected)}
+            checked={selected.includes(value)}
+            onChange={() => toggleFilter(value, selected, setSelected)}
           />
-          <span>{item}</span>
+          <span>{label}</span>
         </label>
       ))}
     </div>
@@ -48,7 +39,7 @@ const Sidebar = ({
   return (
     <nav className="sidebar">
       <ul>
-        {sections.map(({ id, title }) => (
+        {sections.map(({ id, title, items, selected, setSelected }) => (
           <li key={id} className="sidebar-section">
             <div
               className="section-title"
@@ -57,8 +48,6 @@ const Sidebar = ({
               tabIndex={0}
             >
               <span className="sidebar-title">{title}</span>
-
-              {"  "}
               {openSections.includes(id) ? (
                 <FaAngleUp className="sidebar-icon" />
               ) : (
@@ -66,20 +55,7 @@ const Sidebar = ({
               )}
             </div>
 
-            {openSections.includes(id) && (
-              <>
-                {id === "genre" &&
-                  renderFilterItems(genres, selectedGenres, setSelectedGenres)}
-                {id === "region" &&
-                  renderFilterItems(
-                    regions,
-                    selectedRegions,
-                    setSelectedRegions
-                  )}
-                {id === "year" &&
-                  renderFilterItems(years, selectedYears, setSelectedYears)}
-              </>
-            )}
+            {openSections.includes(id) && renderFilterItems(items, selected, setSelected)}
           </li>
         ))}
       </ul>

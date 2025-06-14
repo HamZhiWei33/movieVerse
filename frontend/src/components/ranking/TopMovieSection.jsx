@@ -223,7 +223,7 @@ const TopMovieSection = ({ selectedMovie, setSelectedMovie, ratingDistribution, 
           </div>
         </section>
         <section className="rating-visual-summary">
-          <RatingBarChart movieReviews={movieReviews} />
+          <RatingBarChart movieId={selectedMovie?._id} />
         </section>
 
       </section>

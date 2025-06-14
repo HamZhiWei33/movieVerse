@@ -1,28 +1,95 @@
 import Like from "../models/like.model.js";
+import User from "../models/user.model.js";
 
 export const likeMovie = async (req, res) => {
-  const { movieId } = req.body;
+  const userId = req.user?.id;
+  const { movieId } = req.params;
 
-  if (!movieId) {
-    return res.status(400).json({ message: "Movie ID is required" });
+  if (!userId || !movieId) {
+    return res.status(400).json({ error: "User ID and Movie ID are required." });
   }
 
   try {
-    // Check if the movie is already liked by the user
-    const existingLike = await Like.findOne({ userId: req.user._id, movieId });
-
+    // Prevent duplicate Like document
+    const existingLike = await Like.findOne({ userId, movieId });
     if (existingLike) {
-      return res.status(400).json({ message: "Movie already liked" });
+      return res.status(200).json({ liked: true, message: "Movie already liked." });
     }
 
-    const newLike = await Like.create({
-      userId: req.user._id,
-      movieId,
+    // Create like entry
+    await Like.create({ userId, movieId });
+
+    // Add to user's likedMovies if not present
+    await User.findByIdAndUpdate(userId, {
+      $addToSet: { likedMovies: movieId },
     });
 
-    res.status(201).json({ message: "Movie liked", like: newLike });
+    return res.status(201).json({ liked: true, message: "Movie liked." });
   } catch (error) {
-    console.error("Like error:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error("Like movie error:", error);
+    return res.status(500).json({ error: "Failed to like movie." });
+  }
+};
+
+export const unlikeMovie = async (req, res) => {
+  const userId = req.user?.id;
+  const { movieId } = req.params;
+
+  if (!userId || !movieId) {
+    return res.status(400).json({ error: "User ID and Movie ID are required." });
+  }
+
+  try {
+    // Delete Like entry
+    const deleted = await Like.findOneAndDelete({ userId, movieId });
+    if (!deleted) {
+      return res.status(404).json({ liked: false, message: "Like not found." });
+    }
+
+    // Remove movieId from user's likedMovies
+    await User.findByIdAndUpdate(userId, {
+      $pull: { likedMovies: movieId },
+    });
+
+    return res.status(200).json({ liked: false, message: "Movie unliked." });
+  } catch (error) {
+    console.error("Unlike movie error:", error);
+    return res.status(500).json({ error: "Failed to unlike movie." });
+  }
+};
+
+export const getLikesForMovie = async (req, res) => {
+  const { movieId } = req.params;
+
+  if (!movieId) {
+    return res.status(400).json({ error: "Movie ID is required." });
+  }
+
+  try {
+    const likes = await Like.find({ movieId });
+    return res.status(200).json({ count: likes.length, likes });
+  } catch (error) {
+    console.error("Get likes error:", error);
+    return res.status(500).json({ error: "Failed to get likes." });
+  }
+};
+
+export const hasUserLiked = async (req, res) => {
+  const userId = req.user?.id;
+  const { movieId } = req.params;
+
+  if (!userId) {
+    return res.status(401).json({ error: "Unauthorized: user not authenticated." });
+  }
+  if (!movieId) {
+    return res.status(400).json({ error: "Movie ID is required." });
+  }
+
+  try {
+    const like = await Like.findOne({ userId, movieId });
+    return res.status(200).json({ liked: !!like });
+  } catch (error) {
+    console.error("Check like error:", error);
+    return res.status(500).json({ error: "Failed to check like status." });
   }
 };
