@@ -6,8 +6,12 @@ import { IoTime } from "react-icons/io5";
 import AddToWatchlistIcon from "../directory/AddToWatchlistIcon";
 import RatingBarChart from '../directory/RatingBarChart';
 import axios from 'axios';
+import { useNavigate } from "react-router-dom";
+import usePreviousScrollStore from "../../store/usePreviousScrollStore";
 
 const TopMovieSection = ({ selectedMovie, setSelectedMovie, ratingDistribution, allReviews }) => {
+  const navigate = useNavigate();
+  const { setPreviousScrollPosition } = usePreviousScrollStore();
   const [liked, setLiked] = useState(false);
   const [addedToWatchlist, setAddedToWatchlist] = useState(false);
   const [genres, setGenres] = useState([]);
@@ -42,26 +46,6 @@ const TopMovieSection = ({ selectedMovie, setSelectedMovie, ratingDistribution, 
     fetchData();
   }, []);
 
-  // Calculate average rating
-  const calculateAverageRating = (movieId) => {
-    if (!Array.isArray(allReviews) || allReviews.length === 0) return 0;
-
-    const selectedReviews = allReviews.filter(
-      (r) => r.movieId === movieId
-    );
-
-    const validRatings = selectedReviews
-      .map((r) => Number(r.rating))
-      .filter((r) => !isNaN(r));
-
-    if (validRatings.length === 0) return 0;
-
-    const sum = validRatings.reduce((acc, rating) => acc + rating, 0);
-    const average = sum / validRatings.length;
-
-    return parseFloat(average.toFixed(1));
-  };
-
   // compute top 3 for display with safety checks
   const [first, second, third] = useMemo(() => {
     if (!Array.isArray(movies) || movies.length === 0) return [null, null, null];
@@ -69,7 +53,8 @@ const TopMovieSection = ({ selectedMovie, setSelectedMovie, ratingDistribution, 
     return [...movies]
       .map((movie) => ({
         ...movie,
-        compositeScore: calculateAverageRating(movie._id) * 0.9 + 
+        rating: Number(movie.rating).toFixed(1),
+        compositeScore: movie.rating * 0.9 + 
                        ((movie.year || 2000) - 2000) * 0.1,
       }))
       .sort((a, b) => {
@@ -79,7 +64,7 @@ const TopMovieSection = ({ selectedMovie, setSelectedMovie, ratingDistribution, 
         return b.compositeScore - a.compositeScore;
       })
       .slice(0, 3);
-  }, [movies, allReviews]);
+  }, [movies]);
 
   const top3 = useMemo(() => {
     return [second, first, third].filter(Boolean);
@@ -95,20 +80,6 @@ const TopMovieSection = ({ selectedMovie, setSelectedMovie, ratingDistribution, 
       ? `${hours}h${mins > 0 ? ` ${mins}min` : ""}`.trim()
       : `${mins}min`;
   };
-
-  const durationText = useMemo(() => {
-    return formatDuration(selectedMovie?.duration);
-  }, [selectedMovie]);
-
-  // Total and percent distribution
-  const { totalRatings, percentDistribution } = useMemo(() => {
-    const total = Object.values(ratingDistribution).reduce((sum, v) => sum + v, 0);
-    const percents = {};
-    Object.entries(ratingDistribution).forEach(([star, count]) => {
-      percents[star] = total > 0 ? Math.round((count / total) * 100) : 0;
-    });
-    return { totalRatings: total, percentDistribution: percents };
-  }, [ratingDistribution]);
 
   // Updated genre name mapping
   const genreNames = useMemo(() => {
@@ -129,15 +100,10 @@ const TopMovieSection = ({ selectedMovie, setSelectedMovie, ratingDistribution, 
     return names.join(", ");
   }, [selectedMovie, genres]);
 
-  const averageRating = useMemo(() => 
-    calculateAverageRating(selectedMovie?._id), // Changed from id to _id
-    [selectedMovie, allReviews]
-  );
-
-  const movieReviews = useMemo(() => {
-    if (!selectedMovie || !Array.isArray(allReviews)) return [];
-    return allReviews.filter(r => r.movieId === selectedMovie._id); // Changed from id to _id
-  }, [selectedMovie, allReviews]);
+  const handleCardClick = (movieId) => {
+    setPreviousScrollPosition(window.scrollY);
+    navigate(`/movie/${movieId}`);
+  };
 
   if (loading) {
     return <div className="loading">Loading movies...</div>;
@@ -174,7 +140,8 @@ const TopMovieSection = ({ selectedMovie, setSelectedMovie, ratingDistribution, 
               <div
                 key={movie._id}
                 className={`card ${isActive ? "main-card active" : "side-card"}`}
-                onClick={() => setSelectedMovie(movie)}
+                onClick={() => handleCardClick(movie._id)}
+                style={{ cursor: 'pointer' }}
                 onMouseEnter={() => setSelectedMovie(movie)}
               >
                 <h2 className="rank-label">{label}</h2>
@@ -190,7 +157,7 @@ const TopMovieSection = ({ selectedMovie, setSelectedMovie, ratingDistribution, 
           <div className="left-column">
             <h3>{selectedMovie.title}</h3>
             <div className="rating-bar">
-              <ReviewStars rating={averageRating} readOnly={true} showNumber={true} size="large" />
+              <ReviewStars rating={selectedMovie.rating} readOnly={true} showNumber={true} size="large" />
             </div>
             <div className="tags">
               <span className="badge">{genreNames}</span>
