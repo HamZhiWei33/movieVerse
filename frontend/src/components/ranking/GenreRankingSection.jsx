@@ -107,16 +107,6 @@ const GenreRankingSection = ({ movies = [], allGenres = [], allReviews = [] }) =
     }
   }, [location.hash]);
 
-  const calculateAverageRating = (movieId) => {
-    if (!Array.isArray(data.reviews) || data.reviews.length === 0) return 0;
-
-    const movieReviews = data.reviews.filter((r) => r.movieId === movieId);
-    if (movieReviews.length === 0) return 0;
-
-    const sum = movieReviews.reduce((acc, r) => acc + r.rating, 0);
-    return parseFloat((sum / movieReviews.length).toFixed(1));
-  };
-
   const sorted = useMemo(() => {
     if (!Array.isArray(movies)) return [];
     
@@ -131,25 +121,16 @@ const GenreRankingSection = ({ movies = [], allGenres = [], allReviews = [] }) =
         return selectedGenreId && movie.genre.includes(selectedGenreId);
       })
       .sort((a, b) => {
-        // Sort by rating first
-        const ratingDiff = calculateAverageRating(b._id) - calculateAverageRating(a._id);
+        // Sort by rating directly from database
+        const ratingDiff = b.rating - a.rating;
         if (ratingDiff !== 0) return ratingDiff;
         // If ratings are equal, sort by year
         return b.year - a.year;
       })
       .slice(0, 10); // Limit to 10 movies
-  }, [movies, selectedGenre, allGenres, calculateAverageRating]);
+  }, [movies, selectedGenre, allGenres]);
 
   const [top1, ...otherMovies] = sorted;
-
-  // const formatDuration = (minutes) => {
-  //   if (!minutes || isNaN(minutes)) return "N/A";
-  //   const hours = Math.floor(minutes / 60);
-  //   const mins = minutes % 60;
-  //   return hours > 0
-  //     ? `${hours}h${mins > 0 ? ` ${mins}min` : ""}`
-  //     : `${mins}min`;
-  // };
 
   if (loading) return <div className="loading">Loading rankings...</div>;
   if (error) return <div className="error">{error}</div>;
@@ -187,7 +168,7 @@ const GenreRankingSection = ({ movies = [], allGenres = [], allReviews = [] }) =
                 rank={1}
                 image={top1.posterUrl}
                 title={top1.title}
-                rating={calculateAverageRating(top1._id)}
+                rating={top1.rating}
                 description={top1.description}
                 genre={top1.genre.map(getGenreName).filter(Boolean).join(", ")}
                 region={top1.region}
@@ -203,7 +184,7 @@ const GenreRankingSection = ({ movies = [], allGenres = [], allReviews = [] }) =
                   rank={1}
                   image={top1.posterUrl}
                   title={top1.title}
-                  rating={calculateAverageRating(top1._id)}
+                  rating={top1.rating}
                   genre={top1.genre.map(getGenreName).filter(Boolean).join(", ")}
                   region={top1.region}
                   year={top1.year}
@@ -217,7 +198,7 @@ const GenreRankingSection = ({ movies = [], allGenres = [], allReviews = [] }) =
                   rank={index + 2}
                   image={movie.posterUrl}
                   title={movie.title}
-                  rating={calculateAverageRating(movie._id)}
+                  rating={movie.rating}
                   genre={movie.genre.map(getGenreName).filter(Boolean).join(", ")}
                   region={movie.region}
                   year={movie.year}
