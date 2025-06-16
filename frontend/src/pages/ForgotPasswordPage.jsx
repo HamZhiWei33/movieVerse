@@ -5,7 +5,7 @@ import FormField from "../components/general/FormField";
 import { useAuthStore } from "../store/useAuthStore";
 
 const ForgotPasswordPage = () => {
-  const { requestResetCode, verifyResetCode } = useAuthStore();
+  const { requestResetCode, verifyResetCode, resetPassword } = useAuthStore();
   const [email, setEmail] = useState("");
   const [code, setCode] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -63,20 +63,33 @@ const ForgotPasswordPage = () => {
 
   const handlePasswordReset = async (e) => {
     e.preventDefault();
-    if (newPassword !== confirmPassword) {
-      setMessage({ text: 'Passwords do not match', type: 'error' });
-      return;
-    }
+    // if (newPassword !== confirmPassword) {
+    //   setMessage({ text: 'Passwords do not match', type: 'error' });
+    //   return;
+    // }
 
     try {
-      await axios.post('/api/auth/reset-password', { email, code, newPassword });
-      setMessage({ text: 'Password reset successfully', type: 'success' });
-      setTimeout(() => navigate('/login'), 2000);
+      const response = await resetPassword(email, code, newPassword, confirmPassword);
+      // await axios.post('/api/auth/reset-password', { email, code, newPassword, confirmPassword });
+      
+      if (response) {
+        console.log(response);
+        console.log("Success");
+        setMessage({ text: 'Password reset successfully', type: 'success' });
+        setTimeout(() => navigate('/login'), 2000);
+        return;
+      }
+
+      console.error("Error");
+      console.log(response);
+
     } catch (error) {
       setMessage({
         text: error.response?.data?.message || 'Failed to reset password',
         type: 'error'
       });
+      console.error(error.response?.data?.message || 'Failed to reset password');
+      console.error(error);
     }
   };
 
@@ -123,7 +136,7 @@ const ForgotPasswordPage = () => {
           <form className="form">
             <FormField type="password" name="password" label="New Password" onChange={(e) => setNewPassword(e.target.value)} />
             <FormField type="password" name="confirm_password" label="Confirm New Password" onChange={(e) => setConfirmPassword(e.target.value)} />
-            <button className="submitButton" onClick={handlePasswordReset}>Verify</button>
+            <button className="submitButton" onClick={handlePasswordReset}>Reset</button>
           </form>
           <p>
             Return to <a href="/login">Login</a>

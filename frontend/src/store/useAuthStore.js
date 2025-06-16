@@ -76,14 +76,12 @@ export const useAuthStore = create((set, get) => ({
 
       console.log("Login response:", res.data);
 
-      const { token, user } = res.data;
+      const { token } = res.data;
       localStorage.setItem("token", token);
-      axiosInstance.defaults.headers.common[
-        "Authorization"
-      ] = `Bearer ${token}`;
+      axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
       await get().checkAuth();
-      // set({ authUser: res.data });
-      set({ authUser: user });
+      set({ authUser: res.data });
       toast.success("Login successful!");
       // get().connectSocket(); // connect to socket after successful login
       return res.data;
@@ -218,6 +216,7 @@ export const useAuthStore = create((set, get) => ({
       return [];
     }
   },
+  
   changeNewPassword: async (oldPassword, newPassword) => {
     try {
       const userId = get().authUser?._id;
@@ -280,5 +279,25 @@ export const useAuthStore = create((set, get) => ({
       toast.error(error?.response?.data?.message || "Error sending verification code");
       return null;
     }
-  }
+  },
+
+  resetPassword: async (email, code, newPassword, newPasswordConfirm) => {
+    try {
+      const res = await axiosInstance.post(`/auth/reset-password`, {
+        email: email,
+        code: code,
+        newPassword: newPassword,
+        newPasswordConfirm: newPasswordConfirm
+      });
+
+      toast.success("Password changed successfully");
+      return res.data;
+    } catch (error) {
+      console.error("Error changing password:", error);
+      toast.error(
+        error?.response?.data?.message || "Failed to change password"
+      );
+      return null;
+    }
+  },
 }));
