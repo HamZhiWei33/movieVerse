@@ -17,7 +17,7 @@ router.post("/logout", logout);
 
 // ensure the user is authenticated before allowing profile updates
 // router.put("/update-profile", protectRoute, updateProfile);
-router.put("/update-profile", updateProfile);
+router.put("/update-profile", protectRoute, updateProfile);
 
 // check if the user is authenticated
 router.get("/check", protectRoute, checkAuth);
