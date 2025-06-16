@@ -1,50 +1,56 @@
-import Movie from '../models/movie.model.js';
-import Watchlist from '../models/watchlist.model.js';
+import Movie from "../models/movie.model.js";
+import User from "../models/user.model.js";
 
+// Recommend movies based on user's selected genres and genres from watchlist
 export const getRecommendedMovies = async (req, res) => {
   try {
-    const userId = req.user?.id || req.query.userId;
-    if (!userId) return res.status(400).json({ message: 'User ID is required' });
+    const userId = req.query.userId;
+    if (!userId) return res.status(400).json({ message: "Missing userId" });
 
-    // Step 1: 找到该用户的 watchlist 记录
-    const watchlist = await Watchlist.findOne({ userId }).populate('movies');
-    if (!watchlist || watchlist.movies.length === 0) {
-      // fallback：如果没有 watchlist，就推荐高评分热门电影
-      const fallback = await Movie.find({ rating: { $gte: 3.5 } })
-        .sort({ reviewCount: -1 })
-        .limit(12);
-      return res.status(200).json({ movies: fallback });
-    }
+    // Get user and their selected genres
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
 
-    // Step 2: 收集 genre 偏好
-    const genreCounts = {};
-    for (const movie of watchlist.movies) {
-      for (const g of movie.genre) {
-        genreCounts[g] = (genreCounts[g] || 0) + 1;
-      }
-    }
+    // Assume user.selectedGenres is an array of genre IDs (from signup)
+    const selectedGenres = user.selectedGenres || [];
 
-    // 提取 top N 偏好 genre
-    const topGenres = Object.entries(genreCounts)
-      .sort((a, b) => b[1] - a[1]) // 按频率降序
-      .slice(0, 3) // 可以控制看多少个主要偏好
-      .map(([genreId]) => parseInt(genreId));
+    // Get genres from movies in user's watchlist
+    const watchlistMovies = await Movie.find({ _id: { $in: user.watchlist || [] } });
+    const watchlistGenres = watchlistMovies.flatMap(movie => movie.genre || []);
 
-    // Step 3: 推荐电影（高评分 + 包含偏好 genre）
-    const recommendations = await Movie.aggregate([
-      {
-        $match: {
-          genre: { $in: topGenres },
-          rating: { $gte: 3.5 },
-          _id: { $nin: watchlist.movies.map((m) => m._id) }, // 排除已收藏的电影
-        },
-      },
-      { $sample: { size: 12 } },
-    ]);
+    // Combine and deduplicate genres
+    const allGenres = Array.from(new Set([...selectedGenres, ...watchlistGenres]));
 
-    res.status(200).json({ movies: recommendations });
-  } catch (error) {
-    console.error('getRecommendedMovies error:', error.message);
-    res.status(500).json({ message: 'Failed to fetch recommended movies' });
+    // Find movies that match any of these genres, excluding those already in watchlist
+    const recommendedMovies = await Movie.find({
+      genre: { $in: allGenres },
+      _id: { $nin: user.watchlist || [] }
+    })
+      .sort({ rating: -1 }) // Optional: sort by rating
+      .limit(20);
+
+    res.json({ movies: recommendedMovies });
+  } catch (err) {
+    console.error("Recommendation error:", err);
+    res.status(500).json({ message: "Failed to get recommendations" });
+  }
+};
+
+// Get new released movies (e.g., released in the last 3 months)
+export const getNewReleases = async (req, res) => {
+  try {
+    const threeMonthsAgo = new Date();
+    threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+
+    const newReleases = await Movie.find({
+      releaseDate: { $gte: threeMonthsAgo }
+    })
+      .sort({ releaseDate: -1 })
+      .limit(20);
+
+    res.json({ movies: newReleases });
+  } catch (err) {
+    console.error("New releases error:", err);
+    res.status(500).json({ message: "Failed to get new releases" });
   }
 };

@@ -1,64 +1,93 @@
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import ReviewStars from "../directory/ReviewStars";
 import { IoTime } from "react-icons/io5";
 import { GoHeartFill } from "react-icons/go";
+import LikeIcon from "../directory/LikeIcon";
 import "../../styles/profile/watchlist.css";
-import { getGenreNamebyId, convertDuration } from "./watchlist.js";
-import { axiosInstance } from "../../lib/axios";
+import useMovieStore from '../../store/useMovieStore';
 
 const WatchList = ({
   movie,
   showRatingNumber = false,
-  showBottomInteractiveIcon = false,
-  allReviews,
 }) => {
   const navigate = useNavigate();
+  const { 
+    removeFromWatchlist,
+    fetchWatchlist,
+    likeMovie,
+    unlikeMovie,
+    fetchMovieLikes,
+    hasUserLikedMovie
+  } = useMovieStore();
+  
+  const [loadingRemove, setLoadingRemove] = useState(false);
+  const [liked, setLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(movie.likeCount || 0);
+  const [loadingLike, setLoadingLike] = useState(false);
+
+  // Initialize like status
+  useEffect(() => {
+    const checkLikeStatus = async () => {
+      try {
+        const isLiked = await hasUserLikedMovie(movie._id);
+        setLiked(isLiked);
+        
+        const likesData = await fetchMovieLikes(movie._id);
+        setLikeCount(likesData.count || 0);
+      } catch (error) {
+        console.error("Error checking like status:", error);
+      }
+    };
+    
+    checkLikeStatus();
+  }, [movie._id, hasUserLikedMovie, fetchMovieLikes]);
 
   const handleCardClick = () => {
-    navigate(`/movie/${encodeURIComponent(movie.title)}`, {
-      state: { movieData: movie }, // Pass entire movie object
+    navigate(`/movie/${movie._id}`, {
+      state: { movie: { ...movie, liked, likeCount } },
     });
   };
 
   const handleRemoveClick = async (e) => {
     e.stopPropagation();
-    console.log("Trying to remove:", movie._id);
+    if (loadingRemove) return;
+
+    setLoadingRemove(true);
     try {
-      const res = await axiosInstance.delete(`/users/watchlist/${movie._id}`);
-      console.log(res.data.message);
-      // You probably want to refresh the watchlist here
-      alert("Removed from watchlist!");
+      await removeFromWatchlist(movie._id);
+      await fetchWatchlist(); // Refresh the watchlist
     } catch (err) {
-      console.error(
-        "Failed to remove movie:",
-        err.response?.data || err.message
-      );
+      console.error("Failed to remove movie:", err.response?.data || err.message);
+    } finally {
+      setLoadingRemove(false);
     }
   };
 
-  const calculateAverageRating = () => {
-    if (!Array.isArray(allReviews) || allReviews.length === 0) return 0;
+  const handleLikeClick = async (e) => {
+    e.stopPropagation();
+    if (loadingLike) return;
 
-    // Filter reviews for this specific movie ID
-    const movieReviews = allReviews.filter(
-      (review) => review.movieId === movie.id
-    );
-
-    if (movieReviews.length === 0) return 0;
-
-    const validRatings = movieReviews
-      .map((r) => Number(r.rating))
-      .filter((r) => !isNaN(r));
-
-    if (validRatings.length === 0) return 0;
-
-    const sum = validRatings.reduce((acc, rating) => acc + rating, 0);
-    const average = sum / validRatings.length;
-
-    return parseFloat(average.toFixed(1));
+    setLoadingLike(true);
+    try {
+      if (liked) {
+        await unlikeMovie(movie._id);
+        setLikeCount(prev => prev - 1);
+      } else {
+        await likeMovie(movie._id);
+        setLikeCount(prev => prev + 1);
+      }
+      setLiked(!liked);
+    } catch (error) {
+      console.error("Error updating like:", error);
+    } finally {
+      setLoadingLike(false);
+    }
   };
 
-  const averageRating = calculateAverageRating();
+  const rating = movie.rating && movie.rating > 0 
+    ? Number(movie.rating.toFixed(1))
+    : 0;
 
   return (
     <article id="watchlist" style={{ cursor: "pointer" }}>
@@ -73,12 +102,12 @@ const WatchList = ({
         <div className="movie-details-container-list" onClick={handleCardClick}>
           <h3>{movie.title}</h3>
           <ReviewStars
-            rating={averageRating}
+            rating={rating}
             readOnly={true}
-            showNumber={true}
+            showNumber={showRatingNumber}
           />
           <div className="genre-tags">
-            {movie.genre.map((genre, index) => (
+            {movie.genre?.map((genre, index) => (
               <span key={index} className="genre-tag">
                 {genre}
               </span>
@@ -89,24 +118,27 @@ const WatchList = ({
               <span className="duration-icon">
                 <IoTime />
               </span>
-              {/* {convertDuration(movie.duration)} */}
               {movie.duration}
             </div>
-            <div className="like-tag">
+            <div 
+              className="like-tag"
+              onClick={handleLikeClick}
+            >
               <span className="like-icon">
-                <GoHeartFill />
+                <LikeIcon liked={liked} disabled={loadingLike} />
               </span>
-              {movie.likes}
+              {likeCount}
             </div>
           </div>
         </div>
         <div className="remove-watchlist-container">
           <button
             className="remove-watchlist-btn"
-            onClick={(e) => handleRemoveClick(e, movie._id)}
+            onClick={handleRemoveClick}
+            disabled={loadingRemove}
             aria-label={`Remove ${movie.title} from watchlist`}
           >
-            Remove
+            {loadingRemove ? "Removing..." : "Remove"}
           </button>
         </div>
       </div>
