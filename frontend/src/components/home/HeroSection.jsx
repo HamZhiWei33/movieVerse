@@ -7,136 +7,80 @@ import { FaAngleRight } from "react-icons/fa6";
 import { TfiReload } from "react-icons/tfi";
 import { getTopMoviesByGenre } from "./ranking";
 import RankingCard from "./RankingCard";
-import { movies, genres, reviews } from "../../constant";
+// import { movies, genres, reviews } from "../../constant";
 import { useMemo, useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import useHorizontalScroll from "../../store/useHorizontalScroll";
 import ReviewStars from "../directory/ReviewStars";
 import useGenreStore from "../../store/useGenreStore";
+import useMovieStore from "../../store/useMovieStore";
 const HeroSection = ({ title, moviesType, items }) => {
+  const {
+    movies: storeMovies,
+    isLiked,
+    isInWatchlist,
+    toggleLike,
+    toggleWatchlist,
+    fetchMovies,
+    fetchWatchlist,
+    fetchLikedMovies,
+  } = useMovieStore();
+
+  const { genreMap, fetchGenres } = useGenreStore();
   const [cardPerRow, setCardPerRow] = useState(1);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [displayed, setDisplayed] = useState([]);
-  const [likedMovies, setLikedMovies] = useState([]);
-  const [addToWatchlistMovies, setAddToWatchlistMovies] = useState([]);
-  const movieList = moviesType === "recommendation" ? displayed : items;
-  const { genreMap, fetchGenres } = useGenreStore();
-
-  var ariaLabel;
-  if (moviesType === "watchlist") {
-    ariaLabel = "Your watchlist movies";
-  } else if (moviesType === "newReleased") {
-    ariaLabel = "Newly released movies";
-  } else if (moviesType === "ranking") {
-    ariaLabel = "Top ranked movies by genre";
-  } else if (moviesType === "recommendation") {
-    ariaLabel = "List of recommended movies";
-  }
-
-  //items=allGenres
-  const topMoviesByGenre = useMemo(
-    () => getTopMoviesByGenre(movies, items, 6),
-    [movies, items]
-  );
   const navigate = useNavigate();
   const containerRef = useRef(null);
+  const gridRef = useRef(null);
 
-  const navigateFullPage = () => {
+  // Fetch initial data
+  useEffect(() => {
+    fetchGenres();
     if (moviesType === "watchlist") {
-      navigate("/profile", { state: { targetTab: "WatchList" } });
-    } else if (moviesType === "ranking") {
-      navigate("/ranking");
+      fetchWatchlist();
+    } else if (moviesType === "newReleased") {
+      fetchMovies(1, 20, { sort: "-year" }); // Fetch newest movies
     }
-  };
+  }, []);
 
-  const toggleLike = (title) => {
-    setLikedMovies((prev) =>
-      prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title]
-    );
-  };
+  // Get appropriate movie list based on type
+  const movieList = useMemo(() => {
+    if (moviesType === "recommendation") return displayed;
+    if (moviesType === "watchlist") {
+      return storeMovies.filter(m => {
+        const inWatchlist = isInWatchlist(m._id);
+        console.log(`Movie ${m._id} in watchlist:`, inWatchlist);
+        return inWatchlist;
+      });
+    }
+    if (moviesType === "newReleased") return storeMovies.slice(0, 20);
+    return items;
+  }, [moviesType, displayed, storeMovies, items, isInWatchlist]);
 
-  const toggleAddToWatchlist = (title) => {
-    setAddToWatchlistMovies((prev) =>
-      prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title]
-    );
-  };
-
+  // Handle recommendation reload
   const handleReload = () => {
-    const shuffled = [...items].sort(() => 0.5 - Math.random());
-    setDisplayed(shuffled);
-    sessionStorage.setItem("displayedMovies", JSON.stringify(shuffled));
+    const shuffled = [...storeMovies].sort(() => 0.5 - Math.random());
+    setDisplayed(shuffled.slice(0, 10));
+    sessionStorage.setItem("displayedMovies", JSON.stringify(shuffled.slice(0, 10)));
   };
 
+  // Initialize recommendations
   useEffect(() => {
     if (moviesType !== "recommendation") return;
     const saved = sessionStorage.getItem("displayedMovies");
     if (saved) {
       setDisplayed(JSON.parse(saved));
-    } else if (moviesType === "recommendation") {
-      handleReload(); // fallback if no saved data
+    } else {
+      handleReload();
     }
-  }, [items]);
+  }, [storeMovies]);
 
-  useHorizontalScroll(containerRef);
-
-  // const genreMap = genres.reduce((map, genre) => {
-  //   map[genre.id] = genre.name;
-  //   return map;
-  // }, {});
-
-  const calculateAverageRating = (movieId) => {
-    const movieReviews = reviews.filter((review) => review.movieId === movieId);
-    if (movieReviews.length === 0) return 0;
-    const sum = movieReviews.reduce((acc, review) => acc + review.rating, 0);
-    return sum / movieReviews.length;
-  };
-
-  // const setupMovieCards = (colCount) => {
-  //   const columns = Math.ceil(colCount / 2); // colCount is columns with spacer(gap), need to calculate without gap
-  //   const maxMoviesCount = Math.max(4, columns * 2); // Show only 2 rows, with at least 4 movies
-  //   const cards = [];
-  //   const movieList = moviesType === "recommendation" ? displayed : items;
-  //   movieList.forEach((movie, index) => {
-  //     if (index < maxMoviesCount) {
-  //       // Spacer before every item except the first
-  //       if (index % columns !== 0 && windowWidth >= 942) {
-  //         cards.push(<div key={`spacer-${index}`} className="spacer" />);
-  //       }
-
-  //       cards.push(
-  //         <MovieCard
-  //           key={index}
-  //           role="listitem"
-  //           movie={{
-  //             ...movie,
-  //             genre: (movie.genre || []).map((id) => genreMap[id]),
-  //             year: movie.year.toString(),
-  //           }}
-  //           liked={likedMovies.includes(movie.id)}
-  //           addedToWatchlist={addToWatchlistMovies.includes(movie.id)}
-  //           onLike={() => toggleLike(movie.id)}
-  //           onAddToWatchlist={() => toggleAddToWatchlist(movie.id)}
-  //           allReviews={reviews}
-  //         >
-  //           {moviesType === "recommendation" && (
-  //             <div className="movie-rating">
-  //               <ReviewStars rating={calculateAverageRating(movie.id)} />
-  //             </div>
-  //           )}
-  //         </MovieCard>
-  //       );
-  //     } else {
-  //       cards.push(<div key={index} className="movie-card-placeholder" />);
-  //     }
-  //   });
-  //   setMovieCards(cards);
-  // };
-
-  const gridRef = useRef(null);
-
+  // Calculate responsive layout
   useEffect(() => {
     if (moviesType === "ranking") return;
     if (!gridRef.current) return;
+
     const observer = new ResizeObserver(() => {
       const style = getComputedStyle(gridRef.current);
       const columns = style.gridTemplateColumns.split(" ").length;
@@ -146,12 +90,39 @@ const HeroSection = ({ title, moviesType, items }) => {
 
     observer.observe(gridRef.current);
     return () => observer.disconnect();
-  }, []);
+  }, [moviesType]);
 
-  // Fetch genres from your genre model
+  // Navigation handlers
+  const navigateFullPage = () => {
+    if (moviesType === "watchlist") {
+      navigate("/profile", { state: { targetTab: "WatchList" } });
+    } else if (moviesType === "ranking") {
+      navigate("/ranking");
+    }
+  };
+
+  // Get top movies by genre for ranking section
+  const topMoviesByGenre = useMemo(() =>
+    moviesType === "ranking" ? getTopMoviesByGenre(storeMovies, items, 6) : {},
+    [storeMovies, items, moviesType]
+  );
+
+  // Accessibility labels
+  const ariaLabel = {
+    watchlist: "Your watchlist movies",
+    newReleased: "Newly released movies",
+    ranking: "Top ranked movies by genre",
+    recommendation: "List of recommended movies"
+  }[moviesType];
+
+  // In your HeroSection component
   useEffect(() => {
-    fetchGenres();
-  }, []);
+    console.log('Current watchlist:', {
+      storeMovies: storeMovies.length,
+      watchlist: storeMovies.filter(m => isInWatchlist(m._id)),
+      watchlistMap: useMovieStore.getState().watchlistMap
+    });
+  }, [storeMovies, isInWatchlist]);
 
   return (
     <section
@@ -195,47 +166,41 @@ const HeroSection = ({ title, moviesType, items }) => {
       {(moviesType === "watchlist" ||
         moviesType === "newReleased" ||
         moviesType === "recommendation") && (
-        <div
-          id={moviesType}
-          ref={gridRef}
-          className="home-card-container grid"
-          role="region"
-          aria-label={ariaLabel}
-        >
-          {movieList
-            .slice(0, Math.max(4, cardPerRow * 2))
-            .map((movie, index) => (
-              <React.Fragment key={movie.id}>
-                {index % cardPerRow !== 0 && windowWidth >= 942 && (
-                  <div className="spacer" />
-                )}
-                <MovieCard
-                  key={movie._id}
-                  role="listitem"
-                  movie={{
-                    ...movie,
-                    genre: movie.genre.map((id) => genreMap[id] || "Unknown"),
-                    year: movie.year.toString(),
-                  }}
-                  liked={likedMovies.includes(movie.id)}
-                  addedToWatchlist={addToWatchlistMovies.includes(movie.id)}
-                  onLike={() => toggleLike(movie.id)}
-                  onAddToWatchlist={() => toggleAddToWatchlist(movie.id)}
-                  allReviews={reviews}
-                >
-                  {moviesType === "recommendation" && (
-                    <div className="movie-rating">
-                      <ReviewStars
-                        showNumber="true"
-                        rating={calculateAverageRating(movie.id)}
-                      />
-                    </div>
+          <div
+            id={moviesType}
+            ref={gridRef}
+            className="home-card-container grid"
+            role="region"
+            aria-label={ariaLabel}
+          >
+            {movieList
+              .slice(0, Math.max(4, cardPerRow * 2))
+              .map((movie, index) => (
+                <React.Fragment key={movie._id}>
+                  {index % cardPerRow !== 0 && windowWidth >= 942 && (
+                    <div className="spacer" />
                   )}
-                </MovieCard>
-              </React.Fragment>
-            ))}
-        </div>
-      )}
+                  <MovieCard
+                    movie={{
+                      ...movie,
+                      genre: movie.genre?.map(id => genreMap[id] || "Unknown") || [],
+                      year: movie.year?.toString() || "",
+                    }}
+                    liked={isLiked(movie._id)}
+                    addedToWatchlist={isInWatchlist(movie._id)}
+                    onLike={() => toggleLike(movie._id)}
+                    onAddToWatchlist={() => toggleWatchlist(movie._id)}
+                  >
+                    {moviesType === "recommendation" && (
+                      <div className="movie-rating">
+                        <ReviewStars showNumber={true} rating={movie.averageRating || 0} />
+                      </div>
+                    )}
+                  </MovieCard>
+                </React.Fragment>
+              ))}
+          </div>
+        )}
 
       {/* <div className="home-card-section" role="region" aria-label={ariaLabel}> */}
       {moviesType === "ranking" && (
