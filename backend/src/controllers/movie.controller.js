@@ -457,7 +457,7 @@ async function processTMDBMovie(tmdbMovie) {
     const director = crew.find(p => p.job === "Director")?.name || "Unknown";
     const actors = cast.slice(0, 5).map(a => a.name).filter(Boolean);
 
-    // Build movie data object
+    // Build movie data object - SET RATING TO 0 FOR TMDB MOVIES
     const movieData = {
       tmdbId: tmdbMovie.id,
       title: tmdbMovie.title || "Unknown Title",
@@ -473,7 +473,7 @@ async function processTMDBMovie(tmdbMovie) {
       duration,
       releaseDate: tmdbMovie.release_date || null,
       region,
-      rating: tmdbMovie.vote_average || 0,
+      rating: 0, // Explicitly set rating to 0 for TMDB movies
       hasTrailer: true,
       lastUpdated: new Date()
     };
