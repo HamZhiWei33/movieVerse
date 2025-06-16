@@ -211,4 +211,43 @@ export const useAuthStore = create((set, get) => ({
       return [];
     }
   },
+
+  updateFavouriteGenres: async (genreSelected) => {
+    // set({ isUpdatingProfile: true });
+    try {
+      const userId = get().authUser?._id;
+      if (!userId) throw new Error("User ID not found");
+
+      const res = await axiosInstance.put(`/users/${userId}/favourite-genres`, {favouriteGenres: genreSelected});
+      set({ authUser: res.data });
+
+      toast.success("Favourite genres saved successfully");
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Error while saving favourite genres");
+    }
+  },
+
+  requestResetCode: async (email) => {
+    // set({ isUpdatingProfile: true });
+    try {
+      const res = await axiosInstance.post(`/auth/request-reset-code`, {email: email});
+      toast.success("Verification code sent successfully.\nCheck your email");
+
+      return res.data;
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Error sending verification code");
+      return null;
+    }
+  },
+
+  verifyResetCode: async (email, code) => {
+    try {
+      const res = await axiosInstance.post('/auth/verify-reset-code', { email: email, code: code });
+      toast.success("Code verified successfully");
+      return res;
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Error sending verification code");
+      return null;
+    }
+  }
 }));
