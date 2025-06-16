@@ -14,7 +14,7 @@ import {
   getReviewedGenresAggregation,
   getWatchlistGenresAggregation,
 } from "../lib/genreAnalytics.js";
-
+import bcrypt from "bcryptjs";
 export const getCurrentUser = (req, res) => {
   try {
     if (!req.user) {
@@ -27,7 +27,6 @@ export const getCurrentUser = (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
 
 // @desc    Get user profile
 // @route   GET /api/users/:id
@@ -88,7 +87,9 @@ export const addToWatchlist = async (req, res) => {
   const { movieId } = req.params;
 
   if (!userId || !movieId) {
-    return res.status(400).json({ message: "User ID and Movie ID are required." });
+    return res
+      .status(400)
+      .json({ message: "User ID and Movie ID are required." });
   }
 
   try {
@@ -105,13 +106,17 @@ export const addToWatchlist = async (req, res) => {
     }
 
     if (user.watchlist.includes(movieId)) {
-      return res.status(200).json({ watchlisted: true, message: "Movie already in watchlist." });
+      return res
+        .status(200)
+        .json({ watchlisted: true, message: "Movie already in watchlist." });
     }
 
     user.watchlist.push(movieId);
     await user.save();
 
-    return res.status(201).json({ watchlisted: true, message: "Movie added to watchlist." });
+    return res
+      .status(201)
+      .json({ watchlisted: true, message: "Movie added to watchlist." });
   } catch (err) {
     console.error("Error adding to watchlist:", err);
     return res.status(500).json({ message: "Server error" });
@@ -123,7 +128,9 @@ export const removeFromWatchlist = async (req, res) => {
   const { movieId } = req.params;
 
   if (!userId || !movieId) {
-    return res.status(400).json({ message: "User ID and Movie ID are required." });
+    return res
+      .status(400)
+      .json({ message: "User ID and Movie ID are required." });
   }
 
   try {
@@ -135,14 +142,18 @@ export const removeFromWatchlist = async (req, res) => {
     // Check if movie is in watchlist
     const wasInWatchlist = user.watchlist.includes(movieId);
     if (!wasInWatchlist) {
-      return res.status(200).json({ watchlisted: false, message: "Movie not in watchlist." });
+      return res
+        .status(200)
+        .json({ watchlisted: false, message: "Movie not in watchlist." });
     }
 
     // Remove movie from watchlist
     user.watchlist = user.watchlist.filter((id) => id.toString() !== movieId);
     await user.save();
 
-    return res.status(200).json({ watchlisted: false, message: "Movie removed from watchlist." });
+    return res
+      .status(200)
+      .json({ watchlisted: false, message: "Movie removed from watchlist." });
   } catch (err) {
     console.error("Error removing movie from watchlist:", err);
     return res.status(500).json({ message: "Server error" });
@@ -250,5 +261,106 @@ export const getUserWatchlistGenres = async (req, res) => {
   } catch (err) {
     console.error("Error getting watchlist genre counts:", err);
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const updateFavouriteGenres = async (req, res) => {
+  try {
+    const { favouriteGenres } = req.body;
+
+    const updatedFields = {};
+    if (favouriteGenres !== undefined) updatedFields.favouriteGenres = favouriteGenres;
+
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { $set: updatedFields },
+      { new: true, runValidators: true }
+    ).select("-password");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: "Update failed" });
+  }
+};
+
+// export const changeNewPassword = async (req, res) => {
+//   try {
+//     const { oldPassword, newPassword } = req.body;
+//     const userId = req.user._id;
+
+//     if (!oldPassword || !newPassword) {
+//       return res.status(400).json({ message: "All fields are required" });
+//     }
+
+//     if (newPassword.length < 8) {
+//       return res
+//         .status(400)
+//         .json({ message: "New password must be at least 8 characters long" });
+//     }
+
+//     const user = await User.findById(userId);
+//     if (!user) {
+//       return res.status(404).json({ message: "User not found" });
+//     }
+
+//     const isMatch = await bcrypt.compare(oldPassword, user.password);
+//     if (!isMatch) {
+//       return res.status(400).json({ message: "Old password is incorrect" });
+//     }
+
+//     const salt = await bcrypt.genSalt(10);
+//     const hashedNewPassword = await bcrypt.hash(newPassword, salt);
+//     user.password = hashedNewPassword;
+
+//     await user.save();
+
+//     res.status(200).json({ message: "Password updated successfully" });
+//   } catch (error) {
+//     console.error("Error in changeNewPassword controller:", error.message);
+//     res.status(500).json({ message: "Internal Server Error" });
+//   }
+// };
+export const changeNewPassword = async (req, res) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+    console.log("👉 Received:", { oldPassword, newPassword });
+    console.log("👉 From user:", req.user);
+
+    const userId = req.user._id;
+
+    if (!oldPassword || !newPassword) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    if (newPassword.length < 8) {
+      return res
+        .status(400)
+        .json({ message: "New password must be at least 8 characters long" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Old password is incorrect" });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedNewPassword = await bcrypt.hash(newPassword, salt);
+    user.password = hashedNewPassword;
+
+    await user.save();
+
+    res.status(200).json({ message: "Password updated successfully" });
+  } catch (error) {
+    console.error("❌ Error in changeNewPassword controller:", error); // ← LOG FULL ERROR OBJECT
+    res.status(500).json({ message: error.message || "Internal Server Error" });
   }
 };

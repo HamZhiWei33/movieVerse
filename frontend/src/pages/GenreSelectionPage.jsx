@@ -1,24 +1,76 @@
 import "../styles/general/general.css";
 import "../styles/general/genre-selection.css";
-import React, { useState } from "react";
-// import FormField from "../components/general/FormField";
+import React, { useState, useEffect } from "react";
 import GenreCard from "../components/general/GenreCard";
-import { genres } from "../constant";
+import useGenreStore from "../store/useGenreStore";
+// import useMovieStore from "../store/useMovieStore";
+import { useAuthStore } from "../store/useAuthStore";
+// import { genres } from "../constant";
 import { useNavigate } from "react-router-dom";
+
 const GenreSelectionPage = () => {
-    //   const [email, setEmail] = useState("");
-    //   const [password, setPassword] = useState("");
+    const { genreMap, fetchGenres } = useGenreStore();
+    // const { getCurrentUser } = useMovieStore();
+    const { authUser, updateFavouriteGenres } = useAuthStore();
+    const [genres, setGenres] = useState([]);
+
+    const [currentUser, setCurrentUser] = useState(null);
+    const [favouriteGenres, setFavouriteGenres] = useState([]);
     const [genreCount, setGenreCount] = useState(0);
+    const [genreSelected, setGenreSelected] = useState([]);
     const navigate = useNavigate();
-    const updateGenreCount = (selected) => {
+    const updateGenreCount = (selected, genre) => {
         if (selected) {
+            setGenreSelected((prev) => [...prev, genre.id]);
             setGenreCount(genreCount + 1);
-            console.log("Added");
         } else {
+            setGenreSelected((prev) => prev.filter((t) => t !== genre.id));
             setGenreCount(genreCount - 1);
-            console.log("Removed");
         }
     };
+
+    // Debug, check if genre added/removed
+    useEffect(() => {
+        console.log(genreSelected);
+    }, [genreSelected]);
+
+    // Debug, check if current user fetched
+    useEffect(() => {
+        if (currentUser != null) {
+            setFavouriteGenres(currentUser.favouriteGenres);
+            setGenreSelected(currentUser.favouriteGenres.map(String));
+            setGenreCount(currentUser.favouriteGenres.length);
+        }
+    }, [currentUser]);
+
+    // Fetch genres on mount
+    useEffect(() => {
+        fetchGenres();
+    }, [fetchGenres]);
+
+    // useEffect(() => {
+    //     const fetchCurrentUser = async () => {
+    //         try {
+    //             const userData = await getCurrentUser();
+    //             setCurrentUser(userData);
+    //         } catch (err) {
+    //             console.error("Failed to fetch user data:", err);
+    //         }
+    //     };
+    //     fetchCurrentUser();
+    // }, [getCurrentUser]);
+
+    useEffect(() => {
+        setCurrentUser(authUser);
+    }, [authUser]);
+
+    // Convert genreMap to array when it changes
+    useEffect(() => {
+        if (Object.keys(genreMap).length > 0) {
+            const genreArray = Object.entries(genreMap).map(([id, name]) => ({ id, name }));
+            setGenres(genreArray);
+        }
+    }, [genreMap]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -26,8 +78,16 @@ const GenreSelectionPage = () => {
             return;
         }
 
-        console.log("Form submitted with selected genres");
-        navigate("/login");
+        const saveFavouriteGenres = async () => {
+            try {
+                const userData = await updateFavouriteGenres(genreSelected);
+                console.log("Form submitted with selected genres");
+                navigate("/");
+            } catch (err) {
+                console.error("Failed to fetch user data:", err);
+            }
+        };
+        saveFavouriteGenres();
     };
 
     return (
@@ -41,7 +101,7 @@ const GenreSelectionPage = () => {
                 </div>
                 <div className="genre-grid">
                     {genres.map((item, index) => (
-                        <GenreCard genre={item} onCardClicked={updateGenreCount} />
+                        <GenreCard key={item.id} genre={item} onCardClicked={updateGenreCount} favouriteGenres={favouriteGenres} />
                     ))}
                 </div>
                 <div className="submit-button-wrapper">

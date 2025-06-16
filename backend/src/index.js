@@ -42,7 +42,6 @@ app.use("/api/rating", ratingRoutes);
 app.use("/api/likes", likeRoutes);
 app.use("/api/movies", movieRoutes);
 app.use("/api/reviews", reviewRoutes);
-
 app.listen(PORT, async () => {
   console.log("Server is running on port:" + PORT);
   await connectDB();

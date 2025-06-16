@@ -10,6 +10,8 @@ import {
   getUserReviews,
   addReview,
   deleteAccount,
+  updateFavouriteGenres,
+  changeNewPassword,
 } from "../controllers/user.controller.js";
 import { protectRoute } from "../middleware/auth.middleware.js";
 import {
@@ -18,6 +20,7 @@ import {
   getUserWatchlistGenres,
 } from "../controllers/user.controller.js";
 const router = express.Router();
+router.put("/change-password", protectRoute, changeNewPassword);
 
 router.get("/me", protectRoute, getCurrentUser);
 router.get("/watchlist", protectRoute, getUserWatchlist);
@@ -27,6 +30,7 @@ router.post("/watchlist/:movieId", protectRoute, addToWatchlist);
 router.delete("/watchlist/:movieId", protectRoute, removeFromWatchlist);
 router.get("/:id", getUserProfile);
 router.put("/:id", updateUserProfile);
+router.put("/:id/favourite-genres", updateFavouriteGenres);
 router.delete("/:id", protectRoute, deleteAccount);
 router.get("/:id/liked-genres", protectRoute, getUserLikedGenres);
 router.get("/:id/review-genres", protectRoute, getUserReviewGenres);

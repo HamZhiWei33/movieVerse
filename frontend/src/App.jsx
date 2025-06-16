@@ -7,6 +7,7 @@ import LoginPage from "./pages/LoginPage";
 import GenreSelectionPage from "./pages/GenreSelectionPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import ChangePasswordPage from "./pages/ChangePasswordPage";
 import DirectoryPage from "./pages/DirectoryPage";
 import RankingPage from "./pages/RankingPage";
 import ProfilePage from "./pages/ProfilePage";
@@ -36,7 +37,7 @@ function AppContent() {
   }, []);
 
   useEffect(() => {
-    console.log("Auth User:", authUser);
+    console.log("Auth User App:", authUser);
   }, [authUser]);
 
   return (
@@ -50,6 +51,7 @@ function AppContent() {
         <Route path="/genre_selection" element={<GenreSelectionPage />} />
         <Route path="/forgot_password" element={<ForgotPasswordPage />} />
         <Route path="/reset_password" element={<ResetPasswordPage />} />
+        <Route path="/change_password" element={<ChangePasswordPage />} />
         <Route path="/directory" element={<DirectoryPage />} />
         <Route path="/ranking" element={<RankingPage />} />
         <Route path="/profile" element={<ProfilePage />} />
