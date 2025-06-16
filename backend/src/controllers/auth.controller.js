@@ -195,19 +195,45 @@ export const verifyResetCode = async (req, res) => {
 
 export const resetPassword = async (req, res) => {
   try {
-    const { email, code, newPassword } = req.body;
+    const { email, code, newPassword, newPasswordConfirm } = req.body;
+
+    if (!newPassword || !newPasswordConfirm) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    if (newPassword.length < 8) {
+      return res
+        .status(400)
+        .json({ message: "New password must be at least 8 characters long" });
+    }
+
+    if(newPassword !== newPasswordConfirm) {
+      return res
+        .status(400)
+        .json({ message: "Please confirm your password" });
+    }
+
     const user = await User.findOne({
       email,
       'passwordReset.code': code,
       'passwordReset.expiresAt': { $gt: new Date() }
     });
 
+    const isOld = await bcrypt.compare(newPassword, user.password);
+    if (isOld) {
+      return res.status(400).json({ message: "New password cannot be the same as old password" });
+    }
+
     if (!user) {
       return res.status(400).json({ message: 'Invalid or expired code' });
     }
 
-    user.password = newPassword;
+    const salt = await bcrypt.genSalt(10);
+    const hashedNewPassword = await bcrypt.hash(newPassword, salt);
+
+    user.password = hashedNewPassword;
     user.passwordReset = undefined;
+
     await user.save();
 
     res.json({ success: true });
