@@ -15,6 +15,11 @@ const ChangePasswordPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (newPassword.length < 8) {
+      toast.error("New password should be at least 8 characters");
+      return;
+    }
+
     if (newPassword !== confirmPassword) {
       toast.error("New password and confirmation do not match");
       return;
@@ -29,6 +34,7 @@ const ChangePasswordPage = () => {
       setConfirmPassword("");
     } catch (error) {
       console.error("Change password failed:", error);
+      toast.error("Failed to change password");
     } finally {
       setIsSubmitting(false);
     }
