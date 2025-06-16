@@ -252,3 +252,26 @@ export const getUserWatchlistGenres = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+export const updateFavouriteGenres = async (req, res) => {
+  try {
+    const { favouriteGenres } = req.body;
+
+    const updatedFields = {};
+    if (favouriteGenres !== undefined) updatedFields.favouriteGenres = favouriteGenres;
+
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { $set: updatedFields },
+      { new: true, runValidators: true }
+    ).select("-password");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: "Update failed" });
+  }
+};

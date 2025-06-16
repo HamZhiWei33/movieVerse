@@ -10,6 +10,7 @@ import {
   getUserReviews,
   addReview,
   deleteAccount,
+  updateFavouriteGenres,
 } from "../controllers/user.controller.js";
 import { protectRoute } from "../middleware/auth.middleware.js";
 import {
@@ -27,6 +28,7 @@ router.post("/watchlist/:movieId", protectRoute, addToWatchlist);
 router.delete("/watchlist/:movieId", protectRoute, removeFromWatchlist);
 router.get("/:id", getUserProfile);
 router.put("/:id", updateUserProfile);
+router.put("/:id/favourite-genres", updateFavouriteGenres);
 router.delete("/:id", protectRoute, deleteAccount);
 router.get("/:id/liked-genres", protectRoute, getUserLikedGenres);
 router.get("/:id/review-genres", protectRoute, getUserReviewGenres);
