@@ -10,6 +10,7 @@ import {
   getUserReviews,
   addReview,
   deleteAccount,
+  changeNewPassword,
 } from "../controllers/user.controller.js";
 import { protectRoute } from "../middleware/auth.middleware.js";
 import {
@@ -18,6 +19,7 @@ import {
   getUserWatchlistGenres,
 } from "../controllers/user.controller.js";
 const router = express.Router();
+router.put("/change-password", protectRoute, changeNewPassword);
 
 router.get("/me", protectRoute, getCurrentUser);
 router.get("/watchlist", protectRoute, getUserWatchlist);

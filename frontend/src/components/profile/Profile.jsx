@@ -13,7 +13,6 @@ const Profile = () => {
   const navigate = useNavigate();
   const { authUser, updateProfile, isUpdatingProfile, deleteAccount } =
     useAuthStore();
-
   // Local states synced with authUser
   const [name, setName] = useState("");
   const [tempName, setTempName] = useState("");
@@ -72,8 +71,8 @@ const Profile = () => {
   };
 
   const handlePasswordChange = () => {
-    logout();
-    navigate("/forgot_password");
+    // logout();
+    navigate("/change_password");
   };
 
   // const handleAccountDelete = () => {
@@ -265,7 +264,7 @@ const Profile = () => {
                     </span>
                   </button>
                 </li>
-                <li>
+                {/* <li>
                   <InsertButton />
                 </li>
                 <li>
@@ -273,7 +272,7 @@ const Profile = () => {
                 </li>
                 <li>
                   <LikeMovieButton />
-                </li>
+                </li> */}
               </ul>
             </div>
           </div>

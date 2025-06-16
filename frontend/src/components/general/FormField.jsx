@@ -1,8 +1,8 @@
 import React, { useState, useId, useRef, useEffect } from "react";
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
-const FormField = ({ type, name, label, onChange }) => {
+const FormField = ({ type, name, label, value, onChange }) => {
   const id = useId();
   const inputRef = useRef();
 
@@ -14,7 +14,7 @@ const FormField = ({ type, name, label, onChange }) => {
   // const [inputType, setInputType] = useState(isPassword && visible ? "text" : type);
 
   const focusInput = () => {
-    if(!btnClicked){
+    if (!btnClicked) {
       inputRef.current.focus();
     }
   };
@@ -27,6 +27,7 @@ const FormField = ({ type, name, label, onChange }) => {
         name={name}
         type={isPassword && visible ? "text" : type}
         onChange={onChange}
+        value={value}
         placeholder=" "
         autoComplete="off"
         required
@@ -41,11 +42,14 @@ const FormField = ({ type, name, label, onChange }) => {
             setVisible(!visible);
           }}
         >
-          {visible ? <VisibilityIcon size={20} /> : <VisibilityOffIcon size={20} />}
+          {visible ? (
+            <VisibilityIcon size={20} />
+          ) : (
+            <VisibilityOffIcon size={20} />
+          )}
         </button>
       )}
     </div>
-
   );
 };
 

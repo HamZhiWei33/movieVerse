@@ -19,9 +19,11 @@ export const useAuthStore = create((set, get) => ({
 
     const token = localStorage.getItem("token");
     if (token) {
-      axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      axiosInstance.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${token}`;
     }
-    
+
     try {
       const res = await axiosInstance.get("/auth/check");
       set({ authUser: res.data, isCheckingAuth: false });
@@ -48,7 +50,9 @@ export const useAuthStore = create((set, get) => ({
       console.log("Signup response:", res.data);
       const { token } = res.data;
       localStorage.setItem("token", token);
-      axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      axiosInstance.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${token}`;
       set({ authUser: res.data });
       toast.success("Signup successful!");
       //   get().connectSocket();
@@ -72,11 +76,14 @@ export const useAuthStore = create((set, get) => ({
 
       console.log("Login response:", res.data);
 
-      const { token } = res.data;
+      const { token, user } = res.data;
       localStorage.setItem("token", token);
-      axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
-      set({ authUser: res.data });
+      axiosInstance.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${token}`;
+      await get().checkAuth();
+      // set({ authUser: res.data });
+      set({ authUser: user });
       toast.success("Login successful!");
       // get().connectSocket(); // connect to socket after successful login
       return res.data;
@@ -160,7 +167,7 @@ export const useAuthStore = create((set, get) => ({
   },
 
   fetchLikedGenres: async (passedUserId) => {
-    const userId = passedUserId || get().authUser?._id;
+    const userId = get().authUser?._id;
     console.log("Final userId used:", userId);
     if (!userId) {
       toast.error("User not logged in");
@@ -178,7 +185,7 @@ export const useAuthStore = create((set, get) => ({
   },
 
   fetchReviewGenres: async (passedUserId) => {
-    const userId = passedUserId || get().authUser?._id;
+    const userId = get().authUser?._id;
     console.log("Final userId used:", userId);
     if (!userId) {
       toast.error("User not logged in");
@@ -195,8 +202,8 @@ export const useAuthStore = create((set, get) => ({
     }
   },
   fetchWatchlistGenres: async (passedUserId) => {
-    const userId = passedUserId || get().authUser?._id;
-    console.log("Final userId used:", userId);
+    const userId = get().authUser?._id;
+    console.log("Final userId used testing:", userId);
     if (!userId) {
       toast.error("User not logged in");
       return [];
@@ -209,6 +216,30 @@ export const useAuthStore = create((set, get) => ({
       console.error("Failed to fetch watchlist genres:", error);
       toast.error("Failed to load genre statistics");
       return [];
+    }
+  },
+  changeNewPassword: async (oldPassword, newPassword) => {
+    try {
+      const userId = get().authUser?._id;
+      console.log("Final userId used for password change:", userId);
+      if (!userId) {
+        toast.error("User not logged in");
+        return;
+      }
+
+      const res = await axiosInstance.put(`/users/change-password`, {
+        oldPassword,
+        newPassword,
+      });
+
+      toast.success("Password changed successfully");
+      return res.data;
+    } catch (error) {
+      console.error("Error changing password:", error);
+      toast.error(
+        error?.response?.data?.message || "Failed to change password"
+      );
+      throw error;
     }
   },
 }));
