@@ -190,11 +190,17 @@ export const getMovieById = async (req, res) => {
 // @desc    Get distinct filter options (genres, regions, years)
 // @route   GET /api/movies/filters
 // @access  Public
+// @desc    Get distinct filter options (genres, regions, years)
+// @route   GET /api/movies/filters
+// @access  Public
 export const getFilterOptions = async (req, res) => {
   try {
     const genreIds = await Movie.distinct("genre");
     const regionCodes = await Movie.distinct("region");
-    const years = await Movie.distinct("year");
+    let years = await Movie.distinct("year");
+
+    // Sort years in descending order (newest first)
+    years = years.sort((a, b) => b - a);
 
     // Find genres with matching IDs
     const genres = await Genre.find({ id: { $in: genreIds } })
