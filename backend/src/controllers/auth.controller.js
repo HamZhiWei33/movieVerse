@@ -3,6 +3,8 @@
 import { generateToken } from "../lib/utils.js";
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
+import { generateResetCode, getExpirationTime, isCodeExpired } from '../lib/resetPasswordHelpers.js';
+import { sendResetEmail } from '../lib/emailService.js';
 
 export const signup = async (req, res) => {
   const { name, email, password } = req.body;
@@ -132,5 +134,84 @@ export const checkAuth = (req, res) => {
   } catch (error) {
     console.log("Error in checkAuth controller", error.message);
     res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const requestResetCode = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const newCode = generateResetCode();
+    const expiresAt = getExpirationTime();
+
+    await User.findByIdAndUpdate(user._id, {
+      $set: {
+        'passwordReset.code': newCode,
+        'passwordReset.expiresAt': expiresAt
+      },
+      $push: {
+        'passwordReset.previousCodes': user.passwordReset?.code || []
+      }
+    });
+
+    await sendResetEmail(email, newCode, expiresAt);
+
+    res.json({
+      success: true,
+      expiresAt: expiresAt.toISOString()
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || 'Failed to process request'
+    });
+  }
+};
+
+export const verifyResetCode = async (req, res) => {
+  try {
+    const { email, code } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(400).json({ message: 'User not found' });
+    }
+
+    if (user.passwordReset?.code !== code) {
+      return res.status(400).json({ message: 'Invalid code' });
+    }
+
+    if (isCodeExpired(user.passwordReset?.expiresAt)) {
+      return res.status(400).json({ message: 'Expired code' });
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  try {
+    const { email, code, newPassword } = req.body;
+    const user = await User.findOne({
+      email,
+      'passwordReset.code': code,
+      'passwordReset.expiresAt': { $gt: new Date() }
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid or expired code' });
+    }
+
+    user.password = newPassword;
+    user.passwordReset = undefined;
+    await user.save();
+
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };

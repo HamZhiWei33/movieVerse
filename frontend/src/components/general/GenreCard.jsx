@@ -1,14 +1,15 @@
-import React, { useState, memo } from "react";
+import React, { useState, memo, useEffect } from "react";
 // import LikeIcon from "./LikeIcon";
 // import AddToWatchlistIcon from "./AddToWatchlistIcon";
 import "../../styles/general/genre-card.css";
 import { movies } from "../../constant";
+import useMovieStore from "../../store/useMovieStore";
 
-export const PostersGrid = memo(({ genre }) => {
-  const genreMovies = movies.filter((movie) => movie.genre.includes(genre.id));
-  const randomMovies = genreMovies
+export const PostersGrid = memo(({ movies }) => {
+  // const genreMovies = movies.filter((movie) => movie.genre.includes(genre.id));
+  const randomMovies = movies
     .sort(() => 0.5 - Math.random()) // Shuffle
-    .slice(0, Math.min(4, genreMovies.length)); // Choose
+    .slice(0, Math.min(4, movies.length)); // Choose
 
   var moviesCount = randomMovies.length;
 
@@ -19,6 +20,8 @@ export const PostersGrid = memo(({ genre }) => {
           {<img className="poster-img" src={item.posterUrl} /> || ""}
         </div>
       ))}
+
+      {/* Display remaining movies' posters if movies count < 4 */}
       {Array.from({ length: 4 - moviesCount }).map((_, index) => (
         <div key={index + moviesCount} style={{ display: "flex" }}>
           {(
@@ -37,12 +40,39 @@ export const PostersGrid = memo(({ genre }) => {
   );
 });
 
-const GenreCard = ({ genre, onCardClicked }) => {
+const GenreCard = ({ genre, onCardClicked, favouriteGenres }) => {
+  const {fetchMovies} = useMovieStore();
+
+  const [movies, setMovies] = useState([]);
   const [selected, setSelected] = useState(false);
 
+  useEffect(() => {
+    setSelected(favouriteGenres.includes(Number(genre.id)));
+  }, [favouriteGenres]);
+
+  // Fetch 10 movies of the genre on mounted
+  useEffect(() => {
+    const fetchGenreMovies = async () => {
+      try {
+        const filters = {
+          genres: String(genre.id),
+          regions: "",
+          years: ""
+        };
+
+        const response = await fetchMovies(1, 10, filters);
+        setMovies(response.data);
+      } catch (err) {
+        console.error("Failed to fetch data:", err);
+      }
+    };
+
+    fetchGenreMovies();
+  }, [fetchMovies]);
+
   const handleCardClick = () => {
-    onCardClicked(!selected);
-    setSelected(!selected);
+    onCardClicked(!selected, genre);
+    setSelected(!selected, genre);
   };
 
   return (
@@ -50,7 +80,7 @@ const GenreCard = ({ genre, onCardClicked }) => {
       className={`signup-genre-card ${selected ? "selected" : ""}`}
       onClick={handleCardClick}
     >
-      <PostersGrid genre={genre} />
+      <PostersGrid movies={movies} />
       <h3>{genre.name}</h3>
     </article>
   );
