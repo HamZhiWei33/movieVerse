@@ -268,4 +268,88 @@ export const filterMovies = async (req, res) => {
 // - getTopRatedMovies(req, res)
 
 // tzw
-// - getNewReleases(req, res)
+// @desc    Get newly released movies
+// @route   GET /api/movies/new-releases
+// @access  Public
+export const getNewReleases = async (req, res) => {
+  try {
+    const currentYear = new Date().getFullYear();
+    const recentYears = [currentYear, currentYear - 1]; // last 2 years
+    const limit = parseInt(req.query.limit) || 10;
+
+    const movies = await Movie.find({
+      year: { $in: recentYears },
+      trailerUrl: { $exists: true, $ne: "" }
+    })
+      .select('title posterUrl rating year genre description region duration trailerUrl')
+      .sort({ year: -1 }) // Newest first
+      .limit(limit)
+      .lean();
+
+    res.status(200).json({
+      success: true,
+      count: movies.length,
+      data: movies
+    });
+  } catch (error) {
+    console.error("Error getting new releases:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch new releases."
+    });
+  }
+};
+
+// @desc    Get movies for home page sections: watchlist, new releases, recommendations
+// @route   GET /api/movies/home
+// @access  Public (but returns personalized data if user is logged in)
+// movie.controller.js
+export const getHomePageMovies = async (req, res) => {
+  try {
+    console.log("📥 Fetching home page movies...");
+
+    const currentYear = new Date().getFullYear();
+    const recentYears = [currentYear, currentYear - 1];
+
+    // 🔹 1. New Releases
+    const newReleases = await Movie.find({
+      year: { $in: recentYears },
+      trailerUrl: { $exists: true, $ne: "" }
+    })
+      .select("title posterUrl rating year genre description region duration trailerUrl")
+      .sort({ year: -1 })
+      .limit(10)
+      .lean();
+
+    // 🔹 2. Recommendations
+    const recommendations = await Movie.find({
+      trailerUrl: { $exists: true, $ne: "" }
+    })
+      .sort({ rating: -1, reviewCount: -1 })
+      .select("title posterUrl rating year genre description region duration trailerUrl")
+      .limit(10)
+      .lean();
+
+    // 🔹 3. Skip watchlist for now (to simplify debugging)
+    const watchlistMovies = [];
+
+    console.log("✅ Home data fetched successfully.");
+
+    res.status(200).json({
+      success: true,
+      data: {
+        newReleases,
+        recommendations,
+        watchlist: watchlistMovies
+      }
+    });
+  } catch (error) {
+    console.error("❌ Error in getHomePageMovies:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch home page movies"
+    });
+  }
+};
+
+

@@ -7,11 +7,9 @@ import {
   getAllGenres,
   getAllRegions,
 } from "../controllers/movie.controller.js";
+import { getHomePageMovies } from "../controllers/movie.controller.js";
 
 const router = express.Router();
-
-// Get all movies
-router.get("/", protectRoute, getAllMovies);
 
 // Get all distinct filters
 router.get("/filters", getFilterOptions);
@@ -21,6 +19,12 @@ router.get("/genres", getAllGenres);
 
 // Get all region
 router.get("/regions", getAllRegions);
+
+// Get home page movies
+router.get("/home", getHomePageMovies);
+
+// Get all movies
+router.get("/", protectRoute, getAllMovies);
 
 // Get movies by id
 router.get("/:id", protectRoute, getMovieById);
