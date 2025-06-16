@@ -190,11 +190,17 @@ export const getMovieById = async (req, res) => {
 // @desc    Get distinct filter options (genres, regions, years)
 // @route   GET /api/movies/filters
 // @access  Public
+// @desc    Get distinct filter options (genres, regions, years)
+// @route   GET /api/movies/filters
+// @access  Public
 export const getFilterOptions = async (req, res) => {
   try {
     const genreIds = await Movie.distinct("genre");
     const regionCodes = await Movie.distinct("region");
-    const years = await Movie.distinct("year");
+    let years = await Movie.distinct("year");
+
+    // Sort years in descending order (newest first)
+    years = years.sort((a, b) => b - a);
 
     // Find genres with matching IDs
     const genres = await Genre.find({ id: { $in: genreIds } })
@@ -457,7 +463,7 @@ async function processTMDBMovie(tmdbMovie) {
     const director = crew.find(p => p.job === "Director")?.name || "Unknown";
     const actors = cast.slice(0, 5).map(a => a.name).filter(Boolean);
 
-    // Build movie data object
+    // Build movie data object - SET RATING TO 0 FOR TMDB MOVIES
     const movieData = {
       tmdbId: tmdbMovie.id,
       title: tmdbMovie.title || "Unknown Title",
@@ -473,7 +479,7 @@ async function processTMDBMovie(tmdbMovie) {
       duration,
       releaseDate: tmdbMovie.release_date || null,
       region,
-      rating: tmdbMovie.vote_average || 0,
+      rating: 0, // Explicitly set rating to 0 for TMDB movies
       hasTrailer: true,
       lastUpdated: new Date()
     };
