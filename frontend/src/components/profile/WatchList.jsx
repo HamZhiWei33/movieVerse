@@ -5,12 +5,9 @@ import { IoTime } from "react-icons/io5";
 import { GoHeartFill } from "react-icons/go";
 import LikeIcon from "../directory/LikeIcon";
 import "../../styles/profile/watchlist.css";
-import useMovieStore from '../../store/useMovieStore';
+import useMovieStore from "../../store/useMovieStore";
 
-const WatchList = ({
-  movie,
-  showRatingNumber = false,
-}) => {
+const WatchList = ({ movie, showRatingNumber = false, onRemove }) => {
   const navigate = useNavigate();
   const {
     removeFromWatchlist,
@@ -18,7 +15,7 @@ const WatchList = ({
     likeMovie,
     unlikeMovie,
     fetchMovieLikes,
-    hasUserLikedMovie
+    hasUserLikedMovie,
   } = useMovieStore();
 
   const [loadingRemove, setLoadingRemove] = useState(false);
@@ -53,12 +50,20 @@ const WatchList = ({
     e.stopPropagation();
     if (loadingRemove) return;
 
+    const confirm = window.confirm(
+      `Are you sure you want to remove "${movie.title}" from your watchlist?`
+    );
+    if (!confirm) return;
+
     setLoadingRemove(true);
     try {
       await removeFromWatchlist(movie._id);
-      await fetchWatchlist(); // Refresh the watchlist
+      onRemove(movie._id);
     } catch (err) {
-      console.error("Failed to remove movie:", err.response?.data || err.message);
+      console.error(
+        "Failed to remove movie:",
+        err.response?.data || err.message
+      );
     } finally {
       setLoadingRemove(false);
     }
@@ -72,10 +77,10 @@ const WatchList = ({
     try {
       if (liked) {
         await unlikeMovie(movie._id);
-        setLikeCount(prev => prev - 1);
+        setLikeCount((prev) => prev - 1);
       } else {
         await likeMovie(movie._id);
-        setLikeCount(prev => prev + 1);
+        setLikeCount((prev) => prev + 1);
       }
       setLiked(!liked);
     } catch (error) {
@@ -85,9 +90,8 @@ const WatchList = ({
     }
   };
 
-  const rating = movie.rating && movie.rating > 0
-    ? Number(movie.rating.toFixed(1))
-    : 0;
+  const rating =
+    movie.rating && movie.rating > 0 ? Number(movie.rating.toFixed(1)) : 0;
 
   return (
     <article id="watchlist" style={{ cursor: "pointer" }}>

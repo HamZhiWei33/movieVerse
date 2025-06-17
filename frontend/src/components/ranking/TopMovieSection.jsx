@@ -1,15 +1,23 @@
-// components/TopMovieSection.jsx
 import React, { useState, useEffect, useMemo } from "react";
 import ReviewStars from "../directory/ReviewStars";
-import LikeIcon from "../directory/LikeIcon";
 import { IoTime } from "react-icons/io5";
-import AddToWatchlistIcon from "../directory/AddToWatchlistIcon";
 import RatingBarChart from '../directory/RatingBarChart';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 import usePreviousScrollStore from "../../store/usePreviousScrollStore";
+import useRatingStore from '../../store/useRatingStore';
+import LikeIcon from "../directory/LikeIcon";
+import AddToWatchlistIcon from "../directory/AddToWatchlistIcon";
+import useMovieStore from "../../store/useMovieStore";
 
 const TopMovieSection = ({ selectedMovie, setSelectedMovie, ratingDistribution, allReviews }) => {
+  const {
+    likeMovie,
+    unlikeMovie,
+    addToWatchlist,
+    removeFromWatchlist,
+  } = useMovieStore();
+
   const navigate = useNavigate();
   const { setPreviousScrollPosition } = usePreviousScrollStore();
   const [liked, setLiked] = useState(false);
@@ -25,9 +33,14 @@ const TopMovieSection = ({ selectedMovie, setSelectedMovie, ratingDistribution, 
     selectedMovie.rating && selectedMovie.rating > 0 ? Number(selectedMovie.rating.toFixed(1)) : 0;
 
   useEffect(() => {
-    setLiked(false);
-    setAddedToWatchlist(false);
-  }, [selectedMovie]);
+    if (selectedMovie?._id) {
+      // Initialize like and watchlist status based on the movie data
+      setLiked(selectedMovie.liked || false);
+      setAddedToWatchlist(selectedMovie.watchlisted || false);
+      setMovieData(selectedMovie); 
+      fetchReviewsByMovie(selectedMovie._id);
+    }
+  }, [selectedMovie, fetchReviewsByMovie, setMovieData]);
 
   // Fetch both movies and genres in one request
   useEffect(() => {
@@ -51,7 +64,7 @@ const TopMovieSection = ({ selectedMovie, setSelectedMovie, ratingDistribution, 
     fetchData();
   }, []);
 
-  // compute top 3 for display with safety checks
+  // Compute top 3 for display with safety checks
   const [first, second, third] = useMemo(() => {
     if (!Array.isArray(movies) || movies.length === 0) return [null, null, null];
 
@@ -61,12 +74,7 @@ const TopMovieSection = ({ selectedMovie, setSelectedMovie, ratingDistribution, 
         compositeScore: movie.rating * 0.9 +
           ((movie.year || 2000) - 2000) * 0.1,
       }))
-      .sort((a, b) => {
-        if (b.compositeScore === a.compositeScore) {
-          return a._id?.localeCompare(b._id) || 0;
-        }
-        return b.compositeScore - a.compositeScore;
-      })
+      .sort((a, b) => b.compositeScore - a.compositeScore)
       .slice(0, 3);
   }, [movies]);
 
@@ -100,13 +108,52 @@ const TopMovieSection = ({ selectedMovie, setSelectedMovie, ratingDistribution, 
       })
       .filter(Boolean);
 
-    console.log('Mapped genre names:', names);
     return names.join(", ");
   }, [selectedMovie, genres]);
 
   const handleCardClick = (movieId) => {
     setPreviousScrollPosition(window.scrollY);
     navigate(`/movie/${movieId}`);
+  };
+
+  // Handle Like button click
+  const handleLikeClick = async (e) => {
+    e.stopPropagation();
+    if (loadingLike) return;
+
+    setLoadingLike(true);
+    try {
+      if (liked) {
+        await unlikeMovie(selectedMovie._id);
+      } else {
+        await likeMovie(selectedMovie._id);
+      }
+      setLiked(!liked);
+    } catch (error) {
+      console.error("Error updating like:", error);
+    } finally {
+      setLoadingLike(false);
+    }
+  };
+
+  // Handle Add to Watchlist button click
+  const handleAddToWatchlistClick = async (e) => {
+    e.stopPropagation();
+    if (loadingWatchlist) return;
+
+    setLoadingWatchlist(true);
+    try {
+      if (addedToWatchlist) {
+        await removeFromWatchlist(selectedMovie._id);
+      } else {
+        await addToWatchlist(selectedMovie._id);
+      }
+      setAddedToWatchlist(!addedToWatchlist);
+    } catch (error) {
+      console.error("Error updating watchlist:", error);
+    } finally {
+      setLoadingWatchlist(false);
+    }
   };
 
   if (loading) {
@@ -190,7 +237,10 @@ const TopMovieSection = ({ selectedMovie, setSelectedMovie, ratingDistribution, 
           </div>
         </section>
         <section className="rating-visual-summary">
-          <RatingBarChart movieId={selectedMovie?._id} />
+          <RatingBarChart 
+        movieId={selectedMovie?._id}
+        key={selectedMovie?._id} // This key prop will force re-render
+      />
         </section>
 
       </section>
