@@ -1,4 +1,3 @@
-// components/Top1Card.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ReviewStars from "../directory/ReviewStars";
@@ -6,7 +5,7 @@ import LikeIcon from "../directory/LikeIcon";
 import AddToWatchlistIcon from "../directory/AddToWatchlistIcon";
 import { IoTime } from "react-icons/io5";
 import usePreviousScrollStore from "../../store/usePreviousScrollStore";
-import useMovieStore from '../../store/useMovieStore';
+import useRankingStore from '../../store/useRankingStore';
 import "../directory/MovieCard";
 
 const Top1Card = ({ movie, rank, image, title, rating, description, genre, region, year, duration }) => {
@@ -17,22 +16,33 @@ const Top1Card = ({ movie, rank, image, title, rating, description, genre, regio
     unlikeMovie,
     addToWatchlist,
     removeFromWatchlist,
-  } = useMovieStore();
+    hasUserLikedMovie,
+    isInWatchlist,
+  } = useRankingStore();
 
   const [loadingLike, setLoadingLike] = useState(false);
   const [loadingWatchlist, setLoadingWatchlist] = useState(false);
-  const [liked, setLiked] = useState(movie?.liked || false);
-  const [isInWatchlist, setIsInWatchlist] = useState(movie?.watchlisted || false);
+  const [liked, setLiked] = useState(false);
+  const [watchlisted, setWatchlisted] = useState(false);
 
   const handleCardClick = () => {
     setPreviousScrollPosition(window.scrollY);
     navigate(`/movie/${movie._id}`);
   };
 
+  const fetchLikeState = async () => {
+    const likedStatus = await hasUserLikedMovie(movie._id);
+    setLiked(likedStatus);
+  };
+
+  React.useEffect(() => {
+    fetchLikeState();
+    setWatchlisted(isInWatchlist(movie._id));
+  }, [movie._id]);
+
   const handleLikeClick = async (e) => {
     e.stopPropagation();
     if (loadingLike) return;
-
     setLoadingLike(true);
     try {
       if (liked) {
@@ -40,7 +50,7 @@ const Top1Card = ({ movie, rank, image, title, rating, description, genre, regio
       } else {
         await likeMovie(movie._id);
       }
-      setLiked(!liked);
+      fetchLikeState();
     } catch (error) {
       console.error("Error updating like:", error);
     } finally {
@@ -51,15 +61,15 @@ const Top1Card = ({ movie, rank, image, title, rating, description, genre, regio
   const handleAddToWatchlistClick = async (e) => {
     e.stopPropagation();
     if (loadingWatchlist) return;
-
     setLoadingWatchlist(true);
     try {
-      if (isInWatchlist) {
+      if (watchlisted) {
         await removeFromWatchlist(movie._id);
+        setWatchlisted(false);
       } else {
         await addToWatchlist(movie._id);
+        setWatchlisted(true);
       }
-      setIsInWatchlist(!isInWatchlist);
     } catch (error) {
       console.error("Error updating watchlist:", error);
     } finally {
@@ -74,7 +84,6 @@ const Top1Card = ({ movie, rank, image, title, rating, description, genre, regio
         <div className="genre-rating-value">
           {rating === 0 ? 0 : rating.toFixed(1)}
         </div>
-
       </div>
 
       <div className="genre-card-body">
@@ -97,15 +106,12 @@ const Top1Card = ({ movie, rank, image, title, rating, description, genre, regio
             </span>
             {duration}
           </span>
-          {/* <div className="iteractive-icon" onClick={handleLikeClick}>
+          <div className="iteractive-icon" onClick={handleLikeClick}>
             <LikeIcon liked={liked} disabled={loadingLike} />
           </div>
           <div className="iteractive-icon" onClick={handleAddToWatchlistClick}>
-            <AddToWatchlistIcon 
-              addedToWatchlist={isInWatchlist} 
-              disabled={loadingWatchlist}
-            />
-          </div> */}
+            <AddToWatchlistIcon addedToWatchlist={watchlisted} disabled={loadingWatchlist} />
+          </div>
         </div>
         <p className="top1-description">{description}</p>
       </div>

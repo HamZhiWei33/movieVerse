@@ -1,12 +1,11 @@
-// components/GenreCard.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ReviewStars from "../directory/ReviewStars";
 import LikeIcon from "../directory/LikeIcon";
 import AddToWatchlistIcon from "../directory/AddToWatchlistIcon";
 import { IoTime } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import usePreviousScrollStore from "../../store/usePreviousScrollStore";
-import useMovieStore from '../../store/useMovieStore';
+import useRankingStore from '../../store/useRankingStore';
 import "../directory/MovieCard";
 
 const GenreCard = ({ movie, rank, image, title, rating, genre, region, year, duration }) => {
@@ -17,12 +16,24 @@ const GenreCard = ({ movie, rank, image, title, rating, genre, region, year, dur
     unlikeMovie,
     addToWatchlist,
     removeFromWatchlist,
-  } = useMovieStore();
+    hasUserLikedMovie,
+    isInWatchlist
+  } = useRankingStore();
 
   const [loadingLike, setLoadingLike] = useState(false);
   const [loadingWatchlist, setLoadingWatchlist] = useState(false);
-  const [liked, setLiked] = useState(movie?.liked || false);
-  const [isInWatchlist, setIsInWatchlist] = useState(movie?.watchlisted || false);
+  const [liked, setLiked] = useState(false);
+  const [watchlisted, setWatchlisted] = useState(false);
+
+  useEffect(() => {
+    if (!movie?._id) return;
+    const checkStates = async () => {
+      const likedStatus = await hasUserLikedMovie(movie._id);
+      setLiked(likedStatus);
+      setWatchlisted(isInWatchlist(movie._id));
+    };
+    checkStates();
+  }, [movie._id]);
 
   const handleCardClick = () => {
     setPreviousScrollPosition(window.scrollY);
@@ -40,7 +51,8 @@ const GenreCard = ({ movie, rank, image, title, rating, genre, region, year, dur
       } else {
         await likeMovie(movie._id);
       }
-      setLiked(!liked);
+      const updated = await hasUserLikedMovie(movie._id);
+      setLiked(updated);
     } catch (error) {
       console.error("Error updating like:", error);
     } finally {
@@ -54,12 +66,13 @@ const GenreCard = ({ movie, rank, image, title, rating, genre, region, year, dur
 
     setLoadingWatchlist(true);
     try {
-      if (isInWatchlist) {
+      if (watchlisted) {
         await removeFromWatchlist(movie._id);
+        setWatchlisted(false);
       } else {
         await addToWatchlist(movie._id);
+        setWatchlisted(true);
       }
-      setIsInWatchlist(!isInWatchlist);
     } catch (error) {
       console.error("Error updating watchlist:", error);
     } finally {
@@ -95,21 +108,15 @@ const GenreCard = ({ movie, rank, image, title, rating, genre, region, year, dur
               </span>
               {duration}
             </span>
-            {/* <div className="iteractive-icon" onClick={(e) => {
-              e.stopPropagation();
-              handleLikeClick(e);
-            }}>
+            <div className="iteractive-icon" onClick={handleLikeClick}>
               <LikeIcon liked={liked} disabled={loadingLike} />
             </div>
-            <div className="iteractive-icon" onClick={(e) => {
-              e.stopPropagation();
-              handleAddToWatchlistClick(e);
-            }}>
+            <div className="iteractive-icon" onClick={handleAddToWatchlistClick}>
               <AddToWatchlistIcon 
-                addedToWatchlist={isInWatchlist} 
+                addedToWatchlist={watchlisted} 
                 disabled={loadingWatchlist}
               />
-            </div> */}
+            </div>
           </div>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import ReviewStars from "../directory/ReviewStars";
 import { IoTime } from "react-icons/io5";
 import RatingBarChart from '../directory/RatingBarChart';
@@ -8,56 +8,56 @@ import usePreviousScrollStore from "../../store/usePreviousScrollStore";
 import useRatingStore from '../../store/useRatingStore';
 import LikeIcon from "../directory/LikeIcon";
 import AddToWatchlistIcon from "../directory/AddToWatchlistIcon";
-import useMovieStore from "../../store/useMovieStore";
+import useRankingStore from "../../store/useRankingStore";
 
 const TopMovieSection = ({ selectedMovie, setSelectedMovie, ratingDistribution, allReviews }) => {
   const {
+    isInWatchlist,
     likeMovie,
     unlikeMovie,
+    fetchWatchlist,
     addToWatchlist,
     removeFromWatchlist,
-  } = useMovieStore();
+    hasUserLikedMovie, // NEW
+  } = useRankingStore();
 
   const navigate = useNavigate();
   const { setPreviousScrollPosition } = usePreviousScrollStore();
-  
-  // Initialize state based on selectedMovie's liked and watchlisted status
-  const [liked, setLiked] = useState(selectedMovie?.liked || false);
-  const [addedToWatchlist, setAddedToWatchlist] = useState(selectedMovie?.watchlisted || false);
+  const { fetchReviewsByMovie, setMovieData } = useRatingStore();
+
   const [loadingLike, setLoadingLike] = useState(false);
   const [loadingWatchlist, setLoadingWatchlist] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [movies, setMovies] = useState([]);
   const [genres, setGenres] = useState([]);
-
-  const { fetchReviewsByMovie, setMovieData } = useRatingStore();
+  const [liked, setLiked] = useState(false); // now local state
 
   useEffect(() => {
     if (selectedMovie?._id) {
-      // Initialize like and watchlist status based on the movie data
-      setLiked(selectedMovie.liked || false);
-      setAddedToWatchlist(selectedMovie.watchlisted || false);
+      console.log("[🟡 useEffect] selectedMovie._id:", selectedMovie._id);
+
+      hasUserLikedMovie(selectedMovie._id).then((result) => {
+        console.log("[✅ hasUserLikedMovie]", result);
+        setLiked(result);
+      });
+
+      fetchWatchlist();
       setMovieData(selectedMovie); 
       fetchReviewsByMovie(selectedMovie._id);
     }
-  }, [selectedMovie, fetchReviewsByMovie, setMovieData]);
+  }, [selectedMovie]);
 
-  // Fetch both movies and genres in one request
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         const response = await axios.get('http://localhost:5001/api/rankings');
-        console.log('API Response:', response.data);
-        
-        if (response.data) {
-          setMovies(response.data.movies || []);
-          setGenres(response.data.genres || []);
-        }
+        setMovies(response.data.movies || []);
+        setGenres(response.data.genres || []);
       } catch (err) {
-        console.error('Error fetching data:', err);
-        setError('Failed to load data');
+        setError("Failed to load data");
+        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -65,7 +65,6 @@ const TopMovieSection = ({ selectedMovie, setSelectedMovie, ratingDistribution, 
     fetchData();
   }, []);
 
-  // Compute top 3 for display with safety checks
   const [first, second, third] = useMemo(() => {
     if (!Array.isArray(movies) || movies.length === 0) return [null, null, null];
 
@@ -79,37 +78,14 @@ const TopMovieSection = ({ selectedMovie, setSelectedMovie, ratingDistribution, 
       .slice(0, 3);
   }, [movies]);
 
-  const top3 = useMemo(() => {
-    return [second, first, third].filter(Boolean);
-  }, [first, second, third]);
+  const top3 = useMemo(() => [second, first, third].filter(Boolean), [first, second, third]);
 
-  const formatDuration = (minutes) => {
-    if (!minutes || isNaN(minutes)) return "N/A";
-
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-
-    return hours > 0
-      ? `${hours}h${mins > 0 ? ` ${mins}min` : ""}`.trim()
-      : `${mins}min`;
-  };
-
-  // Updated genre name mapping
   const genreNames = useMemo(() => {
-    if (!selectedMovie?.genre || !Array.isArray(genres)) {
-      console.log('No genres or movie:', { movie: selectedMovie, genres });
-      return "";
-    }
-    
-    const names = selectedMovie.genre
-      .map(genreId => {
-        const genre = genres.find(g => g.id === genreId);
-        if (!genre) console.log('Genre not found for ID:', genreId);
-        return genre ? genre.name : '';
-      })
-      .filter(Boolean);
-
-    return names.join(", ");
+    if (!selectedMovie?.genre || !Array.isArray(genres)) return "";
+    return selectedMovie.genre
+      .map((id) => genres.find((g) => g.id === id)?.name)
+      .filter(Boolean)
+      .join(", ");
   }, [selectedMovie, genres]);
 
   const handleCardClick = (movieId) => {
@@ -117,11 +93,8 @@ const TopMovieSection = ({ selectedMovie, setSelectedMovie, ratingDistribution, 
     navigate(`/movie/${movieId}`);
   };
 
-  // Handle Like button click
-  const handleLikeClick = async (e) => {
-    e.stopPropagation();
-    if (loadingLike) return;
-
+  const handleLikeClick = async () => {
+    if (!selectedMovie?._id) return;
     setLoadingLike(true);
     try {
       if (liked) {
@@ -129,45 +102,32 @@ const TopMovieSection = ({ selectedMovie, setSelectedMovie, ratingDistribution, 
       } else {
         await likeMovie(selectedMovie._id);
       }
-      setLiked(!liked);
+      const updated = await hasUserLikedMovie(selectedMovie._id);
+      setLiked(updated);
     } catch (error) {
-      console.error("Error updating like:", error);
+      console.error("Like error:", error);
     } finally {
       setLoadingLike(false);
     }
   };
 
-  // Handle Add to Watchlist button click
-  const handleAddToWatchlistClick = async (e) => {
-    e.stopPropagation();
-    if (loadingWatchlist) return;
-
+  const handleAddToWatchlistClick = async () => {
+    if (!selectedMovie?._id) return;
     setLoadingWatchlist(true);
     try {
-      if (addedToWatchlist) {
-        await removeFromWatchlist(selectedMovie._id);
-      } else {
-        await addToWatchlist(selectedMovie._id);
-      }
-      setAddedToWatchlist(!addedToWatchlist);
+      isInWatchlist(selectedMovie._id)
+        ? await removeFromWatchlist(selectedMovie._id)
+        : await addToWatchlist(selectedMovie._id);
     } catch (error) {
-      console.error("Error updating watchlist:", error);
+      console.error("Watchlist error:", error);
     } finally {
       setLoadingWatchlist(false);
     }
   };
 
-  if (loading) {
-    return <div className="loading">Loading movies...</div>;
-  }
-
-  if (error) {
-    return <div className="error">{error}</div>;
-  }
-
-  if (!selectedMovie || top3.length === 0) {
-    return <div className="no-movies">No movies available</div>;
-  }
+  if (loading) return <div className="loading">Loading movies...</div>;
+  if (error) return <div className="error">{error}</div>;
+  if (!selectedMovie || top3.length === 0) return <div className="no-movies">No movies available</div>;
 
   return (
     <div className="blurred-banner-wrapper">
@@ -175,7 +135,7 @@ const TopMovieSection = ({ selectedMovie, setSelectedMovie, ratingDistribution, 
         <div
           className="background-blur"
           style={{
-            backgroundImage: `url(${selectedMovie ? selectedMovie.posterUrl : top3[0]?.posterUrl})`
+            backgroundImage: `url(${selectedMovie?.posterUrl || top3[0]?.posterUrl})`,
           }}
         />
         <div className="dark-overlay" />
@@ -187,13 +147,12 @@ const TopMovieSection = ({ selectedMovie, setSelectedMovie, ratingDistribution, 
             if (!movie) return null;
             const label = idx === 0 ? "Top 2" : idx === 1 ? "Top 1" : "Top 3";
             const isActive = movie._id === selectedMovie._id;
-            
             return (
               <div
                 key={movie._id}
                 className={`card ${isActive ? "main-card active" : "side-card"}`}
                 onClick={() => handleCardClick(movie._id)}
-                style={{ cursor: 'pointer' }}
+                style={{ cursor: "pointer" }}
                 onMouseEnter={() => setSelectedMovie(movie)}
               >
                 <h2 className="rank-label">{label}</h2>
@@ -209,7 +168,12 @@ const TopMovieSection = ({ selectedMovie, setSelectedMovie, ratingDistribution, 
           <div className="left-column">
             <h3>{selectedMovie.title}</h3>
             <div className="rating-bar">
-              <ReviewStars rating={Number(selectedMovie.rating).toFixed(1)} readOnly={true} showNumber={true} size="large" />
+              <ReviewStars
+                rating={Number(selectedMovie.rating).toFixed(1)}
+                readOnly={true}
+                showNumber={true}
+                size="large"
+              />
             </div>
             <div className="tags">
               <span className="badge">{genreNames}</span>
@@ -217,24 +181,37 @@ const TopMovieSection = ({ selectedMovie, setSelectedMovie, ratingDistribution, 
               <span className="badge">{selectedMovie.year}</span>
             </div>
             <div className="duration-like">
-              <span className="badge-duration"><span className="badge-duration-icon">
-                <IoTime />
-              </span>{selectedMovie?.duration}</span>
+              <span className="badge-duration">
+                <span className="badge-duration-icon">
+                  <IoTime />
+                </span>
+                {selectedMovie.duration}
+              </span>
             </div>
             <div className="action-buttons">
-              <button 
-                className="watch-trailer" 
-                onClick={() => selectedMovie.trailerUrl ? window.open(selectedMovie.trailerUrl, "_blank") : null}
+              <button
+                className="watch-trailer"
+                onClick={() =>
+                  selectedMovie.trailerUrl
+                    ? window.open(selectedMovie.trailerUrl, "_blank")
+                    : null
+                }
                 disabled={!selectedMovie.trailerUrl}
               >
                 ▶ Watch Trailer
               </button>
-              {/* <div className="iteractive-icon" onClick={handleLikeClick}>
-                <LikeIcon liked={liked} disabled={loadingLike} />
+              <div className="iteractive-icon" onClick={handleLikeClick}>
+                <LikeIcon
+                  liked={liked}
+                  disabled={loadingLike}
+                />
               </div>
               <div className="iteractive-icon" onClick={handleAddToWatchlistClick}>
-                <AddToWatchlistIcon addedToWatchlist={addedToWatchlist} disabled={loadingWatchlist} />
-              </div> */}
+                <AddToWatchlistIcon
+                  addedToWatchlist={isInWatchlist(selectedMovie._id)}
+                  disabled={loadingWatchlist}
+                />
+              </div>
             </div>
           </div>
           <div className="right-column">
@@ -242,12 +219,11 @@ const TopMovieSection = ({ selectedMovie, setSelectedMovie, ratingDistribution, 
           </div>
         </section>
         <section className="rating-visual-summary">
-          <RatingBarChart 
-        movieId={selectedMovie?._id}
-        key={selectedMovie?._id} // This key prop will force re-render
-      />
+          <RatingBarChart
+            movieId={selectedMovie?._id}
+            key={selectedMovie?._id}
+          />
         </section>
-
       </section>
     </div>
   );
