@@ -26,6 +26,7 @@ export const getAllMovies = async (req, res) => {
     // First try to get from database
     const [movies, total] = await Promise.all([
       Movie.find(query)
+        .sort({ releaseDate: -1 })
         .skip(skip)
         .limit(limit)
         .lean(),
@@ -52,7 +53,9 @@ export const getAllMovies = async (req, res) => {
         });
 
         // Process and store TMDB movies
-        const tmdbMovies = data.results.slice(0, needed);
+        const tmdbMovies = data.results
+          .slice(0, needed)
+          .sort((a, b) => new Date(b.release_date) - new Date(a.release_date));
         const processedMovies = [];
 
         for (const tmdbMovie of tmdbMovies) {
@@ -307,6 +310,7 @@ export const filterMovies = async (req, res) => {
     query.trailerUrl = { $exists: true, $ne: "" };
 
     const movies = await Movie.find(query)
+      .sort({ releaseDate: -1 })
       .select('title posterUrl rating year genre description region duration trailerUrl')
       .skip(skip)
       .limit(limit)
@@ -386,7 +390,9 @@ export const fetchFromTMDB = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      data: processedMovies.slice(0, limit),
+      data: processedMovies
+        .slice(0, limit)
+        .sort((a, b) => new Date(b.releaseDate) - new Date(a.releaseDate)),
       pagination: {
         hasMore: true // TMDB has virtually infinite pages
       }

@@ -33,10 +33,13 @@ const useRatingStore = create((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await axiosInstance.get(`/reviews/${movieId}`);
+      const sortedReviews = response.data.sort((a, b) => 
+        new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt)
+    );
       set((state) => ({
         reviewsByMovie: {
           ...state.reviewsByMovie,
-          [movieId]: response.data,
+          [movieId]: sortedReviews,
         },
       }));
     } catch (err) {
@@ -64,32 +67,38 @@ const useRatingStore = create((set, get) => ({
     }
   },
 
-  addReview: async (movieId, { rating, review }) => {
+   addReview: async (movieId, { rating, review }) => {
     set({ isLoading: true, error: null });
     try {
       const response = await axiosInstance.post(
         `/reviews/${movieId}`,
         { rating, review },
-        {
-          withCredentials: true,
-        }
+        { withCredentials: true }
       );
-      // update store
+      
       set((state) => {
         const updatedReviews = state.reviewsByMovie[movieId]
           ? [...state.reviewsByMovie[movieId], response.data.review]
           : [response.data.review];
+          
         return {
           reviewsByMovie: {
             ...state.reviewsByMovie,
             [movieId]: updatedReviews,
           },
           userReview: { ...state.userReview, [movieId]: response.data.review },
+          moviesById: {
+            ...state.moviesById,
+            [movieId]: response.data.movie 
+          }
         };
       });
+      
+      return response.data;
     } catch (err) {
       console.error(`Failed to add review for movie ${movieId}:`, err);
       set({ error: err.response?.data || err.message });
+      throw err;
     } finally {
       set({ isLoading: false });
     }
@@ -101,23 +110,29 @@ const useRatingStore = create((set, get) => ({
       const response = await axiosInstance.put(
         `/reviews/${movieId}`,
         { rating, review },
-        {
-          withCredentials: true,
-        }
+        { withCredentials: true }
       );
+      
       set((state) => {
-        const updatedList =
-          state.reviewsByMovie[movieId]?.map((r) =>
-            r.userId === state.user?.id ? response.data.review : r
-          ) || [];
+        const updatedList = state.reviewsByMovie[movieId]?.map((r) =>
+          r.userId === state.user?.id ? response.data.review : r
+        ) || [];
+        
         return {
           reviewsByMovie: { ...state.reviewsByMovie, [movieId]: updatedList },
           userReview: { ...state.userReview, [movieId]: response.data.review },
+          moviesById: {
+            ...state.moviesById,
+            [movieId]: response.data.movie 
+          }
         };
       });
+      
+      return response.data;
     } catch (err) {
       console.error(`Failed to update review for movie ${movieId}:`, err);
       set({ error: err.response?.data || err.message });
+      throw err;
     } finally {
       set({ isLoading: false });
     }
