@@ -127,6 +127,10 @@
   gap: 0.6rem;
 }
 
+/* .iteractive-icon-container .like-count {
+  display: none; 
+} */
+
 .iteractive-icon .icon {
   font-size: 1.3rem;
   display: flex;
@@ -149,12 +153,6 @@
   display: flex;
   align-items: center;
   gap: 0.3rem;
-}
-
-.like-count {
-  font-size: 0.8rem;
-  color: #bfbfbf;
-  transition: color 0.2s ease;
 }
 
 .bottom-iteractive-icon-container {

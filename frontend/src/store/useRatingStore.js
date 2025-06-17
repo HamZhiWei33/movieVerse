@@ -4,9 +4,9 @@ import { axiosInstance } from "../lib/axios.js";
 
 const useRatingStore = create((set, get) => ({
   user: null,
-  userReviews: [],       // reviews made by current user
-  reviewsByMovie: {},    // { [movieId]: Review[] }
-  userReview: {},        // { [movieId]: Review }
+  userReviews: [], // reviews made by current user
+  reviewsByMovie: {}, // { [movieId]: Review[] }
+  userReview: {}, // { [movieId]: Review }
   moviesById: {},
   error: null,
   isLoading: false,
@@ -21,7 +21,10 @@ const useRatingStore = create((set, get) => ({
       });
       set({ userReviews: response.data, isLoading: false });
     } catch (err) {
-      console.error("Failed to fetch user reviews:", err.response?.data || err.message);
+      console.error(
+        "Failed to fetch user reviews:",
+        err.response?.data || err.message
+      );
       set({ error: err.response?.data || err.message, isLoading: false });
     }
   },
@@ -50,7 +53,9 @@ const useRatingStore = create((set, get) => ({
       const response = await axiosInstance.get(`/reviews/${movieId}/user`, {
         withCredentials: true,
       });
-      set(state => ({ userReview: { ...state.userReview, [movieId]: response.data } }));
+      set((state) => ({
+        userReview: { ...state.userReview, [movieId]: response.data },
+      }));
     } catch (err) {
       console.error(`Failed to fetch user review for movie ${movieId}:`, err);
       set({ error: err.response?.data || err.message });
@@ -62,17 +67,24 @@ const useRatingStore = create((set, get) => ({
   addReview: async (movieId, { rating, review }) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axiosInstance.post(`/reviews/${movieId}`, { rating, review }, {
-        withCredentials: true,
-      });
+      const response = await axiosInstance.post(
+        `/reviews/${movieId}`,
+        { rating, review },
+        {
+          withCredentials: true,
+        }
+      );
       // update store
-      set(state => {
+      set((state) => {
         const updatedReviews = state.reviewsByMovie[movieId]
           ? [...state.reviewsByMovie[movieId], response.data.review]
           : [response.data.review];
         return {
-          reviewsByMovie: { ...state.reviewsByMovie, [movieId]: updatedReviews },
-          userReview: { ...state.userReview, [movieId]: response.data.review }
+          reviewsByMovie: {
+            ...state.reviewsByMovie,
+            [movieId]: updatedReviews,
+          },
+          userReview: { ...state.userReview, [movieId]: response.data.review },
         };
       });
     } catch (err) {
@@ -86,16 +98,21 @@ const useRatingStore = create((set, get) => ({
   updateReview: async (movieId, { rating, review }) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axiosInstance.put(`/reviews/${movieId}`, { rating, review }, {
-        withCredentials: true,
-      });
-      set(state => {
-        const updatedList = state.reviewsByMovie[movieId]?.map(r =>
-          r.userId === state.user?.id ? response.data.review : r
-        ) || [];
+      const response = await axiosInstance.put(
+        `/reviews/${movieId}`,
+        { rating, review },
+        {
+          withCredentials: true,
+        }
+      );
+      set((state) => {
+        const updatedList =
+          state.reviewsByMovie[movieId]?.map((r) =>
+            r.userId === state.user?.id ? response.data.review : r
+          ) || [];
         return {
           reviewsByMovie: { ...state.reviewsByMovie, [movieId]: updatedList },
-          userReview: { ...state.userReview, [movieId]: response.data.review }
+          userReview: { ...state.userReview, [movieId]: response.data.review },
         };
       });
     } catch (err) {
@@ -108,11 +125,11 @@ const useRatingStore = create((set, get) => ({
 
   setMovieData: (movie) => {
     if (!movie?._id) return;
-    set(state => ({
+    set((state) => ({
       moviesById: {
         ...state.moviesById,
-        [movie._id]: movie
-      }
+        [movie._id]: movie,
+      },
     }));
   },
 
@@ -120,7 +137,6 @@ const useRatingStore = create((set, get) => ({
     const movie = get().moviesById?.[movieId];
     return movie?.rating ?? 0;
   },
-
 }));
 
 export default useRatingStore;

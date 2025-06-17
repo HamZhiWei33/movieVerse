@@ -62,7 +62,7 @@ const MovieCardList = ({
         setLikeCount(prev => prev + 1);
       }
       setLiked(!liked);
-      await fetchMovieLikes(movie._id); // Optionally refresh like data
+      await fetchMovieLikes(movie._id);
     } catch (error) {
       console.error("Error updating like:", error);
     } finally {
@@ -125,12 +125,8 @@ const MovieCardList = ({
           </div>
           {!showBottomInteractiveIcon && (
             <div className="iteractive-icon-container" onClick={(e) => e.stopPropagation()}>
-              <div className="iteractive-icon" onClick={handleLikeClick}>
-                <LikeIcon liked={liked} disabled={loadingLike} />
-              </div>
-              <div className="iteractive-icon" onClick={handleAddToWatchlistClick}>
-                <AddToWatchlistIcon addedToWatchlist={isInWatchlist} disabled={loadingWatchlist} />
-              </div>
+                <LikeIcon movie={movie} disabled={loadingLike} />
+                <AddToWatchlistIcon movie={movie} disabled={loadingWatchlist} />
             </div>
           )}
         </div>
@@ -167,13 +163,8 @@ const MovieCardList = ({
               <FaPlay className="play-icon" />
               Watch Trailer
             </button>
-            <div className="iteractive-icon" onClick={handleLikeClick}>
-              <LikeIcon liked={liked} disabled={loadingLike} />
-              <span className="like-count">{likeCount}</span>
-            </div>
-            <div className="iteractive-icon" onClick={handleAddToWatchlistClick}>
-              <AddToWatchlistIcon addedToWatchlist={isInWatchlist} disabled={loadingWatchlist} />
-            </div>
+              <LikeIcon movie={movie} showCount={true} disabled={loadingLike} />
+              <AddToWatchlistIcon movie={movie} disabled={loadingWatchlist} />
           </div>
         )}
       </div>

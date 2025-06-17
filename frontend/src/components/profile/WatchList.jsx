@@ -5,22 +5,19 @@ import { IoTime } from "react-icons/io5";
 import { GoHeartFill } from "react-icons/go";
 import LikeIcon from "../directory/LikeIcon";
 import "../../styles/profile/watchlist.css";
-import useMovieStore from '../../store/useMovieStore';
+import useMovieStore from "../../store/useMovieStore";
 
-const WatchList = ({
-  movie,
-  showRatingNumber = false,
-}) => {
+const WatchList = ({ movie, showRatingNumber = false, onRemove }) => {
   const navigate = useNavigate();
-  const { 
+  const {
     removeFromWatchlist,
     fetchWatchlist,
     likeMovie,
     unlikeMovie,
     fetchMovieLikes,
-    hasUserLikedMovie
+    hasUserLikedMovie,
   } = useMovieStore();
-  
+
   const [loadingRemove, setLoadingRemove] = useState(false);
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(movie.likeCount || 0);
@@ -32,14 +29,14 @@ const WatchList = ({
       try {
         const isLiked = await hasUserLikedMovie(movie._id);
         setLiked(isLiked);
-        
+
         const likesData = await fetchMovieLikes(movie._id);
         setLikeCount(likesData.count || 0);
       } catch (error) {
         console.error("Error checking like status:", error);
       }
     };
-    
+
     checkLikeStatus();
   }, [movie._id, hasUserLikedMovie, fetchMovieLikes]);
 
@@ -53,12 +50,20 @@ const WatchList = ({
     e.stopPropagation();
     if (loadingRemove) return;
 
+    const confirm = window.confirm(
+      `Are you sure you want to remove "${movie.title}" from your watchlist?`
+    );
+    if (!confirm) return;
+
     setLoadingRemove(true);
     try {
       await removeFromWatchlist(movie._id);
-      await fetchWatchlist(); // Refresh the watchlist
+      onRemove(movie._id);
     } catch (err) {
-      console.error("Failed to remove movie:", err.response?.data || err.message);
+      console.error(
+        "Failed to remove movie:",
+        err.response?.data || err.message
+      );
     } finally {
       setLoadingRemove(false);
     }
@@ -72,10 +77,10 @@ const WatchList = ({
     try {
       if (liked) {
         await unlikeMovie(movie._id);
-        setLikeCount(prev => prev - 1);
+        setLikeCount((prev) => prev - 1);
       } else {
         await likeMovie(movie._id);
-        setLikeCount(prev => prev + 1);
+        setLikeCount((prev) => prev + 1);
       }
       setLiked(!liked);
     } catch (error) {
@@ -85,9 +90,8 @@ const WatchList = ({
     }
   };
 
-  const rating = movie.rating && movie.rating > 0 
-    ? Number(movie.rating.toFixed(1))
-    : 0;
+  const rating =
+    movie.rating && movie.rating > 0 ? Number(movie.rating.toFixed(1)) : 0;
 
   return (
     <article id="watchlist" style={{ cursor: "pointer" }}>
@@ -120,15 +124,7 @@ const WatchList = ({
               </span>
               {movie.duration}
             </div>
-            <div 
-              className="like-tag"
-              onClick={handleLikeClick}
-            >
-              <span className="like-icon">
-                <LikeIcon liked={liked} disabled={loadingLike} />
-              </span>
-              {likeCount}
-            </div>
+                <LikeIcon movie={movie} disabled={loadingLike} />
           </div>
         </div>
         <div className="remove-watchlist-container">

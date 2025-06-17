@@ -16,3 +16,14 @@
 .icon.addedToWatchlist {
   color: #ccff00;
 }
+
+.like-count {
+  display: inline;
+  font-size: 0.8rem;
+  color: #bfbfbf;
+  transition: color 0.2s ease;
+}
+
+.like-count.hidden {
+  display: none;
+}

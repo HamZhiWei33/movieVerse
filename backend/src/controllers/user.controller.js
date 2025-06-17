@@ -9,6 +9,7 @@
 import User from "../models/user.model.js";
 import Movie from "../models/movie.model.js";
 import Review from "../models/review.model.js";
+import Like from "../models/like.model.js";
 import {
   getLikedGenresAggregation,
   getReviewedGenresAggregation,
@@ -74,11 +75,33 @@ export const updateUserProfile = async (req, res) => {
 export const getUserWatchlist = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).populate("watchlist");
-    console.log("Watchlist:", user.watchlist);
+    const sortedWatchlist = [...user.watchlist].reverse();
 
-    res.status(200).json(user.watchlist);
+    res.status(200).json(sortedWatchlist);
   } catch (err) {
     res.status(500).json({ message: "Error fetching watchlist" });
+  }
+};
+
+// controllers/userController.js
+export const checkWatchlistStatus = async (req, res) => {
+  try {
+    const { movieId } = req.params;
+    const userId = req.user._id;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const isInWatchlist = user.watchlist.some(id => id.toString() === movieId);
+    
+    res.status(200).json({ 
+      inWatchlist: isInWatchlist  
+    });
+  } catch (error) {
+    console.error("Error checking watchlist status:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -211,19 +234,16 @@ export const getUserReviews = async (req, res) => {
 };
 
 export const deleteAccount = async (req, res) => {
+  const userId = req.user._id;
   try {
-    const userId = req.user._id;
-    // const userId = req.params.id;
-    // Delete user reviews
     await Review.deleteMany({ userId });
-
-    // Delete the user account
+    await Like.deleteMany({ userId });
     await User.findByIdAndDelete(userId);
 
     res.status(200).json({ message: "Account deleted successfully." });
   } catch (err) {
-    console.error(`Error deleting user ${req.user._id}:`, err);
-    res.status(500).json({ message: "Server error while deleting account." });
+    console.error("Delete failed:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -269,7 +289,8 @@ export const updateFavouriteGenres = async (req, res) => {
     const { favouriteGenres } = req.body;
 
     const updatedFields = {};
-    if (favouriteGenres !== undefined) updatedFields.favouriteGenres = favouriteGenres;
+    if (favouriteGenres !== undefined)
+      updatedFields.favouriteGenres = favouriteGenres;
 
     const user = await User.findByIdAndUpdate(
       req.params.id,
@@ -350,6 +371,13 @@ export const changeNewPassword = async (req, res) => {
     const isMatch = await bcrypt.compare(oldPassword, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: "Old password is incorrect" });
+    }
+
+    const isOld = await bcrypt.compare(newPassword, user.password);
+    if (isOld) {
+      return res
+        .status(400)
+        .json({ message: "New password cannot be the same as old password" });
     }
 
     const salt = await bcrypt.genSalt(10);

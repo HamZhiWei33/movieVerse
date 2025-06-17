@@ -102,5 +102,18 @@
 .bottom-icons {
   display: flex;
   justify-content: flex-end;
-  gap: 1rem;
+  gap: 0.5rem;
 }
+
+.bottom-icons .iteractive-icon{
+  background-color: transparent;
+  border: transparent;
+}
+
+.bottom-icons .iteractive-icon .icon {
+  font-size: 1.7rem;
+}
+
+/* .bottom-icons .like-count {
+  display: none; 
+} */
