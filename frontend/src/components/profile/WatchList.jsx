@@ -50,6 +50,11 @@ const WatchList = ({ movie, showRatingNumber = false, onRemove }) => {
     e.stopPropagation();
     if (loadingRemove) return;
 
+    const confirm = window.confirm(
+      `Are you sure you want to remove "${movie.title}" from your watchlist?`
+    );
+    if (!confirm) return;
+
     setLoadingRemove(true);
     try {
       await removeFromWatchlist(movie._id);
