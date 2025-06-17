@@ -152,7 +152,7 @@ legend {
   grid-template-columns: repeat(3, 1fr);
   gap: 0.5rem;
   row-gap: 1rem;
-  max-height: 390px;
+  max-height: 400px;
   overflow-y: auto;
   padding-right: 8px;
 }
