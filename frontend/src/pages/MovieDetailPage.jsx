@@ -17,7 +17,7 @@ const MovieDetailPage = () => {
         getCurrentUser,
         isLiked,
         toggleLike,
-        fetchFilterOptions // Add this to your useMovieStore imports
+        fetchFilterOptions
     } = useMovieStore();
     const { state } = useLocation();
     const { movieId } = useParams();
@@ -27,7 +27,7 @@ const MovieDetailPage = () => {
     const [currentUser, setCurrentUser] = useState(null);
     const [loading, setLoading] = useState(!state?.movie);
     const [error, setError] = useState(null);
-    const [genres, setGenres] = useState([]); // This will store all available genres
+    const [genres, setGenres] = useState([]);
 
     const [currentPage, setCurrentPage] = useState(0);
     const reviewsPerPage = 4;
@@ -37,13 +37,12 @@ const MovieDetailPage = () => {
     const {
         reviewsByMovie,
         userReview,
-        user,
         fetchUserReview,
         fetchReviewsByMovie,
         addReview,
         updateReview,
         setUser,
-        setMovieData,
+        setMovieData, // Keep this if setMovieData is used elsewhere for general movie state
     } = useRatingStore();
 
     const movieReviews = reviewsByMovie[movieId] || [];
@@ -56,12 +55,10 @@ const MovieDetailPage = () => {
             return map;
         }, {});
     }, [genres]);
-    console.log(movie);
 
     // Get genre names for the current movie
     const movieGenreNames = useMemo(() => {
         if (!movie?.genre) return [];
-
         return Array.isArray(movie.genre) ? movie.genre : [];
     }, [movie]);
 
@@ -70,24 +67,17 @@ const MovieDetailPage = () => {
             try {
                 setLoading(true);
 
-                // Fetch all available genres first
                 const filterOptions = await fetchFilterOptions();
-                console.log("Fetched genres:", filterOptions.genres);
                 setGenres(filterOptions.genres || []);
 
                 const userData = await getCurrentUser();
                 setCurrentUser(userData);
                 setUser(userData);
 
-                if (!movie) {
-                    const movieData = await fetchMovieById(movieId);
-                    console.log("Fetched movie:", movieData); // Add this
-                    console.log("Movie genres:", movieData.genre); // Add this
-                    setMovie(movieData);
-                    setMovieData(movieData);
-                } else {
-                    setMovieData(movie);
-                }
+                // Always fetch the movie details for the initial load
+                const movieData = await fetchMovieById(movieId);
+                setMovie(movieData);
+                setMovieData(movieData); // Ensure global movie data is set if needed by other components
 
                 await fetchReviewsByMovie(movieId);
                 await fetchUserReview(movieId);
@@ -105,50 +95,49 @@ const MovieDetailPage = () => {
         return () => {
             setCurrentPage(0);
         };
-    }, [movieId]);
+    }, [movieId, fetchMovieById, fetchFilterOptions, getCurrentUser, setUser, fetchReviewsByMovie, fetchUserReview, setMovieData]);
+
 
     const handleBack = () => {
         navigate(-1, { state: { scrollPosition: window.scrollY } });
     };
 
-    // In your handleReviewSubmit function:
-const handleReviewSubmit = async (data) => {
-    try {
-        let updatedReview;
-        if (existingReview) {
-            updatedReview = await updateReview(movieId, data);
-        } else {
-            updatedReview = await addReview(movieId, data);
-        }
-
-        // Refresh the movie data to get updated ratings
-        const updatedMovie = await fetchMovieById(movieId);
-        setMovie(updatedMovie);
-        setMovieData(updatedMovie);
-
-        // Refresh reviews - they should be sorted by date on the backend
-        await Promise.all([
-            fetchReviewsByMovie(movieId),
-            fetchUserReview(movieId),
-        ]);
-
-        // Reset to first page to ensure newest review is visible
-        setCurrentPage(0);
-
-        // Scroll to rating bar chart section
-        setTimeout(() => {
-            const ratingSection = document.querySelector('.rating-container');
-            if (ratingSection) {
-                ratingSection.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
+    const handleReviewSubmit = async (data) => {
+        try {
+            if (existingReview) {
+                await updateReview(movieId, data);
+            } else {
+                await addReview(movieId, data);
             }
-        }, 100);
-    } catch (err) {
-        console.error("Failed to submit review", err);
-    }
-};
+
+            // After review submission, only refresh reviews and user review state.
+            // RatingBarChart will handle its own movie data refresh.
+            await Promise.all([
+                fetchReviewsByMovie(movieId),
+                fetchUserReview(movieId),
+            ]);
+
+            const updatedMovie = await fetchMovieById(movieId);
+            setMovie(updatedMovie);
+            setMovieData(updatedMovie);
+
+            // Reset to first page to ensure newest review is visible
+            setCurrentPage(0);
+
+            // Scroll to rating bar chart section
+            setTimeout(() => {
+                const ratingSection = document.querySelector('.rating-container');
+                if (ratingSection) {
+                    ratingSection.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            }, 100);
+        } catch (err) {
+            console.error("Failed to submit review", err);
+        }
+    };
 
     if (loading) {
         return <div className="loading">Loading movie details...</div>;
@@ -194,11 +183,11 @@ const handleReviewSubmit = async (data) => {
                             }
                         ><IoAdd className="add-icon" />Add Your Review</button>
                     </div>
-                    <RatingBarChart movieId={movieId}  key={`rating-chart-${movie?._id}-${movieReviews.length}`}/>
+                    {/* RatingBarChart now handles its own movie data fetching for ratings */}
+                    <RatingBarChart movieId={movieId} />
                     <div className="review-list">
                         {currentReviews.length > 0 ? (
                             currentReviews.map((review) => {
-                                const user = review.user || {};
                                 return (
                                     <ReviewCard
                                         key={review._id}

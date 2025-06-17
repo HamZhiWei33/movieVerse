@@ -2,36 +2,74 @@ import Rating from '@mui/material/Rating';
 import StarIcon from '@mui/icons-material/Star';
 import '../../styles/directory/RatingBarChart.css';
 import useRatingStore from '../../store/useRatingStore';
-import { useMemo } from "react";
+import useMovieStore from '../../store/useMovieStore';
+import { useMemo, useEffect, useState } from "react";
 
-const RatingBarChart = ({ movieId }) => {
-    const { 
-        reviewsByMovie, 
-        moviesById
+// For MovieDetailPage, we mainly rely on data from stores.
+// For TopMovieSection, we pass initialMovieData/initialReviews to avoid extra fetches.
+const RatingBarChart = ({ movieId, initialMovieData, initialReviews }) => {
+    const {
+        reviewsByMovie,
+        fetchReviewsByMovie,
     } = useRatingStore();
-    
-    const movieReviews = reviewsByMovie[movieId] || [];
-    const movie = moviesById[movieId];
-    const totalRatings = movieReviews.length;
-    
-    const average = movie?.rating || 0;
-    
-    const formattedAverage = totalRatings === 0 
-        ? '0' 
-        : isNaN(Number(average)) 
-            ? '0' 
+
+    const { fetchMovieById } = useMovieStore();
+
+    // Use a single state for movie data, and another for reviews data,
+    // which will be updated by fetches OR by prop changes if provided.
+    const [localMovieData, setLocalMovieData] = useState(initialMovieData);
+    const [localReviews, setLocalReviews] = useState(initialReviews);
+
+    // This useEffect handles fetching and updating local state when movieId changes
+    // or when the component is first mounted without initial props.
+    useEffect(() => {
+        const loadData = async () => {
+            if (!movieId) return;
+
+            let fetchedMovie = initialMovieData;
+            let fetchedReviews = initialReviews;
+
+            // If initial props are not provided, or are stale, fetch them.
+            // Check if movieInternalData or initialMovieData match the current movieId
+            if (!fetchedMovie || fetchedMovie._id !== movieId) {
+                fetchedMovie = await fetchMovieById(movieId);
+            }
+
+            if (!fetchedReviews || reviewsByMovie[movieId]?.length !== fetchedReviews.length) {
+                await fetchReviewsByMovie(movieId);
+                fetchedReviews = reviewsByMovie[movieId];
+            }
+
+
+            setLocalMovieData(fetchedMovie);
+            setLocalReviews(fetchedReviews);
+        };
+
+        loadData();
+    }, [movieId, initialMovieData, initialReviews, fetchMovieById, fetchReviewsByMovie, reviewsByMovie]);
+
+    const currentMovie = initialMovieData || localMovieData;
+    const currentReviews = initialReviews || reviewsByMovie[movieId] || localReviews; // Prefer store's latest reviews
+
+    const average = currentMovie?.rating || 0;
+    const totalRatings = currentReviews?.length || 0;
+
+    const formattedAverage = totalRatings === 0
+        ? '0'
+        : isNaN(Number(average))
+            ? '0'
             : Number(average).toFixed(1);
 
     const breakdown = useMemo(() => {
         const breakdown = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-        movieReviews.forEach(review => {
+        currentReviews.forEach(review => {
             const roundedRating = Math.round(review.rating);
             if (breakdown[roundedRating] !== undefined) {
                 breakdown[roundedRating]++;
             }
         });
         return breakdown;
-    }, [movieReviews]);
+    }, [currentReviews]);
 
     return (
         <div className="rating-breakdown-container">

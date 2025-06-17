@@ -152,24 +152,6 @@ const DirectoryPage = () => {
     });
   }, [movies, hasMore, loading, isFetchingMore]);
 
-  // Deduplicate movies when filters change
-  useEffect(() => {
-    const uniqueMovies = movies.reduce((acc, movie) => {
-      const existing = acc.find(m =>
-        m._id === movie._id ||
-        (m.tmdbId && movie.tmdbId && m.tmdbId === movie.tmdbId)
-      );
-      if (!existing) {
-        acc.push(movie);
-      }
-      return acc;
-    }, []);
-
-    if (uniqueMovies.length !== movies.length) {
-      useMovieStore.setState({ movies: uniqueMovies });
-    }
-  }, [movies, selectedGenres, selectedRegions, selectedDecades]);
-
   useEffect(() => {
     if (!loading && movies.length > 0 && previousScrollPosition > 0) {
       window.scrollTo(0, previousScrollPosition);
