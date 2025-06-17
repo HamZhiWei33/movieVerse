@@ -1,75 +1,90 @@
-import { useState, useEffect, useMemo } from "react";
-import axios from "axios";
+import {  useEffect, useMemo } from "react";
 import GenreRankingSection from "../components/ranking/GenreRankingSection";
 import GenreDonutChart from "../components/ranking/GenreDonutChart";
 import TopMovieSection from "../components/ranking/TopMovieSection";
+import useRankingStore from "../store/useRankingStore";
 import "../styles/ranking.css";
 
 const RankingPage = () => {
-  const [movies, setMovies] = useState([]);
-  const [reviews, setReviews] = useState([]);
-  const [genres, setGenres] = useState([]);
-  const [selectedMovie, setSelectedMovie] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+//   const [movies, setMovies] = useState([]);
+//   const [reviews, setReviews] = useState([]);
+//   const [genres, setGenres] = useState([]);
+//   const [selectedMovie, setSelectedMovie] = useState(null);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState(null);
+
+//   useEffect(() => {
+//     const fetchRankingData = async () => {
+//         try {
+//             setLoading(true);
+
+// const response = await axios.get('http://localhost:5001/api/rankings');
+//             console.log('API Response:', response.data); // Debug log
+            
+//             const { movies = [], reviews = [], genres = [] } = response.data || {};
+//             setMovies(movies);
+//             setReviews(reviews);
+//             setGenres(genres);
+//             setSelectedMovie(movies[0] || null);
+            
+//         } catch (error) {
+//             console.error('Error fetching ranking data:', error);
+//             setError('Failed to load ranking data');
+//         } finally {
+//             setLoading(false);
+//         }
+//     };
+
+//     fetchRankingData();
+//   }, []);
+  const {
+    rankingMovies,
+    rankingReviews,
+    rankingGenres,
+    selectedMovie,
+    fetchRankingData,
+    fetchWatchlist,
+    setSelectedMovie,
+    rankingLoading,
+    rankingError,
+  } = useRankingStore();
 
   useEffect(() => {
-    const fetchRankingData = async () => {
-        try {
-            setLoading(true);
-            const response = await axios.get('http://localhost:5001/api/rankings');
-            console.log('API Response:', response.data); // Debug log
-            
-            const { movies = [], reviews = [], genres = [] } = response.data || {};
-            setMovies(movies);
-            setReviews(reviews);
-            setGenres(genres);
-            setSelectedMovie(movies[0] || null);
-            
-        } catch (error) {
-            console.error('Error fetching ranking data:', error);
-            setError('Failed to load ranking data');
-        } finally {
-            setLoading(false);
-        }
-    };
-
     fetchRankingData();
+    fetchWatchlist();
   }, []);
 
-  // Rating distribution for selected movie
   const ratingDistribution = useMemo(() => {
-    if (!selectedMovie || !Array.isArray(reviews)) return {};
-    
+    if (!selectedMovie || !Array.isArray(rankingReviews)) return {};
     const dist = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
-    reviews.forEach(({ movieId, rating }) => {
+    rankingReviews.forEach(({ movieId, rating }) => {
       if (movieId === selectedMovie._id && dist[rating] !== undefined) {
         dist[rating]++;
       }
     });
     return dist;
-  }, [selectedMovie, reviews]);
+  }, [selectedMovie, rankingReviews]);
 
-  // Genre chart data with safety checks
   const chartData = useMemo(() => {
-    if (!Array.isArray(movies) || !Array.isArray(genres)) return [];
+    if (!Array.isArray(rankingMovies) || !Array.isArray(rankingGenres)) return [];
 
     const genreCount = {};
-    movies.forEach((movie) => {
+    rankingMovies.forEach((movie) => {
       if (Array.isArray(movie.genre)) {
         movie.genre.forEach((genreId) => {
-          const genreObj = genres.find((g) => g.id === genreId);
+          const genreObj = rankingGenres.find((g) => g.id === genreId);
           if (genreObj) {
             genreCount[genreObj.name] = (genreCount[genreObj.name] || 0) + 1;
           }
         });
       }
     });
-    return Object.entries(genreCount).map(([genre, value]) => ({ genre, value }));
-  }, [movies, genres]);
 
-  if (loading) return <div className="loading">Loading rankings...</div>;
-  if (error) return <div className="error">{error}</div>;
+    return Object.entries(genreCount).map(([genre, value]) => ({ genre, value }));
+  }, [rankingMovies, rankingGenres]);
+
+  if (rankingLoading) return <div className="loading">Loading rankings...</div>;
+  if (rankingError) return <div className="error">{rankingError}</div>;
 
   return (
     <div className="page-wrapper">
@@ -78,24 +93,20 @@ const RankingPage = () => {
           selectedMovie={selectedMovie}
           setSelectedMovie={setSelectedMovie}
           ratingDistribution={ratingDistribution}
-          allReviews={reviews}
-          aria-label={`Currently selected movie: ${selectedMovie.title}`}
+          allReviews={rankingReviews}
         />
       )}
 
       <main className="ranking-page">
         <GenreRankingSection
-          movies={movies}
-          allGenres={genres}
-          allReviews={reviews}
+          movies={rankingMovies}
+          allGenres={rankingGenres}
+          allReviews={rankingReviews}
         />
         <div className="chart-section-container">
           <h2 className="chart-title">Genre Distribution</h2>
           {chartData.length > 0 ? (
-            <GenreDonutChart 
-              data={chartData} 
-              aria-label="A donut chart showing the distribution of movie genres." 
-            />
+            <GenreDonutChart data={chartData} />
           ) : (
             <div className="no-movies">No genre data available</div>
           )}
