@@ -7,9 +7,18 @@ const TabWatchlist = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const activeTab = searchParams.get("tab") || "default";
-  const { watchlist, fetchWatchlist } = useWatchlistStore();
-  // const [genreMap, setGenreMap] = useState({});
+  const { watchlist: globalWatchlist, fetchWatchlist } = useWatchlistStore();
+  const [watchlist, setWatchlist] = useState([]);
   const { genreMap, fetchGenres } = useGenreStore();
+
+  // Sync Zustand store to local state once it's fetched
+  useEffect(() => {
+    setWatchlist(globalWatchlist);
+  }, [globalWatchlist]);
+
+  useEffect(() => {
+    fetchWatchlist(); // fetch on mount
+  }, [fetchWatchlist]);
 
   // Fetch genres from your genre model
   useEffect(() => {
@@ -39,6 +48,11 @@ const TabWatchlist = () => {
       </section>
     );
   }
+
+  const handleRemove = (movieId) => {
+    setWatchlist((prev) => prev.filter((movie) => movie._id !== movieId));
+  };
+
   return (
     <div id="watchlist">
       {Array.isArray(watchlist) &&
@@ -50,7 +64,7 @@ const TabWatchlist = () => {
               ...movie,
               genre: movie.genre.map((id) => genreMap[id] || "Unknown"),
             }}
-            allReviews={[]} // replace with actual reviews if needed
+            onRemove={handleRemove}
           />
         ))}
     </div>
