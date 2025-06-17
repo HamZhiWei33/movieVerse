@@ -74,9 +74,9 @@ export const updateUserProfile = async (req, res) => {
 export const getUserWatchlist = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).populate("watchlist");
-    console.log("Watchlist:", user.watchlist);
+    const sortedWatchlist = [...user.watchlist].reverse();
 
-    res.status(200).json(user.watchlist);
+    res.status(200).json(sortedWatchlist);
   } catch (err) {
     res.status(500).json({ message: "Error fetching watchlist" });
   }
@@ -269,7 +269,8 @@ export const updateFavouriteGenres = async (req, res) => {
     const { favouriteGenres } = req.body;
 
     const updatedFields = {};
-    if (favouriteGenres !== undefined) updatedFields.favouriteGenres = favouriteGenres;
+    if (favouriteGenres !== undefined)
+      updatedFields.favouriteGenres = favouriteGenres;
 
     const user = await User.findByIdAndUpdate(
       req.params.id,
@@ -354,7 +355,9 @@ export const changeNewPassword = async (req, res) => {
 
     const isOld = await bcrypt.compare(newPassword, user.password);
     if (isOld) {
-      return res.status(400).json({ message: "New password cannot be the same as old password" });
+      return res
+        .status(400)
+        .json({ message: "New password cannot be the same as old password" });
     }
 
     const salt = await bcrypt.genSalt(10);
