@@ -11,11 +11,12 @@ export const useAuthStore = create((set, get) => ({
   isSigningUp: false,
   isLoggingIn: false,
   isUpdatingProfile: false,
+  isAuthChecked: false,
   isCheckingAuth: true,
   socket: null,
 
   checkAuth: async () => {
-    set({ isCheckingAuth: true });
+    set({ isCheckingAuth: true, isAuthChecked: false });
 
     const token = localStorage.getItem("token");
     if (token) {
@@ -34,7 +35,7 @@ export const useAuthStore = create((set, get) => ({
       delete axiosInstance.defaults.headers.common["Authorization"];
       set({ authUser: null, isCheckingAuth: false });
     } finally {
-      set({ isCheckingAuth: false });
+      set({ isCheckingAuth: false, isAuthChecked: true });
     }
   },
 
@@ -49,16 +50,21 @@ export const useAuthStore = create((set, get) => ({
       });
       console.log("Signup response:", res.data);
       const { token } = res.data;
-      localStorage.setItem("token", token);
-      axiosInstance.defaults.headers.common[
-        "Authorization"
-      ] = `Bearer ${token}`;
-      set({ authUser: res.data });
+      // localStorage.setItem("token", token);
+      // axiosInstance.defaults.headers.common[
+      //   "Authorization"
+      // ] = `Bearer ${token}`;
+
+      // await get().checkAuth();
+      // console.log("Before setting authUser:", get().authUser);
+      // set({ authUser: res.data });
+      // console.log("After setting authUser:", get().authUser);
+
       toast.success("Signup successful!");
       //   get().connectSocket();
-      return res.data; // Return the response data
+      return get().authUser; // Return the response data
     } catch (error) {
-      console.error("Signup error:", error.response?.data);
+      console.error("Signup error:", error);
       toast.error(error.response.data.message);
       throw error; // Re-throw the error so the UI can handle it
     } finally {
@@ -67,6 +73,7 @@ export const useAuthStore = create((set, get) => ({
   },
 
   login: async (data) => {
+    console.error("Logging in");
     set({ isLoggingIn: true });
     try {
       const res = await axiosInstance.post("/auth/login", {
@@ -81,7 +88,9 @@ export const useAuthStore = create((set, get) => ({
       axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
       await get().checkAuth();
-      set({ authUser: res.data });
+      // console.log("Before setting authUser:", get().authUser);
+      // set({ authUser: res.data });
+      // console.log("After setting authUser:", get().authUser);
       toast.success("Login successful!");
       // get().connectSocket(); // connect to socket after successful login
       return res.data;

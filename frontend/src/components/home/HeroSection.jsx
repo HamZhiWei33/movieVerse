@@ -17,6 +17,7 @@ import useMovieStore from "../../store/useMovieStore";
 const HeroSection = ({ title, moviesType, items }) => {
   const {
     movies: storeMovies,
+    loading,
     isLiked,
     isInWatchlist,
     toggleLike,
@@ -39,8 +40,14 @@ const HeroSection = ({ title, moviesType, items }) => {
     fetchGenres();
     if (moviesType === "watchlist") {
       fetchWatchlist();
-    } else if (moviesType === "newReleased") {
-      fetchMovies(1, 20, { sort: "-year" }); // Fetch newest movies
+    }
+    // if (moviesType === "newReleased") {
+    //   fetchMovies(1, 20, { sort: "-year" }); // Fetch newest movies
+    // }
+
+    // Fetch at least 500 movies
+    if (!loading && storeMovies.length < 500) {
+      fetchMovies(1, 1000, { sort: "-year" }); // Fetch newest movies
     }
   }, []);
 
@@ -50,7 +57,7 @@ const HeroSection = ({ title, moviesType, items }) => {
     if (moviesType === "watchlist") {
       return storeMovies.filter(m => {
         const inWatchlist = isInWatchlist(m._id);
-        console.log(`Movie ${m._id} in watchlist:`, inWatchlist);
+        // console.log(`Movie ${m._id} in watchlist:`, inWatchlist);
         return inWatchlist;
       });
     }
@@ -103,9 +110,30 @@ const HeroSection = ({ title, moviesType, items }) => {
 
   // Get top movies by genre for ranking section
   const topMoviesByGenre = useMemo(() =>
-    moviesType === "ranking" ? getTopMoviesByGenre(storeMovies, items, 6) : {},
-    [storeMovies, items, moviesType]
+    moviesType === "ranking" ? getTopMoviesByGenre(storeMovies, items, 4) : {},
+    [storeMovies]
   );
+
+  // useEffect(() => {
+  //   if (moviesType === "ranking") {
+  //     console.log("Debug");
+  //     // console.log(items);
+  //     console.log(topMoviesByGenre);
+  //     // console.log(storeMovies);
+  //   }
+
+  //   // console.log(topMoviesByGenre[genre.name]);
+  //   // console.error("StoreMovies", storeMovies);
+  // }, [topMoviesByGenre]);
+
+  // useEffect(() => {
+  //   if (moviesType === "ranking") {
+  //     console.log("Store Movies:", storeMovies);
+  //   }
+
+  //   // console.log(topMoviesByGenre[genre.name]);
+  //   // console.error("StoreMovies", storeMovies);
+  // }, [storeMovies]);
 
   // Accessibility labels
   const ariaLabel = {

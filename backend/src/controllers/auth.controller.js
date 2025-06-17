@@ -37,11 +37,11 @@ export const signup = async (req, res) => {
 
     if (newUser) {
       // generate jwt token
-      const token = generateToken(newUser._id, res);
+      // const token = generateToken(newUser._id, res);
       // save user to database
       await newUser.save();
       res.status(201).json({
-        token,
+        // token,
         _id: newUser._id,
         name: newUser.name,
         email: newUser.email,

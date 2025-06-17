@@ -25,7 +25,7 @@ const SignupPage = () => {
     confirm_password: "",
   });
 
-  const { signup, isSigningUp } = useAuthStore();
+  const { signup, isSigningUp, authUser, checkAuth } = useAuthStore();
 
   const validateForm = () => {
     // Name validation
@@ -142,7 +142,7 @@ const SignupPage = () => {
     }
 
     try {
-      console.log("Calling signup API..."); // Debug 3
+      // console.log("Calling signup API..."); // Debug 3
       const result = await signup({
         name: formData.name,
         email: formData.email,
@@ -150,9 +150,10 @@ const SignupPage = () => {
         // confirm_password: formData.confirm_password,
       });
       console.log("Signup result:", result); // Debug 4
+      console.log("Signup AuthUser:", authUser);
 
       console.log("Navigating to /genre_selection"); // Debug 5
-      navigate("/genre_selection");
+      navigate("/login");
     } catch (error) {
       console.error("SIGNUP ERROR:", error); // Debug 6
     }

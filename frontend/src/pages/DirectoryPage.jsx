@@ -1,7 +1,7 @@
 import MovieCard from "../components/directory/MovieCard";
 import MovieCardList from "../components/directory/MovieCardList";
 import { useEffect, useState, useMemo } from "react";
-import { useNavigationType, useSearchParams } from "react-router-dom";
+import { useNavigationType, useSearchParams, useLocation } from "react-router-dom";
 import "../styles/directory.css";
 import ViewDropdown from "../components/directory/ViewDropdown";
 import { FaListUl } from "react-icons/fa";
@@ -36,6 +36,10 @@ const DirectoryPage = () => {
   const [view, setView] = useState(initialView);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isSearchResult, setIsSearchResult] = useState(false);
+  const [searchedMovies, setSearchedMovies] = useState([]);
+
+  const location = useLocation();
 
   const { previousScrollPosition, clearScrollPosition } = usePreviousScrollStore();
   const navigationType = useNavigationType();
@@ -60,7 +64,24 @@ const DirectoryPage = () => {
   useEffect(() => {
     searchParams.set("view", view);
     setSearchParams(searchParams);
+    console.log("view: " + view);
+    console.log(isSearchResult);
   }, [view]);
+
+  // Debug
+  useEffect(() => {
+    if (searchParams.get("view") === null) {
+      searchParams.set("view", view);
+      setSearchParams(searchParams);
+    }
+    setIsSearchResult(searchParams.get('query') !== null);
+    // const { filteredSearchMovies = [], searchQuery = '' } = location.state || {};
+    // if (location.state !== null) {
+      
+    //   console.log(filteredSearchMovies);
+    //   console.log(searchQuery);
+    // }
+  }, [searchParams]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -181,6 +202,20 @@ const DirectoryPage = () => {
 
   // In your filteredMovies useMemo:
   const filteredMovies = useMemo(() => {
+    // For search
+    if (location.state !== null) {
+      const { filteredSearchMovies = [], searchQuery = '' } = location.state || {};
+      setSearchedMovies(filteredSearchMovies);
+      return filteredSearchMovies;
+    }
+
+    if(isSearchResult) {
+      // console.error(filteredMovies);
+      return searchedMovies;
+    }
+    console.error("Outsie Triggered!");
+    // console.error(location.state);
+
     if (!movies || movies.length === 0) return [];
 
     return movies.filter((movie) => {
@@ -345,7 +380,7 @@ const DirectoryPage = () => {
                     ))}
                   </div>
                   <div ref={setLoadMoreRef} className="load-more-trigger">
-                    {isFetchingMore && <p>Loading more movies...</p>}
+                    {(isFetchingMore && !isSearchResult) && <p>Loading more movies...</p>}
                   </div>
                 </>
               ) : (
@@ -373,12 +408,14 @@ const DirectoryPage = () => {
                       padding: '20px'
                     }}
                   >
-                    {isFetchingMore ? (
+                    {!isSearchResult && (
+                      (isFetchingMore) ? (
                       <div className="loading-spinner">Loading more movies...</div>
                     ) : hasMore ? (
                       <button onClick={loadMoreMovies}>Load More</button>
                     ) : (
                       <p>No more movies to load</p>
+                    )
                     )}
                   </div>
                 </>

@@ -1,9 +1,10 @@
 import "../styles/navbar.css";
-import { useState, useContext } from "react";
+import { useState, useContext, useMemo } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { FaAngleDown } from "react-icons/fa";
 import SearchIcon from "@mui/icons-material/Search";
 import MenuIcon from "@mui/icons-material/Menu";
+import SearchBar from "../components/SearchBar";
 import useIsMobile from "../store/useIsMobile";
 import { UserValidationContext } from "../context/UserValidationProvider ";
 import { useAuthStore } from "../store/useAuthStore";
@@ -25,6 +26,20 @@ const Navbar = () => {
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
+
+  const profilePic = useMemo(() => {
+    return authUser?.profilePic || "/profile/placeholder_avatar.svg";
+    if (moviesType === "recommendation") return displayed;
+    if (moviesType === "watchlist") {
+      return storeMovies.filter(m => {
+        const inWatchlist = isInWatchlist(m._id);
+        // console.log(`Movie ${m._id} in watchlist:`, inWatchlist);
+        return inWatchlist;
+      });
+    }
+    if (moviesType === "newReleased") return storeMovies.slice(0, 20);
+    return items;
+  }, [authUser]);
 
   return (
     <header role="banner">
@@ -57,15 +72,16 @@ const Navbar = () => {
           ></div>
         )}
         {authUser && (
-          <div className="search-bar" role="search" aria-label="Site search">
-            <input
-              id="searchInput"
-              type="text"
-              placeholder="Search"
-              aria-label="Search input"
-            />
-            <SearchIcon size={20} />
-          </div>
+          // <div className="search-bar" role="search" aria-label="Site search">
+          //   <input
+          //     id="searchInput"
+          //     type="text"
+          //     placeholder="Search"
+          //     aria-label="Search input"
+          //   />
+          //   <SearchIcon size={20} />
+          // </div>
+          <SearchBar />
         )}
 
         <div
@@ -77,9 +93,8 @@ const Navbar = () => {
           }}
         >
           <nav
-            className={`nav-links ${authUser ? "validate" : ""} ${
-              menuOpen ? "open" : ""
-            }`}
+            className={`nav-links ${authUser ? "validate" : ""} ${menuOpen ? "open" : ""
+              }`}
             role="navigation"
             aria-label="Main navigation"
           >
@@ -141,10 +156,7 @@ const Navbar = () => {
                 <div>
                   <div className="profile-container">
                     <img
-                      src={
-                        localStorage.getItem("profileImg") ||
-                        "/profile/placeholder_avatar.svg"
-                      }
+                      src={profilePic}
                       alt="User profile avatar"
                       height={50}
                       aria-label="User profile image"
