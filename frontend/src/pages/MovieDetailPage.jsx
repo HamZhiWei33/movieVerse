@@ -111,24 +111,44 @@ const MovieDetailPage = () => {
         navigate(-1, { state: { scrollPosition: window.scrollY } });
     };
 
-    const handleReviewSubmit = async (data) => {
-        try {
-            if (existingReview) {
-                await updateReview(movieId, data);
-            } else {
-                await addReview(movieId, data);
-            }
-
-            const updatedMovie = await fetchMovieById(movieId);
-            setMovie(updatedMovie);
-            setMovieData(updatedMovie);
-
-            await fetchReviewsByMovie(movieId);
-            await fetchUserReview(movieId);
-        } catch (err) {
-            console.error("Failed to submit review", err);
+    // In your handleReviewSubmit function:
+const handleReviewSubmit = async (data) => {
+    try {
+        let updatedReview;
+        if (existingReview) {
+            updatedReview = await updateReview(movieId, data);
+        } else {
+            updatedReview = await addReview(movieId, data);
         }
-    };
+
+        // Refresh the movie data to get updated ratings
+        const updatedMovie = await fetchMovieById(movieId);
+        setMovie(updatedMovie);
+        setMovieData(updatedMovie);
+
+        // Refresh reviews - they should be sorted by date on the backend
+        await Promise.all([
+            fetchReviewsByMovie(movieId),
+            fetchUserReview(movieId),
+        ]);
+
+        // Reset to first page to ensure newest review is visible
+        setCurrentPage(0);
+
+        // Scroll to rating bar chart section
+        setTimeout(() => {
+            const ratingSection = document.querySelector('.rating-container');
+            if (ratingSection) {
+                ratingSection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        }, 100);
+    } catch (err) {
+        console.error("Failed to submit review", err);
+    }
+};
 
     if (loading) {
         return <div className="loading">Loading movie details...</div>;
@@ -152,14 +172,7 @@ const MovieDetailPage = () => {
 
             <div className="detail-content-container">
                 <MovieCardList
-                    // movie={{
-                    //     ...movie,
-                    //     reviewCount: movieReviews.length,
-                    //     likeCount: movie.likeCount,
-                    //     liked: movie.liked,
-                    //     watchlisted: movie.watchlisted
-                    // }}
-                    key={movie._id}
+                    key={`movie-card-${movie?._id}-${movie?.rating}`}
                     movie={movie}
                     genres={movieGenreNames}
                     liked={isLiked(movie._id)}
@@ -181,7 +194,7 @@ const MovieDetailPage = () => {
                             }
                         ><IoAdd className="add-icon" />Add Your Review</button>
                     </div>
-                    <RatingBarChart movieId={movieId} />
+                    <RatingBarChart movieId={movieId}  key={`rating-chart-${movie?._id}-${movieReviews.length}`}/>
                     <div className="review-list">
                         {currentReviews.length > 0 ? (
                             currentReviews.map((review) => {
@@ -189,8 +202,9 @@ const MovieDetailPage = () => {
                                 return (
                                     <ReviewCard
                                         key={review._id}
+                                        id={`review-${review._id}`}
                                         name={review.userId?.name ?? "Anonymous"}
-                                        date={new Date(review.createdAt).toLocaleDateString("en-GB")}
+                                        date={new Date(review.updatedAt || review.createdAt).toLocaleDateString("en-GB")}
                                         rating={review.rating}
                                         reviewText={review.review}
                                         profilePic={review.userId?.profilePic}
