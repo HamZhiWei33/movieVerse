@@ -25,6 +25,7 @@ const HeroSection = ({ title, moviesType, items }) => {
     fetchMovies,
     fetchWatchlist,
     fetchLikedMovies,
+    recommendedMovies
   } = useMovieStore();
 
   const { genreMap, fetchGenres } = useGenreStore();
@@ -53,7 +54,6 @@ const HeroSection = ({ title, moviesType, items }) => {
 
   // Get appropriate movie list based on type
   const movieList = useMemo(() => {
-    if (moviesType === "recommendation") return displayed;
     if (moviesType === "watchlist") {
       return storeMovies.filter(m => {
         const inWatchlist = isInWatchlist(m._id);
@@ -67,9 +67,10 @@ const HeroSection = ({ title, moviesType, items }) => {
 
   // Handle recommendation reload
   const handleReload = () => {
-    const shuffled = [...storeMovies].sort(() => 0.5 - Math.random());
-    setDisplayed(shuffled.slice(0, 10));
-    sessionStorage.setItem("displayedMovies", JSON.stringify(shuffled.slice(0, 10)));
+    const shuffled = [...recommendedMovies].sort(() => 0.5 - Math.random());
+    useMovieStore.setState({ recommendedMovies: shuffled });
+    // setDisplayed(shuffled.slice(0, 10));
+    // sessionStorage.setItem("displayedMovies", JSON.stringify(shuffled.slice(0, 10)));
   };
 
   // Initialize recommendations
@@ -110,9 +111,8 @@ const HeroSection = ({ title, moviesType, items }) => {
 
   // Get top movies by genre for ranking section
   const topMoviesByGenre = useMemo(() =>
-    moviesType === "ranking" ? getTopMoviesByGenre(storeMovies, items, 4) : {},
-    [storeMovies]
-  );
+    moviesType === "ranking" ? getTopMoviesByGenre(storeMovies, items, 4) : {}
+  , [storeMovies]);
 
   // useEffect(() => {
   //   if (moviesType === "ranking") {
