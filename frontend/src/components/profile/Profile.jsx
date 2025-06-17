@@ -25,6 +25,7 @@ const Profile = () => {
   const [selectedImg, setSelectedImg] = useState(null);
 
   useEffect(() => {
+    console.log("Profile page authUser:", authUser);
     if (authUser) {
       setName(authUser.name || "");
       setTempName(authUser.name || "");
@@ -217,7 +218,7 @@ const Profile = () => {
                 ) : (
                   <>
                     <span className="profile-value gender">
-                      {gender || "-"}
+                      {gender ? gender : "-"}
                     </span>
                     <button
                       className="edit-icon edit"
