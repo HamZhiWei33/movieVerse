@@ -1,56 +1,46 @@
-import Movie from "../models/movie.model.js";
-import User from "../models/user.model.js";
+import Movie from '../models/movie.model.js';
+import Watchlist from '../models/watchlist.model.js';
+import User from '../models/user.model.js';
 
-// Recommend movies based on user's selected genres and genres from watchlist
 export const getRecommendedMovies = async (req, res) => {
   try {
-    const userId = req.query.userId;
-    if (!userId) return res.status(400).json({ message: "Missing userId" });
+    const userId = req.user?.id || req.query.userId;
+    if (!userId) return res.status(400).json({ message: 'User ID is required' });
 
-    // Get user and their selected genres
+    // 获取用户基本信息
     const user = await User.findById(userId);
-    if (!user) return res.status(404).json({ message: "User not found" });
+    const favouriteGenres = user?.favouriteGenres || []; // 用户注册时选的
+    const genreSet = new Set(favouriteGenres.map(String));
 
-    // Assume user.selectedGenres is an array of genre IDs (from signup)
-    const selectedGenres = user.selectedGenres || [];
+    // 获取 watchlist 里的电影 genre
+    const watchlist = await Watchlist.findOne({ userId }).populate('movies');
+    if (watchlist) {
+      for (const movie of watchlist.movies) {
+        movie.genre.forEach(g => genreSet.add(String(g)));
+      }
+    }
 
-    // Get genres from movies in user's watchlist
-    const watchlistMovies = await Movie.find({ _id: { $in: user.watchlist || [] } });
-    const watchlistGenres = watchlistMovies.flatMap(movie => movie.genre || []);
+    const combinedGenres = Array.from(genreSet);
 
-    // Combine and deduplicate genres
-    const allGenres = Array.from(new Set([...selectedGenres, ...watchlistGenres]));
+    // 如果 genre 不够，fallback
+    if (combinedGenres.length === 0) {
+      const fallback = await Movie.find({ rating: { $gte: 3.5 } })
+        .sort({ rating: -1, reviewCount: -1 })
+        .limit(12);
+      return res.status(200).json({ movies: fallback });
+    }
 
-    // Find movies that match any of these genres, excluding those already in watchlist
-    const recommendedMovies = await Movie.find({
-      genre: { $in: allGenres },
-      _id: { $nin: user.watchlist || [] }
+    // 推荐逻辑：在这些 genre 中评分高的
+    const recommendations = await Movie.find({
+      genre: { $in: combinedGenres },
+      rating: { $gte: 3.0 }
     })
-      .sort({ rating: -1 }) // Optional: sort by rating
-      .limit(20);
+      .sort({ rating: -1, reviewCount: -1 })
+      .limit(12);
 
-    res.json({ movies: recommendedMovies });
-  } catch (err) {
-    console.error("Recommendation error:", err);
-    res.status(500).json({ message: "Failed to get recommendations" });
-  }
-};
-
-// Get new released movies (e.g., released in the last 3 months)
-export const getNewReleases = async (req, res) => {
-  try {
-    const threeMonthsAgo = new Date();
-    threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-
-    const newReleases = await Movie.find({
-      releaseDate: { $gte: threeMonthsAgo }
-    })
-      .sort({ releaseDate: -1 })
-      .limit(20);
-
-    res.json({ movies: newReleases });
-  } catch (err) {
-    console.error("New releases error:", err);
-    res.status(500).json({ message: "Failed to get new releases" });
+    res.status(200).json({ movies: recommendations });
+  } catch (error) {
+    console.error('getRecommendedMovies error:', error.message);
+    res.status(500).json({ message: 'Failed to fetch recommended movies' });
   }
 };
