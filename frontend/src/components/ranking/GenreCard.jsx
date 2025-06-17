@@ -81,7 +81,7 @@ const GenreCard = ({ movie, rank, image, title, rating, genre, region, year, dur
         <div className="genre-info">
           <h4 className="genre-title">{title}</h4>
           <div className="rating-bar">
-            <ReviewStars rating={rating} readOnly={true} showNumber={true} />
+            <ReviewStars rating={rating} readOnly={true} />
           </div>
           <div className="tags">
             <span className="badge">{genre}</span>
@@ -95,21 +95,11 @@ const GenreCard = ({ movie, rank, image, title, rating, genre, region, year, dur
               </span>
               {duration}
             </span>
-            <div className="iteractive-icon" onClick={(e) => {
-              e.stopPropagation();
-              handleLikeClick(e);
-            }}>
-              <LikeIcon liked={liked} disabled={loadingLike} />
-            </div>
-            <div className="iteractive-icon" onClick={(e) => {
-              e.stopPropagation();
-              handleAddToWatchlistClick(e);
-            }}>
-              <AddToWatchlistIcon 
-                addedToWatchlist={isInWatchlist} 
+            <LikeIcon movie={movie} disabled={loadingLike} />
+              <AddToWatchlistIcon
+                movie={movie}
                 disabled={loadingWatchlist}
               />
-            </div>
           </div>
         </div>
       </div>

@@ -1,12 +1,57 @@
 import Rating from '@mui/material/Rating';
 import StarIcon from '@mui/icons-material/Star';
 import '../../styles/directory/RatingBarChart.css';
+import useMovieStore from "../../store/useMovieStore";
 import useRatingStore from '../../store/useRatingStore';
+import { useEffect, useState, useMemo } from "react";
 
-const RatingBarChart = ({ movieId}) => {
-    const { reviewsByMovie, getAverageRatingByMovieId } = useRatingStore();
+
+const RatingBarChart = ({ movieId }) => {
+    const {
+        fetchMovieById,
+        getCurrentUser,
+        isLiked,
+        toggleLike,
+        fetchFilterOptions // Add this to your useMovieStore imports
+    } = useMovieStore();
+    const { setMovieData, reviewsByMovie, fetchReviewsByMovie, getAverageRatingByMovieId } = useRatingStore();
     const movieReviews = reviewsByMovie[movieId] || [];
-    const average = getAverageRatingByMovieId(movieId);
+    const [average, setAverage] = useState(getAverageRatingByMovieId(movieId)||0);
+    // const [movie, setMovie]
+
+    // console.log(movieId);
+
+    useEffect(() => {
+        const loadData = async () => {
+            try {
+                const movieData = await fetchMovieById(movieId);
+                // console.log("Fetched movie:", movieData); // Add this
+                // console.log("Movie genres:", movieData.genre); // Add this
+                setMovieData(movieData);
+                setAverage(getAverageRatingByMovieId(movieId));
+                await fetchReviewsByMovie(movieId);
+            } catch (err) {
+                console.error("Error fetching movie review", err);
+            }
+        };
+
+        loadData();
+    }, [movieId]);
+
+    const breakdown = useMemo(() => {
+        const breakdown = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+        movieReviews.forEach(review => {
+            const roundedRating = Math.round(review.rating);
+            if (breakdown[roundedRating] !== undefined) {
+                breakdown[roundedRating]++;
+            }
+        });
+        return breakdown;
+    }, [reviewsByMovie]);
+
+    const totalRatings = useMemo(() => {
+        return movieReviews.length;
+    }, [reviewsByMovie]);
 
     const calculateRatingBreakdown = () => {
         const breakdown = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
@@ -19,8 +64,8 @@ const RatingBarChart = ({ movieId}) => {
         return breakdown;
     };
 
-    const breakdown = calculateRatingBreakdown();
-    const totalRatings = movieReviews.length;
+    // const breakdown = calculateRatingBreakdown();
+    // const totalRatings = movieReviews.length;
 
     return (
         <div className="rating-breakdown-container">

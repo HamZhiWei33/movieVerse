@@ -23,7 +23,7 @@ const MovieDetailPage = () => {
     const { movieId } = useParams();
     const navigate = useNavigate();
 
-    const [movie, setMovie] = useState(state?.movie || null);
+    const [movie, setMovie] = useState(null);
     const [currentUser, setCurrentUser] = useState(null);
     const [loading, setLoading] = useState(!state?.movie);
     const [error, setError] = useState(null);
@@ -56,6 +56,7 @@ const MovieDetailPage = () => {
             return map;
         }, {});
     }, [genres]);
+    console.log(movie);
 
     // Get genre names for the current movie
     const movieGenreNames = useMemo(() => {
