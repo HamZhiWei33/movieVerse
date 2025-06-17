@@ -14,7 +14,10 @@ import Movie from "../models/movie.model.js";
 export const getReviewsByMovieId = async (req, res) => {
   try {
     const { movieId } = req.params;
-    const reviews = await Review.find({ movieId }).populate("userId", "name profilePic");
+    const reviews = await Review.find({ movieId }).populate(
+      "userId",
+      "name profilePic"
+    );
     res.json(reviews);
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch reviews", error });
@@ -47,12 +50,16 @@ export const addReview = async (req, res) => {
     }
 
     if (!rating || !review) {
-      return res.status(400).json({ message: "Rating and review are required." });
+      return res
+        .status(400)
+        .json({ message: "Rating and review are required." });
     }
 
     const existing = await Review.findOne({ movieId, userId });
     if (existing) {
-      return res.status(400).json({ message: "You already submitted a review." });
+      return res
+        .status(400)
+        .json({ message: "You already submitted a review." });
     }
 
     const newReview = await Review.create({
@@ -66,7 +73,7 @@ export const addReview = async (req, res) => {
 
     res.status(201).json({ review: newReview, updatedStats });
   } catch (error) {
-    console.error("Add review error:", error); 
+    console.error("Add review error:", error);
     res.status(500).json({ message: "Failed to add review" });
   }
 };
