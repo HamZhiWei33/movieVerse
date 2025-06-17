@@ -1,5 +1,6 @@
 import { Router } from 'express';
-import { getNewReleases, getRecommendedMovies } from '../controllers/recommendation.controller.js';
+import { getRecommendedMovies } from '../controllers/recommendation.controller.js';
+import { getNewReleases } from '../controllers/movie.controller.js';
 
 const router = Router();
 
