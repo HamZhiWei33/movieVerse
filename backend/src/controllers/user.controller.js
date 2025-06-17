@@ -9,6 +9,7 @@
 import User from "../models/user.model.js";
 import Movie from "../models/movie.model.js";
 import Review from "../models/review.model.js";
+import Like from "../models/like.model.js";
 import {
   getLikedGenresAggregation,
   getReviewedGenresAggregation,
@@ -211,19 +212,16 @@ export const getUserReviews = async (req, res) => {
 };
 
 export const deleteAccount = async (req, res) => {
+  const userId = req.user._id;
   try {
-    const userId = req.user._id;
-    // const userId = req.params.id;
-    // Delete user reviews
     await Review.deleteMany({ userId });
-
-    // Delete the user account
+    await Like.deleteMany({ userId });
     await User.findByIdAndDelete(userId);
 
     res.status(200).json({ message: "Account deleted successfully." });
   } catch (err) {
-    console.error(`Error deleting user ${req.user._id}:`, err);
-    res.status(500).json({ message: "Server error while deleting account." });
+    console.error("Delete failed:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
