@@ -22,9 +22,11 @@ const RatingBarChart = ({ movieId}) => {
     const breakdown = calculateRatingBreakdown();
     const totalRatings = movieReviews.length;
 
+    const formattedAverage = isNaN(Number(average)) ? 0 : Number(average).toFixed(1);
+
     return (
         <div className="rating-breakdown-container">
-            <div className="average-score">{average === 0 ? "0" : average.toFixed(1)}</div>
+            <div className="average-score">{formattedAverage}</div>
             <div className="bar-section">
                 {[5, 4, 3, 2, 1].map((star) => {
                     const percentage = totalRatings > 0 ? (breakdown[star] / totalRatings) : 0;
