@@ -92,7 +92,7 @@ const Top1Card = ({ movie, rank, image, title, rating, description, genre, regio
       <div className="genre-info">
         <h4 className="genre-title">{title}</h4>
         <div className="rating-bar">
-          <ReviewStars rating={Number(rating.toFixed(1))} readOnly={true} showNumber={true} size="medium" />
+          <ReviewStars rating={rating} readOnly={true} size="medium" />
         </div>
         <div className="tags">
           <span className="badge">{genre}</span>
@@ -106,12 +106,11 @@ const Top1Card = ({ movie, rank, image, title, rating, description, genre, regio
             </span>
             {duration}
           </span>
-          <div className="iteractive-icon" onClick={handleLikeClick}>
-            <LikeIcon liked={liked} disabled={loadingLike} />
-          </div>
-          <div className="iteractive-icon" onClick={handleAddToWatchlistClick}>
-            <AddToWatchlistIcon addedToWatchlist={watchlisted} disabled={loadingWatchlist} />
-          </div>
+          <LikeIcon movie={movie} disabled={loadingLike} />
+            <AddToWatchlistIcon 
+              movie={movie} 
+              disabled={loadingWatchlist}
+            />
         </div>
         <p className="top1-description">{description}</p>
       </div>

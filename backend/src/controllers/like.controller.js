@@ -68,15 +68,16 @@ export const getLikesForMovie = async (req, res) => {
 
   // Validate ObjectId format
   if (!mongoose.Types.ObjectId.isValid(movieId)) {
-    return res.status(400).json({ error: "Invalid movie ID format." });
+    return res.status(200).json({ count: 0, likes: [] });
+    // return res.status(400).json({ error: "Invalid movie ID format." });
   }
 
   try {
-    const likes = await Like.find({ movieId });
+    const likes = await Like.find({ "movieId": movieId });
     return res.status(200).json({ count: likes.length, likes });
   } catch (error) {
     console.error("Get likes error:", error);
-    return res.status(500).json({ error: "Failed to get likes." });
+    return res.status(500).json({ details: error.message });
   }
 };
 

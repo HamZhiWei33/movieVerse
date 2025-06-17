@@ -319,6 +319,10 @@
   flex-wrap: wrap;
 }
 
+/* .action-buttons .like-count {
+  display: none; 
+} */
+
 .icon-button {
   background: rgba(255, 255, 255, 0.1);
   border: none;
@@ -543,6 +547,10 @@
   font-size: 0.9rem;
 }
 
+/* .genre-card-ranking .like-count {
+  display: none; 
+} */
+
 .genre-card-ranking .badge {
   padding: 0.2rem 0.7rem;
   font-weight: 300;
@@ -569,6 +577,10 @@
 .top1-card .genre-card-header h3 {
   font-size: 1.7rem;
 }
+
+/* .top1-card .like-count {
+  display: none; 
+} */
 
 .top1-card .genre-card-header .genre-rating-value {
   font-size: 1.7rem;

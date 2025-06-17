@@ -79,10 +79,9 @@ const MovieCard = ({ movie, children }) => {
             </span>
           </div>
           <div className="bottom-icons" onClick={(e) => e.stopPropagation()}>
-            <LikeIcon liked={liked} onClick={handleLikeClick} disabled={loadingLike} />
+            <LikeIcon movie={movie} disabled={loadingLike} />
             <AddToWatchlistIcon
-              addedToWatchlist={isInWatchlist}
-              onClick={handleAddToWatchlistClick}
+              movie={movie}
               disabled={loadingWatchlist}
             />
           </div>

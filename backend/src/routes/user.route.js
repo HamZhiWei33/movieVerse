@@ -18,6 +18,7 @@ import {
   getUserLikedGenres,
   getUserReviewGenres,
   getUserWatchlistGenres,
+  checkWatchlistStatus
 } from "../controllers/user.controller.js";
 const router = express.Router();
 router.put("/change-password", protectRoute, changeNewPassword);
@@ -28,6 +29,7 @@ router.get("/review", protectRoute, getUserReviews);
 router.post("/review", protectRoute, addReview);
 router.post("/watchlist/:movieId", protectRoute, addToWatchlist);
 router.delete("/watchlist/:movieId", protectRoute, removeFromWatchlist);
+router.get('/watchlist/:movieId/status', protectRoute, checkWatchlistStatus);
 router.get("/:id", getUserProfile);
 router.put("/:id", updateUserProfile);
 router.put("/:id/favourite-genres", updateFavouriteGenres);

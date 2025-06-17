@@ -46,7 +46,7 @@ const MovieSection = ({
             <span className="rating">{movie.rating}</span>
           </div>
           <div className="bottom-icons" onClick={(e) => e.stopPropagation()}>
-            <LikeIcon liked={liked} onClick={handleLikeClick} />
+            <LikeIcon movie={movie} onClick={handleLikeClick} />
             <AddToWatchlistIcon
               addedToWatchlist={addedToWatchlist}
               onClick={handleAddToWatchlistClick}

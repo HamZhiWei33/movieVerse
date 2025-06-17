@@ -83,6 +83,28 @@ export const getUserWatchlist = async (req, res) => {
   }
 };
 
+// controllers/userController.js
+export const checkWatchlistStatus = async (req, res) => {
+  try {
+    const { movieId } = req.params;
+    const userId = req.user._id;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const isInWatchlist = user.watchlist.some(id => id.toString() === movieId);
+    
+    res.status(200).json({ 
+      inWatchlist: isInWatchlist  
+    });
+  } catch (error) {
+    console.error("Error checking watchlist status:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 export const addToWatchlist = async (req, res) => {
   const userId = req.user?._id;
   const { movieId } = req.params;

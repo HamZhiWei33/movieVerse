@@ -124,12 +124,7 @@ const WatchList = ({ movie, showRatingNumber = false, onRemove }) => {
               </span>
               {movie.duration}
             </div>
-            <div className="like-tag" onClick={handleLikeClick}>
-              <span className="like-icon">
-                <LikeIcon liked={liked} disabled={loadingLike} />
-              </span>
-              {likeCount}
-            </div>
+                <LikeIcon movie={movie} disabled={loadingLike} />
           </div>
         </div>
         <div className="remove-watchlist-container">
