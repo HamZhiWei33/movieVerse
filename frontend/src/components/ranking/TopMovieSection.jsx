@@ -63,18 +63,11 @@ const TopMovieSection = ({ selectedMovie, setSelectedMovie }) => {
         if (!Array.isArray(movies) || movies.length === 0) return [null, null, null];
 
         return [...movies]
-            .map((movie) => ({
-                ...movie,
-                // Ensure movie.rating is a number for calculation
-                compositeScore: (Number(movie.rating) || 0) * 0.9 +
-                    ((movie.year || 2000) - 2000) * 0.1,
-            }))
-            .sort((a, b) => {
-                if (b.compositeScore === a.compositeScore) {
-                    return a._id?.localeCompare(b._id) || 0;
-                }
-                return b.compositeScore - a.compositeScore;
-            })
+        .sort((a, b) => {
+            const ratingDiff = (b.rating || 0) - (a.rating || 0);
+            if (ratingDiff !== 0) return ratingDiff;
+            return (b.year || 0) - (a.year || 0); 
+        })
             .slice(0, 3);
     }, [movies]);
 
