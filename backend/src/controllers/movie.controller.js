@@ -495,10 +495,8 @@ async function processTMDBMovie(tmdbMovie) {
       .filter(id => !isNaN(id) && id !== 0);
 
     // Process region
-    let region = "US";
-    const releaseResults = releaseResponse.data.results || [];
-    const primary = releaseResults.find(r => r.iso_3166_1 === "US") || releaseResults[0];
-    region = primary?.iso_3166_1 || region;
+    const originCountries = detailData.origin_country || [];
+    const region = originCountries.length ? originCountries[0] : "US";
 
     // Process credits
     const crew = creditResponse.data.crew || [];

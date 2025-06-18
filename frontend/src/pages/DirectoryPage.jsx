@@ -150,7 +150,7 @@ const DirectoryPage = () => {
       },
       {
         threshold: 0.2,
-        rootMargin: '300px'
+        rootMargin: '400px'
       }
     );
 
