@@ -9,13 +9,8 @@ import "../../styles/ranking.css";
 import TopMovieSection from "../ranking/TopMovieSection";
 import useRankingStore from "../../store/useRankingStore";
 
-
 const HomeRanking = () => {
-  const {
-    rankingReviews,
-    selectedMovie,
-    setSelectedMovie,
-  } = useRankingStore();
+  const { rankingReviews, selectedMovie, setSelectedMovie } = useRankingStore();
 
   // compute rating distribution for selected movie using reviews
   const ratingDistribution = useMemo(() => {
