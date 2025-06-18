@@ -121,7 +121,7 @@ const MovieCardList = ({
         <div className="duration-and-icons-container">
           <div className="duration-tag">
             <span className="duration-icon"><IoTime /></span>
-            {movie.duration}
+            {movie.duration === "0h 0min" ? "To Be Announced" : movie.duration}
           </div>
           {!showBottomInteractiveIcon && (
             <div className="iteractive-icon-container" onClick={(e) => e.stopPropagation()}>

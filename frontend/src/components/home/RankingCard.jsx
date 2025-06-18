@@ -1,7 +1,6 @@
 import "../../styles/home/ranking-card.css";
 import { useNavigate } from "react-router-dom";
 import { FaArrowRight } from "react-icons/fa";
-import { PostersGrid } from "../general/GenreCard";
 import RankingGrid from "./RankingGrid";
 import { BsFire } from "react-icons/bs";
 
@@ -33,11 +32,10 @@ const RankingCard = ({ genre, isAllGenre = false, topMovies = [] }) => {
         if (e.key === "Enter") handleCardClick();
       }}
     >
-      {/* <PostersGrid genre={genre} /> */}
       <div className="home-poster-container">
         {previewMovie ? (
           <>
-            <RankingGrid genre={genre} isAllGenre />
+            <RankingGrid topMovies={topMovies} isAllGenre />
           </>
         ) : (
           // <img
@@ -61,16 +59,16 @@ const RankingCard = ({ genre, isAllGenre = false, topMovies = [] }) => {
           )}
         </div>
 
-        {/* Genre name overlay (visible on hover) */}
+        {/* Genre name overlay */}
         <div className="genre-name-overlay">
-          <h3>{isAllGenre ? "All Genres" : genre.name}</h3>
+          <h3>{genreName}</h3>
         </div>
 
         <div className="hover-overlay">
           <div className="home-hover-bottom">
             <div className="hover-left">
               <div className="home-hover-left">Top 10 in</div>
-              <h3>{isAllGenre ? "All Genres" : genre.name}</h3>
+              <h3>{genreName}</h3>
             </div>
             <span className="hover-right home-icon-arrow">
               <FaArrowRight aria-hidden="true" />

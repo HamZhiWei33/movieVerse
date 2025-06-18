@@ -6,7 +6,8 @@ import {
   getFilterOptions,
   getAllGenres,
   getAllRegions,
-  fetchFromTMDB
+  fetchFromTMDB,
+  getRecommendedMovies
 } from "../controllers/movie.controller.js";
 import { getHomePageMovies } from "../controllers/movie.controller.js";
 
@@ -24,13 +25,12 @@ router.get("/regions", getAllRegions);
 // Fetch from TMDB
 router.get("/tmdb", fetchFromTMDB);
 
-// Get home page movies
-router.get("/home", getHomePageMovies);
-
-// Get all movies
-router.get("/", protectRoute, getAllMovies);
+// Get recommendation
+router.get("/recommended", protectRoute, getRecommendedMovies);
 
 // Get movies by id
 router.get("/:id", protectRoute, getMovieById);
+
+
 
 export default router;

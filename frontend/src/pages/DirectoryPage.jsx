@@ -1,7 +1,7 @@
 import MovieCard from "../components/directory/MovieCard";
 import MovieCardList from "../components/directory/MovieCardList";
 import { useEffect, useState, useMemo } from "react";
-import { useNavigationType, useSearchParams } from "react-router-dom";
+import { useNavigationType, useSearchParams, useLocation } from "react-router-dom";
 import "../styles/directory.css";
 import ViewDropdown from "../components/directory/ViewDropdown";
 import { FaListUl } from "react-icons/fa";
@@ -24,26 +24,64 @@ const DirectoryPage = () => {
 
   const movies = useMovieStore(state => state.movies); const [genres, setGenres] = useState([]);
   const [regions, setRegions] = useState([]);
+  const [decades, setDecades] = useState([]);
+  const [selectedDecades, setSelectedDecades] = useState([]);
   const [years, setYears] = useState([]);
+  const [selectedYears, setSelectedYears] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [selectedRegions, setSelectedRegions] = useState([]);
-  const [selectedYears, setSelectedYears] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const initialView = searchParams.get("view") || "grid";
   const [view, setView] = useState(initialView);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isSearchResult, setIsSearchResult] = useState(false);
+  const [searchedMovies, setSearchedMovies] = useState([]);
+
+  const location = useLocation();
 
   const { previousScrollPosition, clearScrollPosition } = usePreviousScrollStore();
   const navigationType = useNavigationType();
 
   const [loadMoreRef, setLoadMoreRef] = useState(null);
 
+  const getDecadeFromYear = (year) => {
+    const yearNum = parseInt(year, 10);
+    if (isNaN(yearNum)) return null;
+    return `${Math.floor(yearNum / 10) * 10}s`;
+  };
+
+  const decadeToYears = (value) => {
+    if (value.endsWith('s')) {
+      const base = parseInt(value.replace('s', ''), 10);
+      return Array.from({ length: 10 }, (_, i) => base + i);
+    }
+    return [parseInt(value, 10)];
+  };
+
+
   useEffect(() => {
     searchParams.set("view", view);
     setSearchParams(searchParams);
+    console.log("view: " + view);
+    console.log(isSearchResult);
   }, [view]);
+
+  // Debug
+  useEffect(() => {
+    if (searchParams.get("view") === null) {
+      searchParams.set("view", view);
+      setSearchParams(searchParams);
+    }
+    setIsSearchResult(searchParams.get('query') !== null);
+    // const { filteredSearchMovies = [], searchQuery = '' } = location.state || {};
+    // if (location.state !== null) {
+      
+    //   console.log(filteredSearchMovies);
+    //   console.log(searchQuery);
+    // }
+  }, [searchParams]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -52,19 +90,34 @@ const DirectoryPage = () => {
 
       try {
         // First load filter options if needed
-        const needsFilterOptions = genres.length === 0 || regions.length === 0 || years.length === 0;
+        const needsFilterOptions = genres.length === 0 || regions.length === 0 || decades.length === 0;
         if (needsFilterOptions) {
           const filterOptions = await fetchFilterOptions();
           setGenres(filterOptions.genres || []);
           setRegions(filterOptions.regions || []);
-          setYears(filterOptions.years || []);
+          const allYears = filterOptions.years || [];
+          const groupedDecades = Array.from(
+            new Set(
+              allYears
+                .filter(y => parseInt(y) < 2020)
+                .map(year => getDecadeFromYear(year))
+            )
+          ).sort((a, b) => b.localeCompare(a));
+
+          const individualYears = allYears
+            .filter(y => parseInt(y) >= 2020)
+            .map(y => y.toString())
+            .sort((a, b) => b - a);
+
+          setDecades([...individualYears, ...groupedDecades]);
         }
 
-        // Then load movies with current filters
+        const selectedYears = selectedDecades.flatMap(decadeToYears);
+
         const filters = {
           genres: selectedGenres.join(','),
           regions: selectedRegions.join(','),
-          years: selectedYears.join(',')
+          years: selectedYears.join(',') // Send raw years to the API
         };
 
         await fetchMovies(1, 20, filters); // Reduced initial load to 20 for better UX
@@ -77,7 +130,7 @@ const DirectoryPage = () => {
     };
 
     fetchData();
-  }, [selectedGenres, selectedRegions, selectedYears]);
+  }, [selectedGenres, selectedRegions, selectedDecades]);
 
   // Set up intersection observer for lazy loading
   useEffect(() => {
@@ -94,7 +147,7 @@ const DirectoryPage = () => {
       },
       {
         threshold: 0.1,
-        rootMargin: '400px'
+        rootMargin: '1000px'
       }
     );
 
@@ -119,24 +172,6 @@ const DirectoryPage = () => {
       isFetchingMore
     });
   }, [movies, hasMore, loading, isFetchingMore]);
-
-  // Deduplicate movies when filters change
-  useEffect(() => {
-    const uniqueMovies = movies.reduce((acc, movie) => {
-      const existing = acc.find(m =>
-        m._id === movie._id ||
-        (m.tmdbId && movie.tmdbId && m.tmdbId === movie.tmdbId)
-      );
-      if (!existing) {
-        acc.push(movie);
-      }
-      return acc;
-    }, []);
-
-    if (uniqueMovies.length !== movies.length) {
-      useMovieStore.setState({ movies: uniqueMovies });
-    }
-  }, [movies, selectedGenres, selectedRegions, selectedYears]);
 
   useEffect(() => {
     if (!loading && movies.length > 0 && previousScrollPosition > 0) {
@@ -167,6 +202,20 @@ const DirectoryPage = () => {
 
   // In your filteredMovies useMemo:
   const filteredMovies = useMemo(() => {
+    // For search
+    if (location.state !== null) {
+      const { filteredSearchMovies = [], searchQuery = '' } = location.state || {};
+      setSearchedMovies(filteredSearchMovies);
+      return filteredSearchMovies;
+    }
+
+    if(isSearchResult) {
+      // console.error(filteredMovies);
+      return searchedMovies;
+    }
+    console.error("Outsie Triggered!");
+    // console.error(location.state);
+
     if (!movies || movies.length === 0) return [];
 
     return movies.filter((movie) => {
@@ -175,8 +224,8 @@ const DirectoryPage = () => {
 
       // Then apply other filters
       if (selectedGenres.length === 0 &&
-          selectedRegions.length === 0 &&
-          selectedYears.length === 0) {
+        selectedRegions.length === 0 &&
+        selectedDecades.length === 0) {
         return true;
       }
 
@@ -189,14 +238,15 @@ const DirectoryPage = () => {
       const regionMatch = selectedRegions.length === 0 ||
         (movie.region && selectedRegions.includes(movie.region));
 
-      const yearMatch = selectedYears.length === 0 ||
-        (movie.year != null && selectedYears.some(selectedYear =>
-          selectedYear.toString() === movie.year.toString()
-        ));
+      const decadeMatch = selectedDecades.length === 0 ||
+        (movie.year != null && selectedDecades.some(selected => {
+          const targetYears = decadeToYears(selected);
+          return targetYears.includes(parseInt(movie.year, 10));
+        }));
 
-      return genreMatch && regionMatch && yearMatch;
+      return genreMatch && regionMatch && decadeMatch;
     });
-  }, [movies, selectedGenres, selectedRegions, selectedYears, genreMap]);
+  }, [movies, selectedGenres, selectedRegions, selectedDecades, genreMap]);
 
   const renderButtons = (items, selected, setSelected) => (
     <div className="filter-group">
@@ -249,9 +299,9 @@ const DirectoryPage = () => {
               {
                 id: "year",
                 title: "Year",
-                items: years.map((y) => ({ label: y, value: y })),
-                selected: selectedYears,
-                setSelected: setSelectedYears,
+                items: decades.map(d => ({ label: d, value: d })),
+                selected: selectedDecades,
+                setSelected: setSelectedDecades,
               },
             ]}
           />
@@ -285,21 +335,24 @@ const DirectoryPage = () => {
               <section id="year">
                 <fieldset>
                   <legend>Year</legend>
-                  {renderButtons(years, selectedYears, setSelectedYears)}
-                </fieldset>
+                  {renderButtons(
+                    decades.map(decade => ({ label: decade, value: decade })),
+                    selectedDecades,
+                    setSelectedDecades
+                  )}                </fieldset>
               </section>
 
               <ViewDropdown view={view} setView={setView} />
             </section>
 
-            {(selectedGenres.length > 0 || selectedRegions.length > 0 || selectedYears.length > 0) && (
+            {(selectedGenres.length > 0 || selectedRegions.length > 0 || selectedDecades.length > 0) && (
               <div className="clear-filters-container">
                 <button
                   className="clear-filters-button active"
                   onClick={() => {
                     setSelectedGenres([]);
                     setSelectedRegions([]);
-                    setSelectedYears([]);
+                    setSelectedDecades([]);
                   }}
                   aria-label="Clear all filters"
                 >
@@ -327,7 +380,7 @@ const DirectoryPage = () => {
                     ))}
                   </div>
                   <div ref={setLoadMoreRef} className="load-more-trigger">
-                    {isFetchingMore && <p>Loading more movies...</p>}
+                    {(isFetchingMore && !isSearchResult) && <p>Loading more movies...</p>}
                   </div>
                 </>
               ) : (
@@ -355,12 +408,14 @@ const DirectoryPage = () => {
                       padding: '20px'
                     }}
                   >
-                    {isFetchingMore ? (
+                    {!isSearchResult && (
+                      (isFetchingMore) ? (
                       <div className="loading-spinner">Loading more movies...</div>
                     ) : hasMore ? (
                       <button onClick={loadMoreMovies}>Load More</button>
                     ) : (
                       <p>No more movies to load</p>
+                    )
                     )}
                   </div>
                 </>
@@ -373,7 +428,7 @@ const DirectoryPage = () => {
                   onClick={() => {
                     setSelectedGenres([]);
                     setSelectedRegions([]);
-                    setSelectedYears([]);
+                    setSelectedDecades([]);
                   }}
                 >
                   Clear all filters

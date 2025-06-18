@@ -4,6 +4,8 @@ import Region from "../models/region.model.js";
 import Like from "../models/like.model.js";
 import Watchlist from "../models/watchlist.model.js";
 import Review from "../models/review.model.js";
+import User from "../models/user.model.js";
+
 
 import axios from "axios";
 import dotenv from "dotenv";
@@ -26,6 +28,7 @@ export const getAllMovies = async (req, res) => {
     // First try to get from database
     const [movies, total] = await Promise.all([
       Movie.find(query)
+        .sort({ releaseDate: -1 })
         .skip(skip)
         .limit(limit)
         .lean(),
@@ -52,7 +55,9 @@ export const getAllMovies = async (req, res) => {
         });
 
         // Process and store TMDB movies
-        const tmdbMovies = data.results.slice(0, needed);
+        const tmdbMovies = data.results
+          .slice(0, needed)
+          .sort((a, b) => new Date(b.release_date) - new Date(a.release_date));
         const processedMovies = [];
 
         for (const tmdbMovie of tmdbMovies) {
@@ -143,6 +148,8 @@ async function enrichMovies(movies, user) {
 // @route   GET /api/movies/:id
 // @access  Public
 export const getMovieById = async (req, res) => {
+  // console.log("Backend Debug 2");
+  // console.log(req);
   try {
     const movie = await Movie.findById(req.params.id)
       .select('title posterUrl rating year genre description region duration trailerUrl director actors')
@@ -307,6 +314,7 @@ export const filterMovies = async (req, res) => {
     query.trailerUrl = { $exists: true, $ne: "" };
 
     const movies = await Movie.find(query)
+      .sort({ releaseDate: -1 })
       .select('title posterUrl rating year genre description region duration trailerUrl')
       .skip(skip)
       .limit(limit)
@@ -359,7 +367,7 @@ export const fetchFromTMDB = async (req, res) => {
       // Process movies sequentially to avoid API rate limiting
       for (const tmdbMovie of data.results) {
         if (processedMovies.length >= limit) break;
-        
+
         try {
           const movie = await processTMDBMovie(tmdbMovie);
           if (movie?.trailerUrl) {
@@ -372,7 +380,7 @@ export const fetchFromTMDB = async (req, res) => {
 
       currentPage++;
       attempts++;
-      
+
       // Add a small delay between pages to avoid rate limiting
       if (processedMovies.length < limit && attempts < maxAttempts) {
         await new Promise(resolve => setTimeout(resolve, 500));
@@ -386,7 +394,9 @@ export const fetchFromTMDB = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      data: processedMovies.slice(0, limit),
+      data: processedMovies
+        .slice(0, limit)
+        .sort((a, b) => new Date(b.releaseDate) - new Date(a.releaseDate)),
       pagination: {
         hasMore: true // TMDB has virtually infinite pages
       }
@@ -556,34 +566,44 @@ export const getHomePageMovies = async (req, res) => {
 
 
 // tzw
-// @desc    Get newly released movies
-// @route   GET /api/movies/new-releases
-// @access  Public
-export const getNewReleases = async (req, res) => {
+// - getNewReleases(req, res)
+
+
+// Recommendation
+export const getRecommendedMovies = async (req, res) => {
   try {
-    const currentYear = new Date().getFullYear();
-    const limit = parseInt(req.query.limit) || 10;
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
 
-    const movies = await Movie.find({
-      year: { $gte: currentYear - 1 }, // 近两年（含将来）
-      trailerUrl: { $exists: true, $ne: "" }
+    const user = await User.findById(userId).populate("watchlist");
+    const favouriteGenres = user?.favouriteGenres;
+    const watchlist = user?.watchlist?.map((movie) => movie.genre);
+
+    const genreIdSet = new Set(watchlist.reduce((acc, arr) => [...acc, ...arr], favouriteGenres));
+    const combinedGenres = Array.from(genreIdSet);
+
+    // Main recommendation: high-rated movies in those genres
+    const recommendations = await Movie.find({
+      genre: { $in: combinedGenres },
+      rating: { $gte: 3.0 },
     })
-      .select('title posterUrl rating year genre description region duration trailerUrl')
-      .sort({ year: -1, rating: -1 })
-      .limit(limit)
-      .lean();
+      .sort({ rating: -1, reviewCount: -1, year: -1 })
+      .limit(50);
 
-    res.status(200).json({
-      success: true,
-      count: movies.length,
-      data: movies
-    });
+    if (recommendations.length >= 50) {
+      return res.status(200).json({ movies: recommendations });
+    }
+
+    // Fallback: fill the remaining recommendations based on rating>reviewCount>year
+    const fallback = await Movie.find({ _id: { $nin: recommendations.map((movie) => movie._id) } })
+      .sort({ rating: -1, reviewCount: -1, year: -1 })
+      .limit(50 - recommendations.length);
+
+    return res.status(200).json({ movies: [...recommendations, ...fallback] });
   } catch (error) {
-    console.error("Error getting new releases:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch new releases."
-    });
+    console.error("getRecommendedMovies error:", error.message);
+    return res.status(500).json({ message: "Failed to fetch recommended movies", error: error.message });
   }
 };
-

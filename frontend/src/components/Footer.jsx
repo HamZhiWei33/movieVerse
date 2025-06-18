@@ -10,6 +10,11 @@ const Footer = () => {
   const handleWatchlistClick = () => {
     navigate("/profile", { state: { targetTab: "WatchList" } });
   };
+
+  const handleRankingClick = () => {
+    navigate("/ranking", { state: { targetTab: "Ranking" } });
+  };
+
   const handleRecommendationClick = () => {
     navigate("/recommendation", { state: { targetTab: "Recommendation" } });
   };
@@ -28,7 +33,7 @@ const Footer = () => {
               <ul role="list">
                 <li role="listitem">
                   <Link
-                    to="/watchlist"
+                    to="/#watchlist"
                     aria-label="Navigate to Watchlist page"
                     onClick={handleWatchlistClick}
                   >
@@ -36,21 +41,22 @@ const Footer = () => {
                   </Link>
                 </li>
                 <li role="listitem">
-                  <Link to="/ranking" aria-label="Navigate to Ranking page">
+                  <Link to="/#ranking" aria-label="Navigate to Ranking page" onClick={handleRankingClick}>
                     Ranking
                   </Link>
                 </li>
                 <li role="listitem">
                   <Link
-                    to="/directory/new"
+                    to="/#new-released"
                     aria-label="Navigate to New Releases page"
+                    onClick={() => navigate("/new-released")}
                   >
                     New Released
                   </Link>
                 </li>
                 <li role="listitem">
                   <Link
-                    to="/recommendation"
+                    to="/#recommendation"
                     aria-label="Navigate to Recommendations page"
                     onClick={handleRecommendationClick}
                   >
