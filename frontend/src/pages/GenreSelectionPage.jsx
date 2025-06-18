@@ -6,7 +6,7 @@ import useGenreStore from "../store/useGenreStore";
 // import useMovieStore from "../store/useMovieStore";
 import { useAuthStore } from "../store/useAuthStore";
 // import { genres } from "../constant";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const GenreSelectionPage = () => {
     const { genreMap, fetchGenres } = useGenreStore();
@@ -18,7 +18,13 @@ const GenreSelectionPage = () => {
     const [favouriteGenres, setFavouriteGenres] = useState([]);
     const [genreCount, setGenreCount] = useState(0);
     const [genreSelected, setGenreSelected] = useState([]);
+
     const navigate = useNavigate();
+    const location = useLocation();
+
+    const searchParams = new URLSearchParams(location.search);
+    const redirectTo = searchParams.get('redirect') || '/';
+
     const updateGenreCount = (selected, genre) => {
         if (selected) {
             setGenreSelected((prev) => [...prev, genre.id]);
@@ -67,7 +73,9 @@ const GenreSelectionPage = () => {
     // Convert genreMap to array when it changes
     useEffect(() => {
         if (Object.keys(genreMap).length > 0) {
-            const genreArray = Object.entries(genreMap).map(([id, name]) => ({ id, name }));
+            const genreArray = Object.entries(genreMap)
+                .map(([id, name]) => ({ id, name }))
+                .sort((a, b) => a.name.localeCompare(b.name));
             setGenres(genreArray);
         }
     }, [genreMap]);
@@ -82,7 +90,7 @@ const GenreSelectionPage = () => {
             try {
                 const userData = await updateFavouriteGenres(genreSelected);
                 console.log("Form submitted with selected genres");
-                navigate("/");
+                navigate(redirectTo);
             } catch (err) {
                 console.error("Failed to fetch user data:", err);
             }
@@ -110,7 +118,7 @@ const GenreSelectionPage = () => {
                         type="submit"
                         onClick={handleSubmit}
                     >
-                        Submit
+                        Save
                     </button>
                 </div>
             </section>
