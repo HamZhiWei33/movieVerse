@@ -6,37 +6,6 @@ import useRankingStore from "../store/useRankingStore";
 import "../styles/ranking.css";
 
 const RankingPage = () => {
-//   const [movies, setMovies] = useState([]);
-//   const [reviews, setReviews] = useState([]);
-//   const [genres, setGenres] = useState([]);
-//   const [selectedMovie, setSelectedMovie] = useState(null);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState(null);
-
-//   useEffect(() => {
-//     const fetchRankingData = async () => {
-//         try {
-//             setLoading(true);
-
-// const response = await axios.get('http://localhost:5001/api/rankings');
-//             console.log('API Response:', response.data); // Debug log
-            
-//             const { movies = [], reviews = [], genres = [] } = response.data || {};
-//             setMovies(movies);
-//             setReviews(reviews);
-//             setGenres(genres);
-//             setSelectedMovie(movies[0] || null);
-            
-//         } catch (error) {
-//             console.error('Error fetching ranking data:', error);
-//             setError('Failed to load ranking data');
-//         } finally {
-//             setLoading(false);
-//         }
-//     };
-
-//     fetchRankingData();
-//   }, []);
   const {
     rankingMovies,
     rankingReviews,

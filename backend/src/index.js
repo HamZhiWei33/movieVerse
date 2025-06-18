@@ -17,8 +17,7 @@ import likeRoutes from "./routes/like.route.js";
 import movieRoutes from "./routes/movie.route.js";
 import reviewRoutes from "./routes/review.route.js";
 import cors from "cors";
-import { fetchAndStorePopularMovies } from "./lib/tmdb.js";
-import recommendationRoutes from "./routes/recommendation.route.js";
+// import { fetchAndStorePopularMovies } from "./lib/tmdb.js";
 
 dotenv.config();
 const app = express();
@@ -47,5 +46,5 @@ app.use("/api/recommendation", recommendationRoutes);
 app.listen(PORT, async () => {
   console.log("Server is running on port:" + PORT);
   await connectDB();
-  await fetchAndStorePopularMovies(); // Fetch TMDB data
+  // await fetchAndStorePopularMovies(); // Fetch TMDB data
 });

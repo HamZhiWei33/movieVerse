@@ -21,19 +21,22 @@ const HeroSection = ({ title, moviesType, items }) => {
     movies: storeMovies,
     loading,
     isLiked,
+    watchlist,
     isInWatchlist,
     toggleLike,
     toggleWatchlist,
     fetchMovies,
     fetchWatchlist,
     fetchLikedMovies,
-    recommendedMovies
+    recommendedMovies,
+    randomRecommendedMovies,
+    getRecommendedMovies
   } = useMovieStore();
 const {authUser}= useAuthStore();
   const { genreMap, fetchGenres } = useGenreStore();
   const [cardPerRow, setCardPerRow] = useState(1);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  const [displayed, setDisplayed] = useState([]);
+  // const [displayed, setDisplayed] = useState([]);
   const navigate = useNavigate();
   const containerRef = useRef(null);
   const gridRef = useRef(null);
@@ -58,7 +61,7 @@ const {authUser}= useAuthStore();
   // Get appropriate movie list based on type
   const movieList = useMemo(() => {
     if (moviesType === "watchlist") {
-      return storeMovies.filter(m => {
+      return storeMovies.filter((m) => {
         const inWatchlist = isInWatchlist(m._id);
         // console.log(`Movie ${m._id} in watchlist:`, inWatchlist);
         return inWatchlist;
@@ -66,59 +69,38 @@ const {authUser}= useAuthStore();
     }
     if (moviesType === "newReleased") return storeMovies.slice(0, 20);
     return items;
-  }, [moviesType, displayed, storeMovies, items, isInWatchlist]);
+  }, [moviesType, storeMovies, items, isInWatchlist]);
 
   // Handle recommendation reload
   const handleReload = () => {
-    const shuffled = [...recommendedMovies].sort(() => 0.5 - Math.random());
-    useMovieStore.setState({ recommendedMovies: shuffled });
+    const shuffled = [...recommendedMovies]
+      .sort(() => 0.5 - Math.random())
+      .slice(0, 20)
+      .sort((a, b) => b.rating - a.rating);
+    useMovieStore.setState({ randomRecommendedMovies: shuffled });
     // setDisplayed(shuffled.slice(0, 10));
     // sessionStorage.setItem("displayedMovies", JSON.stringify(shuffled.slice(0, 10)));
   };
 
-  // Initialize recommendations
   useEffect(() => {
-    if (moviesType !== "recommendation") return;
-    const saved = sessionStorage.getItem("displayedMovies");
-    if (saved) {
-      setDisplayed(JSON.parse(saved));
-    } else {
+    if (
+      moviesType === "recommendation" &&
+      randomRecommendedMovies.length < 20
+    ) {
       handleReload();
     }
-  }, [storeMovies]);
+  }, [recommendedMovies]);
 
-  
-// const fetchRecommendedMovies = async () => {
-//     try {
-//       console.log("Fetching recommended movies...");
-//       // console.log("Fetching recommended movies for user:", authUser._id);
-//       // if (!authUser._id) {
-//       //   console.warn("No user ID found.");
-//       //   return;
-//       // }
-
-//       const res = await axios.get('/recommendation');
-//       if (!res.data || !res.data.movies) {
-//         console.warn("No recommended movies found in response.");
-//         return;
-//       }
-//       setDisplayed(res.data.movies);
-//     } catch (err) {
-//       console.error("Failed to fetch recommended movies:", err.message);
-//       setDisplayed([]);
-//     }
-//   };
-
-
-  const fetchNewReleasedMovies = async () => {
-    try {
-      const res = await axios.get('/recommendation/new-releases');
-      setDisplayed(res.data.data); // assuming backend returns { success, count, data }
-    } catch (err) {
-      console.error("Failed to fetch new releases:", err.message);
-      setDisplayed([]);
-    }
-  };
+  // Initialize recommendations
+  // useEffect(() => {
+  //   if (moviesType !== "recommendation") return;
+  //   const saved = sessionStorage.getItem("displayedMovies");
+  //   if (saved) {
+  //     setDisplayed(JSON.parse(saved));
+  //   } else {
+  //     handleReload();
+  //   }
+  // }, [storeMovies]);
 
   // Calculate responsive layout
   useEffect(() => {
@@ -133,10 +115,9 @@ const {authUser}= useAuthStore();
     setCardPerRow(Math.ceil(columns / 2));
   });
 
-  observer.observe(gridRef.current);
-  return () => observer.disconnect();
-}, [moviesType]);
-
+    observer.observe(gridRef.current);
+    return () => observer.disconnect();
+  }, [moviesType, movieList]);
 
   // Navigation handlers
   const navigateFullPage = () => {
@@ -148,9 +129,13 @@ const {authUser}= useAuthStore();
   };
 
   // Get top movies by genre for ranking section
-  const topMoviesByGenre = useMemo(() =>
-    moviesType === "ranking" ? getTopMoviesByGenre(storeMovies, items, 4) : {}
-  , [storeMovies]);
+  const topMoviesByGenre = useMemo(
+    () =>
+      moviesType === "ranking"
+        ? getTopMoviesByGenre(storeMovies, items, 4)
+        : {},
+    [storeMovies]
+  );
 
   // useEffect(() => {
   //   if (moviesType === "ranking") {
@@ -178,7 +163,7 @@ const {authUser}= useAuthStore();
     watchlist: "Your watchlist movies",
     newReleased: "Newly released movies",
     ranking: "Top ranked movies by genre",
-    recommendation: "List of recommended movies"
+    recommendation: "List of recommended movies",
   }[moviesType];
 
   // In your HeroSection component
@@ -229,16 +214,20 @@ const {authUser}= useAuthStore();
           </span>
         )}
       </div>
-      {["watchlist", "newReleased", "recommendation"].includes(moviesType) && (
-        <div
-          id={moviesType}
-          ref={gridRef}
-          className="home-card-container grid"
-          role="region"
-          aria-label={ariaLabel}
-        >
-          {Array.isArray(movieList) &&
-            movieList
+      {(moviesType === "watchlist" ||
+        moviesType === "newReleased" ||
+        moviesType === "recommendation") &&
+        (movieList.length === 0 ? (
+          <div className="no-movies-message">{`No movie in ${moviesType}`}</div>
+        ) : (
+          <div
+            id={moviesType}
+            ref={gridRef}
+            className="home-card-container grid"
+            role="region"
+            aria-label={ariaLabel}
+          >
+            {movieList
               .slice(0, Math.max(4, cardPerRow * 2))
               .map((movie, index) => (
                 <React.Fragment key={movie._id}>
@@ -248,7 +237,9 @@ const {authUser}= useAuthStore();
                   <MovieCard
                     movie={{
                       ...movie,
-                      genre: movie.genre?.map(id => genreMap[id] || "Unknown") || [],
+                      genre:
+                        movie.genre?.map((id) => genreMap[id] || "Unknown") ||
+                        [],
                       year: movie.year?.toString() || "",
                     }}
                     liked={isLiked(movie._id)}
@@ -258,14 +249,17 @@ const {authUser}= useAuthStore();
                   >
                     {moviesType === "recommendation" && (
                       <div className="movie-rating">
-                        <ReviewStars showNumber={true} rating={movie.rating || 0} />
+                        <ReviewStars
+                          showNumber={true}
+                          rating={movie.rating || 0}
+                        />
                       </div>
                     )}
                   </MovieCard>
                 </React.Fragment>
               ))}
           </div>
-        )}
+        ))}
 
       {/* <div className="home-card-section" role="region" aria-label={ariaLabel}> */}
       {moviesType === "ranking" && (

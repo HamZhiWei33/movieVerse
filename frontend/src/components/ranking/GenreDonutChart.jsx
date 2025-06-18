@@ -12,18 +12,16 @@ import useIsMobile from "../../store/useIsMobile";
 import CustomLegend from "./CustomLegend";
 
 const COLORS = [
-  "#E3F9E5",
-  "#C6F7C1",
-  "#A9F295",
-  "#8BE76A",
-  "#74E13B",
-  "#66D934",
-  "#59CC2F",
-  "#4DAD29",
-  "#429B23",
-  "#3B8A1F",
-  "#34781A",
-  "#2F6615",
+  "rgba(0, 114, 114, 0.88)",
+  "rgba(0, 171, 171, 0.88)",
+  "rgba(206, 255, 255, 0.88)",
+  "rgba(109, 229, 201, 0.88)",
+  "rgba(65, 197, 166, 0.88)",
+  "rgba(65, 188, 197, 0.88)",
+  "rgba(53, 127, 170, 0.88)",
+  "rgba(5, 68, 146, 0.88)",
+  "rgba(14, 52, 99, 0.88)",
+  "rgba(5, 68, 146, 0.88)",
 ];
 
 const GenreDonutChart = ({ data }) => {
