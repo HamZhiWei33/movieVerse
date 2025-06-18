@@ -55,159 +55,131 @@ async function enrichMovies(movies, user) {
 // @access  Public
 export const getAllMovies = async (req, res) => {
   try {
-    const { page = 1, limit = 20, genres, regions, years, query: searchQuery } = req.query; // Renamed 'query' to 'searchQuery' to avoid conflict with Mongoose 'query' object
+    const { page = 1, limit = 20, genres, regions, years, query: searchQuery } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
+    const dbQuery = { trailerUrl: { $exists: true, $ne: "" } };
 
-    const dbQuery = { trailerUrl: { $exists: true, $ne: "" } }; // Base query: only movies with trailers
-
-    // Apply genre filter
+    // Filters
+    let genreIds = [];
     if (genres) {
       const genreNames = genres.split(',').map(g => decodeURIComponent(g.trim()));
-      // Assuming your Movie model's 'genre' field stores IDs and you have a Genre model for name-to-ID lookup
       const genreObjects = await Genre.find({ name: { $in: genreNames } }).select('id').lean();
-      const genreIds = genreObjects.map(g => g.id); // Assuming 'id' is the TMDB ID
-      if (genreIds.length > 0) {
-        dbQuery.genre = { $in: genreIds };
-      } else {
-        // If no matching genres found, return empty results early
-        return res.status(200).json({
-          success: true,
-          data: [],
-          pagination: { currentPage: 1, totalPages: 0, totalResults: 0, hasMore: false }
-        });
-      }
+      genreIds = genreObjects.map(g => g.id);
+      if (genreIds.length) dbQuery.genre = { $in: genreIds };
     }
 
-    // Apply region filter
     if (regions) {
       const regionCodes = regions.split(',').map(r => decodeURIComponent(r.trim()));
       dbQuery.region = { $in: regionCodes };
     }
 
-    // Apply year filter
     if (years) {
-      const yearNumbers = years.split(',').map(y => parseInt(y.trim())).filter(y => !isNaN(y));
-      if (yearNumbers.length > 0) {
-        dbQuery.year = { $in: yearNumbers };
-      } else {
-        // If no valid years, return empty results early
-        return res.status(200).json({
-          success: true,
-          data: [],
-          pagination: { currentPage: 1, totalPages: 0, totalResults: 0, hasMore: false }
-        });
-      }
+      const yearNums = years.split(',').map(y => parseInt(y.trim())).filter(n => !isNaN(n));
+      if (yearNums.length) dbQuery.year = { $in: yearNums };
     }
 
-    // Apply search query filter
     if (searchQuery) {
-      const regex = new RegExp(decodeURIComponent(searchQuery), 'i'); // Case-insensitive search
-      dbQuery.$or = [
-        { title: regex },
-        { overview: regex } // Assuming overview field exists in your Movie model
-      ];
+      const regex = new RegExp(decodeURIComponent(searchQuery), 'i');
+      dbQuery.$or = [ { title: regex }, { overview: regex } ];
     }
 
-
-    // First try to get from database
     const [movies, total] = await Promise.all([
-      Movie.find(dbQuery) // Use the constructed dbQuery here
-        .sort({ releaseDate: -1 })
-        .skip(skip)
-        .limit(Number(limit))
-        .lean(), // Use .lean() for plain JS objects for better performance
-      Movie.countDocuments(dbQuery) // Use the constructed dbQuery here for total count
+      Movie.find(dbQuery).sort({ releaseDate: -1 }).skip(skip).limit(Number(limit)).lean(),
+      Movie.countDocuments(dbQuery)
     ]);
 
-    // Determine if more movies exist in the DB after applying filters
     const hasMoreInDB = (parseInt(page) * parseInt(limit)) < total;
+    const needsTMDBFallback = movies.length < limit;
 
-    if ((genres || regions || years || searchQuery) && movies.length === 0 && total === 0) {
-      return res.status(200).json({
+    // TMDB fallback - always attempt if we have filters, even if we got enough from DB
+    // This ensures we can keep loading more pages from TMDB
+    if (needsTMDBFallback || genres || regions || years || searchQuery) {
+      const needed = parseInt(limit) - movies.length;
+      const tmdbPage = Math.max(1, Math.floor(skip / 20) + 1); // More accurate page calculation
+      
+      const tmdbParams = {
+        api_key: TMDB_API_KEY,
+        language: 'en-US',
+        page: tmdbPage,
+        sort_by: 'popularity.desc'
+      };
+
+      // Apply TMDB-supported filters
+      if (genreIds.length) tmdbParams.with_genres = genreIds.join(',');
+      if (years) {
+        const yearNums = years.split(',').map(y => parseInt(y.trim())).filter(n => !isNaN(n));
+        if (yearNums.length === 1) tmdbParams.primary_release_year = yearNums[0];
+        else if (yearNums.length > 1) {
+          // For multiple years, use release_date.gte/lte
+          const minYear = Math.min(...yearNums);
+          const maxYear = Math.max(...yearNums);
+          tmdbParams['primary_release_date.gte'] = `${minYear}-01-01`;
+          tmdbParams['primary_release_date.lte'] = `${maxYear}-12-31`;
+        }
+      }
+      if (searchQuery) tmdbParams.query = decodeURIComponent(searchQuery);
+
+      let processedMovies = [];
+      try {
+        const tmdbUrl = searchQuery
+          ? `${TMDB_BASE_URL}/search/movie`
+          : `${TMDB_BASE_URL}/discover/movie`;
+
+        const { data } = await axios.get(tmdbUrl, { params: tmdbParams });
+
+        const existingTmdb = new Set(movies.map(m => m.tmdbId).filter(Boolean));
+        const toProcess = data.results.filter(m => !existingTmdb.has(m.id));
+
+        for (const tmdbMovie of toProcess) {
+          if (processedMovies.length >= needed) break;
+
+          const saved = await processTMDBMovie(tmdbMovie);
+          if (!saved || !saved.trailerUrl) continue;
+
+          if (regions) {
+            const allowedRegions = regions.split(',').map(r => decodeURIComponent(r.trim()));
+            if (!allowedRegions.includes(saved.region)) continue;
+          }
+
+          processedMovies.push(saved);
+        }
+      } catch (err) {
+        console.error("TMDB fetch failed:", err.message);
+      }
+
+      const combined = [...movies, ...processedMovies];
+      const enriched = await enrichMovies(combined, req.user);
+      
+      // For TMDB fallback, we can't know the exact total, so we assume there might be more
+      const finalHasMore = processedMovies.length > 0 || hasMoreInDB;
+
+      return res.json({
         success: true,
-        data: [],
-        pagination: { currentPage: 1, totalPages: 0, totalResults: 0, hasMore: false }
+        data: enriched,
+        pagination: {
+          currentPage: Number(page),
+          totalPages: Math.ceil((total + processedMovies.length) / limit),
+          totalResults: total + processedMovies.length,
+          hasMore: finalHasMore,
+        },
       });
     }
 
-    const areFiltersActive = genres || regions || years || searchQuery;
-    const needsTMDBFallback = movies.length < limit && !areFiltersActive; // Only fallback if no filters
-
-    if (needsTMDBFallback) {
-      const needed = parseInt(limit) - movies.length;
-      // Adjust TMDB page calculation to continue from where DB left off
-      const tmdbPage = Math.max(1, Math.ceil((skip + movies.length) / 20) + 1); // +1 to ensure next page if current page finished
-
-      try {
-        console.log(`Fetching ${needed} more from TMDB page ${tmdbPage}`);
-        const { data } = await axios.get(`${TMDB_BASE_URL}/movie/popular`, {
-          params: {
-            api_key: TMDB_API_KEY,
-            page: tmdbPage,
-            language: 'en-US'
-          }
-        });
-
-        // Filter out movies already in DB (by tmdbId) to avoid duplicates when combining
-        const existingTmdbIds = new Set(movies.map(m => m.tmdbId).filter(Boolean));
-        const newTmdbMovies = data.results.filter(tmdbMovie => !existingTmdbIds.has(tmdbMovie.id));
-
-        const processedMovies = [];
-        for (const tmdbMovie of newTmdbMovies) {
-          if (processedMovies.length >= needed) break; // Stop if we have enough
-          try {
-            const savedMovie = await processTMDBMovie(tmdbMovie); // This saves to DB
-            if (savedMovie && savedMovie.trailerUrl) { // Only add if it has a trailer
-              processedMovies.push(savedMovie);
-            }
-          } catch (err) {
-            console.error(`Error processing TMDB movie ${tmdbMovie.id}:`, err);
-          }
-        }
-
-        const combinedMovies = [...movies, ...processedMovies];
-        const enrichedCombinedMovies = await enrichMovies(combinedMovies, req.user);
-
-        // Re-calculate hasMore based on combined results if TMDB contributed
-        const finalTotal = total + processedMovies.length;
-        const finalHasMore = (parseInt(page) * parseInt(limit)) < finalTotal;
-
-        return res.status(200).json({
-          success: true,
-          data: enrichedCombinedMovies,
-          pagination: {
-            currentPage: Number(page),
-            totalPages: Math.ceil(finalTotal / limit),
-            totalResults: finalTotal,
-            hasMore: finalHasMore
-          }
-        });
-      } catch (tmdbError) {
-        console.error('TMDB fallback failed:', tmdbError);
-        // If TMDB fallback fails, proceed with whatever was fetched from DB
-      }
-    }
-
-
-    const enrichedMovies = await enrichMovies(movies, req.user);
-
-    return res.status(200).json({
+    // If no filters and we got enough from DB
+    const enriched = await enrichMovies(movies, req.user);
+    return res.json({
       success: true,
-      data: enrichedMovies,
+      data: enriched,
       pagination: {
         currentPage: Number(page),
         totalPages: Math.ceil(total / limit),
         totalResults: total,
-        hasMore: hasMoreInDB // This now correctly reflects if more are in DB given filters
-      }
+        hasMore: hasMoreInDB,
+      },
     });
-
-  } catch (error) {
-    console.error("Error getting all movies:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch movies."
-    });
+  } catch (err) {
+    console.error("getAllMovies error:", err);
+    res.status(500).json({ success: false, message: "Failed to fetch movies." });
   }
 };
 
