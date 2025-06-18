@@ -6,7 +6,8 @@ import {
   getFilterOptions,
   getAllGenres,
   getAllRegions,
-  fetchFromTMDB
+  fetchFromTMDB,
+  getRecommendedMovies
 } from "../controllers/movie.controller.js";
 
 const router = express.Router();
@@ -26,7 +27,12 @@ router.get("/regions", getAllRegions);
 // Fetch from TMDB
 router.get("/tmdb", fetchFromTMDB);
 
+// Get recommendation
+router.get("/recommended", protectRoute, getRecommendedMovies);
+
 // Get movies by id
 router.get("/:id", protectRoute, getMovieById);
+
+
 
 export default router;
