@@ -126,6 +126,22 @@
   align-items: center;
 }
 
+.home-card-container.grid.no-movies-message {
+  display: flex;
+  padding: 1rem;
+  font-size: 1.2rem;
+  text-align: start;
+  justify-content: start !important;
+  align-items: start;
+}
+
+.no-movies-message {
+  display: flex;
+  padding-left: 1rem;
+  color: #a7a0a0;
+  text-align: start;
+}
+
 @media screen and (max-width: 942px) {
   .home-card-container.grid {
     grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
@@ -140,7 +156,7 @@
 
 .home-card-container.grid .movie-card:hover {
   transform: scale(1.03);
-  color: white;
+  color: rgb(255, 0, 0);
 }
 
 /* .home-card-container.grid .movie-card p {
@@ -157,6 +173,6 @@
   color: #cccccc;
 } */
 
-.home-card-container.grid .movie-card:hover p {
-  color: #fff;
+.home-card-container.grid.movie-card:hover p {
+  color: #ff0000;
 }
