@@ -1,124 +1,124 @@
-import HomePage from './pages/HomePage';
-import SignupPage from './pages/SignUpPage';
-import LoginPage from './pages/LoginPage';
-import GenreSelectionPage from './pages/GenreSelectionPage';
-import ForgotPasswordPage from './pages/ForgotPasswordPage';
-import ResetPasswordPage from './pages/ResetPasswordPage';
-import ChangePasswordPage from './pages/ChangePasswordPage';
-import DirectoryPage from './pages/DirectoryPage';
-import RankingPage from './pages/RankingPage';
-import ProfilePage from './pages/ProfilePage';
-import MovieDetailPage from './pages/MovieDetailPage';
-import NewReleasedPage from './pages/NewReleasedPage';
+import HomePage from "./pages/HomePage";
+import SignupPage from "./pages/SignUpPage";
+import LoginPage from "./pages/LoginPage";
+import GenreSelectionPage from "./pages/GenreSelectionPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
+import ChangePasswordPage from "./pages/ChangePasswordPage";
+import DirectoryPage from "./pages/DirectoryPage";
+import RankingPage from "./pages/RankingPage";
+import ProfilePage from "./pages/ProfilePage";
+import MovieDetailPage from "./pages/MovieDetailPage";
+import NewReleasedPage from "./pages/NewReleasedPage";
 
 export const AppRoutes = [
   // Public routes
   {
-    path: '/signup',
+    path: "/signup",
     element: <SignupPage />,
     meta: {
-      title: 'Sign Up',
-      publicOnly: true
-    }
+      title: "Sign Up",
+      publicOnly: true,
+    },
   },
   {
-    path: '/login',
+    path: "/login",
     element: <LoginPage />,
     meta: {
-      title: 'Login',
-      publicOnly: true
-    }
+      title: "Login",
+      publicOnly: true,
+    },
   },
   {
-    path: '/forgot_password',
+    path: "/forgot_password",
     element: <ForgotPasswordPage />,
     meta: {
-      title: 'Forgot Password'
-    }
+      title: "Forgot Password",
+    },
   },
   {
-    path: '/reset_password',
+    path: "/reset_password",
     element: <ResetPasswordPage />,
     meta: {
-      title: 'Reset Password'
-    }
+      title: "Reset Password",
+    },
   },
 
   // Conditionally protected routes
   {
-    path: '/',
+    path: "/",
     element: <HomePage />,
     meta: {
-      title: 'Home',
+      title: "Home",
       public: true,
-      protected: true,
+      // protected: true,
       requiresGenres: true, // Homepage accessible without genres
-      publicSkipGenreCheck: true
-    }
+      publicSkipGenreCheck: true,
+    },
   },
   {
-    path: '/genre_selection',
+    path: "/genre_selection",
     element: <GenreSelectionPage />,
     meta: {
-      title: 'Select Genres',
+      title: "Select Genres",
       protected: true,
-      skipGenreCheck: true // Bypass genre requirement for this route
-    }
+      skipGenreCheck: true, // Bypass genre requirement for this route
+    },
   },
 
   // Fully protected routes (require auth + 3+ genres)
   {
-    path: '/directory',
+    path: "/directory",
     element: <DirectoryPage />,
     meta: {
-      title: 'Directory',
+      title: "Directory",
       protected: true,
-      requiresGenres: true
-    }
+      requiresGenres: true,
+    },
   },
   {
-    path: '/ranking',
+    path: "/ranking",
     element: <RankingPage />,
     meta: {
-      title: 'Rankings',
+      title: "Rankings",
       protected: true,
-      requiresGenres: true
-    }
+      requiresGenres: true,
+    },
   },
   {
-    path: '/profile',
+    path: "/profile",
     element: <ProfilePage />,
     meta: {
-      title: 'Profile',
+      title: "Profile",
       protected: true,
-      requiresGenres: true
-    }
+      requiresGenres: true,
+    },
   },
   {
-    path: '/change_password',
+    path: "/change_password",
     element: <ChangePasswordPage />,
     meta: {
-      title: 'Change Password',
+      title: "Change Password",
       protected: true,
-      requiresGenres: true
-    }
+      requiresGenres: true,
+    },
   },
   {
-    path: '/movie/:movieId',
+    path: "/movie/:movieId",
     element: <MovieDetailPage />,
     meta: {
-      title: 'Movie Details',
+      title: "Movie Details",
       protected: true,
-      requiresGenres: true
-    }
+      requiresGenres: true,
+    },
   },
   {
-    path: '/new-released',
+    path: "/new-released",
     element: <NewReleasedPage />,
     meta: {
-      title: 'New Releases',
+      title: "New Releases",
       protected: true,
-      requiresGenres: true
-    }
-  }
+      requiresGenres: true,
+    },
+  },
 ];

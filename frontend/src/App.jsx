@@ -1,5 +1,11 @@
 import "./App.css";
-import { Routes, Route, useLocation, Navigate, useLoaderData } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  useLocation,
+  Navigate,
+  useLoaderData,
+} from "react-router-dom";
 import Navbar from "./components/Navbar";
 import HomePage from "./pages/HomePage";
 import SignupPage from "./pages/SignUpPage";
@@ -22,11 +28,12 @@ import {
 import FooterGuest from "./components/FooterGuest";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./store/useAuthStore";
-import { FaSpinner } from 'react-icons/fa';
-import { AppRoutes } from './AppRoutes';
+import { FaSpinner } from "react-icons/fa";
+import { AppRoutes } from "./AppRoutes";
 
 const ProtectedRoute = ({ children, intendedPath, meta = {} }) => {
-  const { authUser, isCheckingAuth, isAuthChecked, favouriteGenres } = useAuthStore();
+  const { authUser, isCheckingAuth, isAuthChecked, favouriteGenres } =
+    useAuthStore();
   const location = useLocation();
 
   if (isCheckingAuth || !isAuthChecked) return;
@@ -36,7 +43,9 @@ const ProtectedRoute = ({ children, intendedPath, meta = {} }) => {
 
   // Public-only route but user is authenticated
   if (meta.publicOnly && authUser) {
-    return <Navigate to={`/`} replace />;
+    console.log("Meta error:", meta.title);
+    // return <Navigate to={`/`} replace />;
+    return children;
   }
 
   // No genre check for public, but genre check for validated
@@ -45,8 +54,10 @@ const ProtectedRoute = ({ children, intendedPath, meta = {} }) => {
     console.log("Meta:", meta);
   }
   if (meta.public && !authUser) {
+    console.log("Children");
     return children;
   }
+  console.error("After children");
 
   // Protected route but not authenticated
   if (meta.protected && !authUser) {
@@ -57,42 +68,47 @@ const ProtectedRoute = ({ children, intendedPath, meta = {} }) => {
     // return;
   }
 
-
-
   // Requires genres but doesn't have enough
   if (
-    (meta.requiresGenres &&
-      (!authUser?.favouriteGenres || authUser.favouriteGenres.length < 3) &&
-      !meta.skipGenreCheck)
+    meta.requiresGenres &&
+    (!authUser?.favouriteGenres || authUser.favouriteGenres.length < 3) &&
+    !meta.skipGenreCheck
   ) {
-    return <Navigate to={`/genre_selection?redirect=${encodeURIComponent(location.pathname)}`} replace />;
+    return (
+      <Navigate
+        to={`/genre_selection?redirect=${encodeURIComponent(
+          location.pathname
+        )}`}
+        replace
+      />
+    );
   }
 
   return children;
 
-  // Still loading auth state
-  if (isCheckingAuth || !isAuthChecked) {
-    return <FaSpinner className="icon-spin" />;
-  }
+  // // Still loading auth state
+  // if (isCheckingAuth || !isAuthChecked) {
+  //   return <FaSpinner className="icon-spin" />;
+  // }
 
-  // Not authenticated - redirect to login with return URL
-  if (!authUser) {
-    console.log("Not login!");
-    if (intendedPath === "/") {
-      return children;
-    }
-    return <Navigate to={`/login`} replace />;
-  }
+  // // Not authenticated - redirect to login with return URL
+  // if (!authUser) {
+  //   console.log("Not login!");
+  //   if (intendedPath === "/") {
+  //     return children;
+  //   }
+  //   return <Navigate to={`/login`} replace />;
+  // }
 
-  console.log("Logged In!");
+  // console.log("Logged In!");
 
-  // Authenticated but missing genres - redirect to genre selection
-  if ((authUser.favouriteGenres?.length ?? 0) < 3 && !intendedPath.startsWith('/genre_selection')) {
-    return <Navigate to={`/genre_selection?redirect=${encodeURIComponent(intendedPath)}`} replace />;
-  }
+  // // Authenticated but missing genres - redirect to genre selection
+  // if ((authUser.favouriteGenres?.length ?? 0) < 3 && !intendedPath.startsWith('/genre_selection')) {
+  //   return <Navigate to={`/genre_selection?redirect=${encodeURIComponent(intendedPath)}`} replace />;
+  // }
 
-  // All checks passed - render the requested content
-  return children;
+  // // All checks passed - render the requested content
+  // return children;
 };
 
 // Define FooterSelector first since it's used in App
@@ -113,11 +129,14 @@ function AppContent() {
 
     // }
     const check = async () => {
-      const res = await checkAuth();
-      console.log("Checking Auth: ", res);
-    }
+      try {
+        const res = await checkAuth();
+        console.log("Checking Auth: ", res);
+      } catch (error) {
+        throw error;
+      }
+    };
     check();
-
   }, [checkAuth]);
 
   return (

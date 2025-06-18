@@ -85,7 +85,9 @@ export const useAuthStore = create((set, get) => ({
 
       const { token } = res.data;
       localStorage.setItem("token", token);
-      axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      axiosInstance.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${token}`;
 
       await get().checkAuth();
       // console.log("Before setting authUser:", get().authUser);
@@ -174,7 +176,7 @@ export const useAuthStore = create((set, get) => ({
   },
 
   fetchLikedGenres: async (passedUserId) => {
-    const userId = get().authUser?._id;
+    const userId = get().authUser?._id || passedUserId;
     console.log("Final userId used:", userId);
     if (!userId) {
       toast.error("User not logged in");
@@ -225,7 +227,7 @@ export const useAuthStore = create((set, get) => ({
       return [];
     }
   },
-  
+
   changeNewPassword: async (oldPassword, newPassword) => {
     try {
       const userId = get().authUser?._id;
@@ -257,35 +259,48 @@ export const useAuthStore = create((set, get) => ({
       const userId = get().authUser?._id;
       if (!userId) throw new Error("User ID not found");
 
-      const res = await axiosInstance.put(`/users/${userId}/favourite-genres`, {favouriteGenres: genreSelected});
+      const res = await axiosInstance.put(`/users/${userId}/favourite-genres`, {
+        favouriteGenres: genreSelected,
+      });
       set({ authUser: res.data });
 
       toast.success("Favourite genres saved successfully");
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Error while saving favourite genres");
+      toast.error(
+        error?.response?.data?.message || "Error while saving favourite genres"
+      );
     }
   },
 
   requestResetCode: async (email) => {
     // set({ isUpdatingProfile: true });
     try {
-      const res = await axiosInstance.post(`/auth/request-reset-code`, {email: email});
+      const res = await axiosInstance.post(`/auth/request-reset-code`, {
+        email: email,
+      });
       toast.success("Verification code sent successfully.\nCheck your email");
 
       return res.data;
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Error sending verification code");
+      toast.error(
+        error?.response?.data?.message || "Error sending verification code"
+      );
       return null;
     }
   },
 
   verifyResetCode: async (email, code) => {
     try {
-      const res = await axiosInstance.post('/auth/verify-reset-code', { email: email, code: code });
+      const res = await axiosInstance.post("/auth/verify-reset-code", {
+        email: email,
+        code: code,
+      });
       toast.success("Code verified successfully");
       return res;
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Error sending verification code");
+      toast.error(
+        error?.response?.data?.message || "Error sending verification code"
+      );
       return null;
     }
   },
@@ -296,7 +311,7 @@ export const useAuthStore = create((set, get) => ({
         email: email,
         code: code,
         newPassword: newPassword,
-        newPasswordConfirm: newPasswordConfirm
+        newPasswordConfirm: newPasswordConfirm,
       });
 
       toast.success("Password changed successfully");
