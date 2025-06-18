@@ -32,7 +32,8 @@ const HomePage = () => {
     recommendedMovies,
     getRecommendedMovies,
     watchlist,
-    fetchWatchlist
+    fetchWatchlist,
+    randomRecommendedMovies
   } = useMovieStore();
   // const { watchlist, fetchWatchlist } = useWatchlistStore();
   const { genreMap, fetchGenres } = useGenreStore();
@@ -42,23 +43,24 @@ const HomePage = () => {
   useEffect(() => {
     if (authUser) {
       fetchWatchlist();
-    } else {
+      if(recommendedMovies.length < 50) {
+        getRecommendedMovies();
+      }
+    } else if (rankingMovies.length === 0) {
       fetchRankingData();
     }
     // fetchGenres();
     // if(authUser && recommendedMovies.length < 50) {
     //   getRecommendedMovies();
     // }
-  }, [fetchWatchlist]);
+  }, [authUser]);
 
   useEffect(() => {
     // if(authUser) {
     //   fetchWatchlist();
     // }
     fetchGenres();
-    if (authUser && recommendedMovies.length < 50) {
-      getRecommendedMovies();
-    }
+    
   }, []);
 
   const genres = useMemo(() => {
@@ -104,7 +106,7 @@ const HomePage = () => {
         <HeroSection
           title="Recommendation"
           moviesType={"recommendation"}
-          items={authUser ? recommendedMovies : rankingMovies}
+          items={(authUser && authUser.favouriteGenres?.length >= 3) ? randomRecommendedMovies : rankingMovies}
         />
 
         {/* <RecommendationSection
