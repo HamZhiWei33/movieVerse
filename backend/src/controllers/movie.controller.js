@@ -514,56 +514,6 @@ async function processTMDBMovie(tmdbMovie) {
 }
 
 // - getTopRatedMovies(req, res)
-// @desc    Get movies for home page sections: watchlist, new releases, recommendations
-// @route   GET /api/movies/home
-export const getHomePageMovies = async (req, res) => {
-  try {
-    console.log("📥 Fetching home page movies...");
-
-    const currentYear = new Date().getFullYear();
-    const recentYears = [currentYear, currentYear - 1];
-
-    // 🔹 1. New Releases
-    const newReleases = await Movie.find({
-      year: { $in: recentYears },
-      trailerUrl: { $exists: true, $ne: "" }
-    })
-      .select("title posterUrl rating year genre description region duration trailerUrl")
-      .sort({ year: -1 })
-      .limit(10)
-      .lean();
-
-    // 🔹 2. Recommendations
-    const recommendations = await Movie.find({
-      trailerUrl: { $exists: true, $ne: "" }
-    })
-      .sort({ rating: -1, reviewCount: -1 })
-      .select("title posterUrl rating year genre description region duration trailerUrl")
-      .limit(10)
-      .lean();
-
-    // 🔹 3. Watchlist — currently skipped (empty array)
-    const watchlistMovies = [];
-
-    console.log("✅ Home data fetched successfully.");
-
-    res.status(200).json({
-      success: true,
-      data: {
-        newReleases,
-        recommendations,
-        watchlist: watchlistMovies
-      }
-    });
-  } catch (error) {
-    console.error("❌ Error in getHomePageMovies:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch home page movies"
-    });
-  }
-};
-
 
 // tzw
 // - getNewReleases(req, res)

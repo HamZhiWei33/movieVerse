@@ -9,7 +9,6 @@ import {
   fetchFromTMDB,
   getRecommendedMovies
 } from "../controllers/movie.controller.js";
-import { getHomePageMovies } from "../controllers/movie.controller.js";
 
 const router = express.Router();
 
