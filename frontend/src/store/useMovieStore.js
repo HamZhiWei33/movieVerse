@@ -18,6 +18,7 @@ const useMovieStore = create((set, get) => ({
     hasMore: true,
     isFetchingMore: false,
     watchlistStatuses: {},
+    recommendedMovies: [],
 
     getState: () => get(),
 
@@ -413,6 +414,20 @@ const useMovieStore = create((set, get) => ({
         const likes = get().likes;
         return likes[movieId]?.likeCount || 0;
     },
+
+    getRecommendedMovies: async () => {
+      // set({ loading: true, error: null });
+      try {
+          const response = await axiosInstance.get("/movies/recommended");
+          // set({ currentUser: response.data, loading: false });
+          // console.log(response.data);
+          set({ recommendedMovies: response.data.movies });
+          return response.data;
+      } catch (error) {
+          set({ error: error.message, loading: false });
+          throw error;
+      }
+  },
 
     // Utility functions
     clearError: () => set({ error: null }),
