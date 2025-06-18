@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import WatchList from "./WatchList.jsx";
 import { useLocation, useSearchParams } from "react-router-dom";
-import useWatchlistStore from "../../store/useWatchlistStore.js";
+// import useWatchlistStore from "../../store/useWatchlistStore.js";
+import useMovieStore from "../../store/useMovieStore.js";
 import useGenreStore from "../../store/useGenreStore.js"; // Assuming you have a genre store
 const TabWatchlist = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const activeTab = searchParams.get("tab") || "default";
-  const { watchlist: globalWatchlist, fetchWatchlist } = useWatchlistStore();
+  const { watchlist: globalWatchlist, fetchWatchlist } = useMovieStore();
   const [watchlist, setWatchlist] = useState([]);
   const { genreMap, fetchGenres } = useGenreStore();
 
