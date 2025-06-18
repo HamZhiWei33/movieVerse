@@ -43,9 +43,7 @@ const ProtectedRoute = ({ children, intendedPath, meta = {} }) => {
 
   // Public-only route but user is authenticated
   if (meta.publicOnly && authUser) {
-    console.log("Meta error:", meta.title);
-    // return <Navigate to={`/`} replace />;
-    return children;
+    return <Navigate to={`/`} replace />;
   }
 
   // No genre check for public, but genre check for validated
@@ -54,10 +52,8 @@ const ProtectedRoute = ({ children, intendedPath, meta = {} }) => {
     console.log("Meta:", meta);
   }
   if (meta.public && !authUser) {
-    console.log("Children");
     return children;
   }
-  console.error("After children");
 
   // Protected route but not authenticated
   if (meta.protected && !authUser) {
@@ -90,19 +86,7 @@ const ProtectedRoute = ({ children, intendedPath, meta = {} }) => {
   // if (isCheckingAuth || !isAuthChecked) {
   //   return <FaSpinner className="icon-spin" />;
   // }
-  // // Still loading auth state
-  // if (isCheckingAuth || !isAuthChecked) {
-  //   return <FaSpinner className="icon-spin" />;
-  // }
 
-  // // Not authenticated - redirect to login with return URL
-  // if (!authUser) {
-  //   console.log("Not login!");
-  //   if (intendedPath === "/") {
-  //     return children;
-  //   }
-  //   return <Navigate to={`/login`} replace />;
-  // }
   // // Not authenticated - redirect to login with return URL
   // if (!authUser) {
   //   console.log("Not login!");
@@ -113,12 +97,7 @@ const ProtectedRoute = ({ children, intendedPath, meta = {} }) => {
   // }
 
   // console.log("Logged In!");
-  // console.log("Logged In!");
 
-  // // Authenticated but missing genres - redirect to genre selection
-  // if ((authUser.favouriteGenres?.length ?? 0) < 3 && !intendedPath.startsWith('/genre_selection')) {
-  //   return <Navigate to={`/genre_selection?redirect=${encodeURIComponent(intendedPath)}`} replace />;
-  // }
   // // Authenticated but missing genres - redirect to genre selection
   // if ((authUser.favouriteGenres?.length ?? 0) < 3 && !intendedPath.startsWith('/genre_selection')) {
   //   return <Navigate to={`/genre_selection?redirect=${encodeURIComponent(intendedPath)}`} replace />;
