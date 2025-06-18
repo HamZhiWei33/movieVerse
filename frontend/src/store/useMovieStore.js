@@ -19,6 +19,7 @@ const useMovieStore = create((set, get) => ({
     isFetchingMore: false,
     watchlistStatuses: {},
     recommendedMovies: [],
+    randomRecommendedMovies: [],
 
     getState: () => get(),
 
