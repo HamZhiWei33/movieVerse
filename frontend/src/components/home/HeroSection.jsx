@@ -28,6 +28,7 @@ const HeroSection = ({ title, moviesType, items }) => {
     fetchLikedMovies,
     recommendedMovies,
     randomRecommendedMovies,
+    getRecommendedMovies
   } = useMovieStore();
 
   const { genreMap, fetchGenres } = useGenreStore();

@@ -43,7 +43,7 @@ const SearchBar = () => {
         //   }
         // };
 
-        if (!loading && movies.length < 500) {
+        if (!loading && movies.length < 500 && !location.pathname.startsWith("/directory")) {
             fetchMovies(1, 1000, { sort: "-year" }); // Fetch newest movies
         }
 
@@ -66,8 +66,8 @@ const SearchBar = () => {
             setFilteredItems([]);
             // setIsDropdownOpen(false);
         } else {
-            console.log("searchTerm: " + searchTerm);
-            console.log(movies.length);
+            // console.log("searchTerm: " + searchTerm);
+            // console.log(movies.length);
             const itemsWithMatchPositions = movies
                 .map((movie) => {
                     const title = movie.title.toLowerCase();

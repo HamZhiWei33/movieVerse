@@ -166,15 +166,15 @@ const DirectoryPage = () => {
   }, [loadMoreRef, hasMore, isFetchingMore, loadMoreMovies]);
 
   // Add debug effect
-  useEffect(() => {
-    console.log('Movie state updated:', {
-      count: movies.length,
-      page: getState().currentPage,
-      hasMore,
-      loading,
-      isFetchingMore
-    });
-  }, [movies, hasMore, loading, isFetchingMore, getState]);
+  // useEffect(() => {
+  //   console.log('Movie state updated:', {
+  //     count: movies.length,
+  //     page: getState().currentPage,
+  //     hasMore,
+  //     loading,
+  //     isFetchingMore
+  //   });
+  // }, [movies, hasMore, loading, isFetchingMore, getState]);
 
   useEffect(() => {
     if (!loading && movies.length > 0 && previousScrollPosition > 0 && navigationType === 'POP') {
