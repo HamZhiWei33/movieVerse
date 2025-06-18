@@ -19,19 +19,21 @@ const HeroSection = ({ title, moviesType, items }) => {
     movies: storeMovies,
     loading,
     isLiked,
+    watchlist,
     isInWatchlist,
     toggleLike,
     toggleWatchlist,
     fetchMovies,
     fetchWatchlist,
     fetchLikedMovies,
-    recommendedMovies
+    recommendedMovies,
+    randomRecommendedMovies
   } = useMovieStore();
 
   const { genreMap, fetchGenres } = useGenreStore();
   const [cardPerRow, setCardPerRow] = useState(1);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  const [displayed, setDisplayed] = useState([]);
+  // const [displayed, setDisplayed] = useState([]);
   const navigate = useNavigate();
   const containerRef = useRef(null);
   const gridRef = useRef(null);
@@ -63,26 +65,32 @@ const HeroSection = ({ title, moviesType, items }) => {
     }
     if (moviesType === "newReleased") return storeMovies.slice(0, 20);
     return items;
-  }, [moviesType, displayed, storeMovies, items, isInWatchlist]);
+  }, [moviesType, storeMovies, items, isInWatchlist]);
 
   // Handle recommendation reload
   const handleReload = () => {
-    const shuffled = [...recommendedMovies].sort(() => 0.5 - Math.random());
-    useMovieStore.setState({ recommendedMovies: shuffled });
+    const shuffled = [...recommendedMovies].sort(() => 0.5 - Math.random()).slice(0,20).sort((a, b)=>b.rating-a.rating);
+    useMovieStore.setState({ randomRecommendedMovies: shuffled });
     // setDisplayed(shuffled.slice(0, 10));
     // sessionStorage.setItem("displayedMovies", JSON.stringify(shuffled.slice(0, 10)));
   };
 
-  // Initialize recommendations
   useEffect(() => {
-    if (moviesType !== "recommendation") return;
-    const saved = sessionStorage.getItem("displayedMovies");
-    if (saved) {
-      setDisplayed(JSON.parse(saved));
-    } else {
+    if (moviesType === "recommendation" && randomRecommendedMovies.length < 20) {
       handleReload();
     }
-  }, [storeMovies]);
+  }, [recommendedMovies]);
+
+  // Initialize recommendations
+  // useEffect(() => {
+  //   if (moviesType !== "recommendation") return;
+  //   const saved = sessionStorage.getItem("displayedMovies");
+  //   if (saved) {
+  //     setDisplayed(JSON.parse(saved));
+  //   } else {
+  //     handleReload();
+  //   }
+  // }, [storeMovies]);
 
   // Calculate responsive layout
   useEffect(() => {
