@@ -13,7 +13,7 @@ const ReviewStars = ({
   onChange
 }) => {
   const [hover, setHover] = React.useState(-1);
-  const [value, setValue] = React.useState(rating);
+  const [value, setValue] = React.useState(Number(rating.toFixed(1)));
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -28,7 +28,7 @@ const ReviewStars = ({
   };
 
   React.useEffect(() => {
-    setValue(rating);
+    setValue(Number(rating.toFixed(1)));
   }, [rating]);
 
   return (

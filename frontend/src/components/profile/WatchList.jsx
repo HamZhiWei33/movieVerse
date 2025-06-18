@@ -122,7 +122,7 @@ const WatchList = ({ movie, showRatingNumber = false, onRemove }) => {
               <span className="duration-icon">
                 <IoTime />
               </span>
-              {movie.duration}
+              {movie.duration === "0h 0min" ? "To Be Announced" : movie.duration}
             </div>
                 <LikeIcon movie={movie} disabled={loadingLike} />
           </div>

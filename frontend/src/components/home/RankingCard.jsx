@@ -7,7 +7,6 @@ import { BsFire } from "react-icons/bs";
 
 const RankingCard = ({ genre, isAllGenre = false, topMovies = [] }) => {
   const navigate = useNavigate();
-  console.log("RankingCard", genre, isAllGenre, topMovies);
 
   const genreName = isAllGenre ? "All Genres" : genre.name;
   const handleCardClick = () => {
@@ -37,7 +36,7 @@ const RankingCard = ({ genre, isAllGenre = false, topMovies = [] }) => {
       <div className="home-poster-container">
         {previewMovie ? (
           <>
-            <RankingGrid genre={genre} isAllGenre />
+            <RankingGrid topMovies={topMovies} isAllGenre />
           </>
         ) : (
           // <img

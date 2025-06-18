@@ -18,6 +18,7 @@ const useMovieStore = create((set, get) => ({
     hasMore: true,
     isFetchingMore: false,
     watchlistStatuses: {},
+    recommendedMovies: [],
 
     getState: () => get(),
 
@@ -102,21 +103,52 @@ const useMovieStore = create((set, get) => ({
     },
 
     loadMoreMovies: async () => {
-        const state = get();
-        if (state.isFetchingMore || !state.hasMore) return;
+    const state = get();
+    if (state.isFetchingMore || !state.hasMore) return;
 
-        try {
-            await state.fetchMovies(
-                state.currentPage + 1,
-                20, // Smaller batch size for better UX
-                state.lastUsedFilters,
-                true
+    set({ isFetchingMore: true, error: null });
+
+    try {
+        const response = await axiosInstance.get("/movies", {
+            params: {
+                page: state.currentPage + 1,
+                limit: 20,
+                ...state.lastUsedFilters,
+                fallback: 'true'
+            },
+        });
+
+        const newMovies = response.data.data;
+
+        const uniqueMovies = newMovies.reduce((acc, movie) => {
+            const exists = state.movies.some(m => 
+                m._id === movie._id || 
+                (m.tmdbId && movie.tmdbId && m.tmdbId === movie.tmdbId)
             );
-        } catch (error) {
-            console.error('Load more error:', error);
-            // Optionally retry or show error to user
-        }
-    },
+            if (!exists) {
+                acc.push(movie);
+            }
+            return acc;
+        }, [...state.movies]);
+
+        const hasMore = response.data.pagination?.hasMore ?? true;
+
+        set({
+            movies: uniqueMovies,
+            currentPage: state.currentPage + 1,
+            hasMore,
+            isFetchingMore: false
+        });
+
+        return { data: uniqueMovies };
+    } catch (error) {
+        set({
+            error: error.message,
+            isFetchingMore: false
+        });
+        throw error;
+    }
+},
 
     fetchMovieById: async (id) => {
         set({ loading: true, error: null });
@@ -382,6 +414,20 @@ const useMovieStore = create((set, get) => ({
         const likes = get().likes;
         return likes[movieId]?.likeCount || 0;
     },
+
+    getRecommendedMovies: async () => {
+      // set({ loading: true, error: null });
+      try {
+          const response = await axiosInstance.get("/movies/recommended");
+          // set({ currentUser: response.data, loading: false });
+          // console.log(response.data);
+          set({ recommendedMovies: response.data.movies });
+          return response.data;
+      } catch (error) {
+          set({ error: error.message, loading: false });
+          throw error;
+      }
+  },
 
     // Utility functions
     clearError: () => set({ error: null }),

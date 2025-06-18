@@ -15,7 +15,7 @@ export const getTopMoviesByGenre = (movies, allGenres, limit = 6) => {
 
   // Sort by each genre
   allGenres.forEach((genre) => {
-    const genreMovies = movies.filter((m) => m.genre.includes(genre.id));
+    const genreMovies = movies.filter((m) => m.genre.includes(Number(genre.id)));
 
     const sorted = [...genreMovies]
       .map((movie) => ({
