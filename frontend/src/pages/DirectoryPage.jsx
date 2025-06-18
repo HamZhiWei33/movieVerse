@@ -77,7 +77,7 @@ const DirectoryPage = () => {
     setIsSearchResult(searchParams.get('query') !== null);
     // const { filteredSearchMovies = [], searchQuery = '' } = location.state || {};
     // if (location.state !== null) {
-      
+
     //   console.log(filteredSearchMovies);
     //   console.log(searchQuery);
     // }
@@ -114,10 +114,13 @@ const DirectoryPage = () => {
 
         const selectedYears = selectedDecades.flatMap(decadeToYears);
 
+        const searchQuery = searchParams.get('query'); // Get search query from URL
+
         const filters = {
-          genres: selectedGenres.join(','),
-          regions: selectedRegions.join(','),
-          years: selectedYears.join(',') // Send raw years to the API
+          genres: selectedGenres.length > 0 ? selectedGenres.join(',') : undefined, // Only send if selected
+          regions: selectedRegions.length > 0 ? selectedRegions.join(',') : undefined, // Only send if selected
+          years: selectedYears.length > 0 ? selectedYears.join(',') : undefined, // Send raw years to the API, only if selected
+          query: searchQuery || undefined // Pass search query
         };
 
         await fetchMovies(1, 20, filters); // Reduced initial load to 20 for better UX
@@ -130,13 +133,13 @@ const DirectoryPage = () => {
     };
 
     fetchData();
-  }, [selectedGenres, selectedRegions, selectedDecades]);
+  }, [selectedGenres, selectedRegions, selectedDecades, searchParams]);
 
   // Set up intersection observer for lazy loading
   useEffect(() => {
     const observer = new IntersectionObserver(
       async ([entry]) => {
-        if (entry.isIntersecting && !isFetchingMore && hasMore) {
+        if (entry.isIntersecting && !isFetchingMore && hasMore && !isSearchResult) {
           console.log('Loading more movies...');
           try {
             await loadMoreMovies();
@@ -146,8 +149,8 @@ const DirectoryPage = () => {
         }
       },
       {
-        threshold: 0.1,
-        rootMargin: '1000px'
+        threshold: 0.2,
+        rootMargin: '400px'
       }
     );
 
@@ -171,14 +174,14 @@ const DirectoryPage = () => {
       loading,
       isFetchingMore
     });
-  }, [movies, hasMore, loading, isFetchingMore]);
+  }, [movies, hasMore, loading, isFetchingMore, getState]);
 
   useEffect(() => {
-    if (!loading && movies.length > 0 && previousScrollPosition > 0) {
+    if (!loading && movies.length > 0 && previousScrollPosition > 0 && navigationType === 'POP') {
       window.scrollTo(0, previousScrollPosition);
       clearScrollPosition();
     }
-  }, [navigationType, movies, loading]);
+  }, [navigationType, movies, loading, previousScrollPosition, clearScrollPosition]);
 
   const genreMap = useMemo(() => {
     return genres.reduce((map, genre) => {
@@ -201,52 +204,77 @@ const DirectoryPage = () => {
   };
 
   // In your filteredMovies useMemo:
-  const filteredMovies = useMemo(() => {
-    // For search
-    if (location.state !== null) {
-      const { filteredSearchMovies = [], searchQuery = '' } = location.state || {};
-      setSearchedMovies(filteredSearchMovies);
-      return filteredSearchMovies;
-    }
+  // const filteredMovies = useMemo(() => {
+  //   // For search
+  //   if (location.state !== null) {
+  //     const { filteredSearchMovies = [], searchQuery = '' } = location.state || {};
+  //     setSearchedMovies(filteredSearchMovies);
+  //     return filteredSearchMovies;
+  //   }
 
-    if(isSearchResult) {
-      // console.error(filteredMovies);
-      return searchedMovies;
-    }
-    console.error("Outsie Triggered!");
-    // console.error(location.state);
+  //   if(isSearchResult) {
+  //     // console.error(filteredMovies);
+  //     return searchedMovies;
+  //   }
+  //   console.error("Outsie Triggered!");
+  //   // console.error(location.state);
 
-    if (!movies || movies.length === 0) return [];
+  //   if (!movies || movies.length === 0) return [];
 
-    return movies.filter((movie) => {
-      // First ensure the movie has a trailer
-      if (!movie.trailerUrl) return false;
+  //   return movies.filter((movie) => {
+  //     // First ensure the movie has a trailer
+  //     if (!movie.trailerUrl) return false;
 
-      // Then apply other filters
-      if (selectedGenres.length === 0 &&
-        selectedRegions.length === 0 &&
-        selectedDecades.length === 0) {
-        return true;
-      }
+  //     // Then apply other filters
+  //     if (selectedGenres.length === 0 &&
+  //       selectedRegions.length === 0 &&
+  //       selectedDecades.length === 0) {
+  //       return true;
+  //     }
 
-      const genreMatch = selectedGenres.length === 0 ||
-        (movie.genre && movie.genre.some(id => {
-          const genreName = genreMap[id];
-          return genreName && selectedGenres.includes(genreName);
-        }));
+  //     const genreMatch = selectedGenres.length === 0 ||
+  //       (movie.genre && movie.genre.some(id => {
+  //         const genreName = genreMap[id];
+  //         return genreName && selectedGenres.includes(genreName);
+  //       }));
 
-      const regionMatch = selectedRegions.length === 0 ||
-        (movie.region && selectedRegions.includes(movie.region));
+  //     const regionMatch = selectedRegions.length === 0 ||
+  //       (movie.region && selectedRegions.includes(movie.region));
 
-      const decadeMatch = selectedDecades.length === 0 ||
-        (movie.year != null && selectedDecades.some(selected => {
-          const targetYears = decadeToYears(selected);
-          return targetYears.includes(parseInt(movie.year, 10));
-        }));
+  //     const decadeMatch = selectedDecades.length === 0 ||
+  //       (movie.year != null && selectedDecades.some(selected => {
+  //         const targetYears = decadeToYears(selected);
+  //         return targetYears.includes(parseInt(movie.year, 10));
+  //       }));
 
-      return genreMatch && regionMatch && decadeMatch;
-    });
-  }, [movies, selectedGenres, selectedRegions, selectedDecades, genreMap]);
+  //     return genreMatch && regionMatch && decadeMatch;
+  //   });
+  // }, [movies, selectedGenres, selectedRegions, selectedDecades, genreMap]);
+
+  const filteredMovies = movies;
+
+  const handleClearAllFilters = () => {
+    // 1. Clear local state for filters
+    setSelectedGenres([]);
+    setSelectedRegions([]);
+    setSelectedDecades([]);
+
+    // 2. Clear filter-related search parameters from the URL
+    // Create a new URLSearchParams object based on current params
+    const newSearchParams = new URLSearchParams(searchParams.toString());
+
+    // Delete the parameters related to filters and search query
+    newSearchParams.delete('genres');
+    newSearchParams.delete('regions');
+    newSearchParams.delete('years'); // If you were storing combined years directly
+    newSearchParams.delete('query'); // Crucial for clearing search results
+
+    // Update the URL without navigating, which will trigger the useEffect
+    setSearchParams(newSearchParams);
+
+    // Optional: Reset isSearchResult if it's explicitly tied to a query param
+    setIsSearchResult(false);
+  };
 
   const renderButtons = (items, selected, setSelected) => (
     <div className="filter-group">
@@ -349,11 +377,7 @@ const DirectoryPage = () => {
               <div className="clear-filters-container">
                 <button
                   className="clear-filters-button active"
-                  onClick={() => {
-                    setSelectedGenres([]);
-                    setSelectedRegions([]);
-                    setSelectedDecades([]);
-                  }}
+                  onClick={handleClearAllFilters} // Use the new handler
                   aria-label="Clear all filters"
                 >
                   Clear all
@@ -371,7 +395,7 @@ const DirectoryPage = () => {
                   <div className="movie-grid">
                     {filteredMovies.map((movie) => (
                       <MovieCard
-                        key={`${movie._id}-${movie.tmdbId || ''}`}
+                        key={`${movie._id}-${movie.tmdbId}`}
                         movie={movie}
                         liked={isLiked(movie._id)}
                         likeCount={movie.likeCount}
@@ -388,7 +412,7 @@ const DirectoryPage = () => {
                   <div className="movie-list">
                     {filteredMovies.map((movie) => (
                       <MovieCardList
-                        key={`${movie._id}-${movie.tmdbId || ''}`}
+                        key={`${movie._id}-${movie.tmdbId}`}
                         movie={movie}
                         genres={movie.genre?.map(id => genreMap[id]) || []}
                         liked={isLiked(movie._id)}
@@ -410,12 +434,12 @@ const DirectoryPage = () => {
                   >
                     {!isSearchResult && (
                       (isFetchingMore) ? (
-                      <div className="loading-spinner">Loading more movies...</div>
-                    ) : hasMore ? (
-                      <button onClick={loadMoreMovies}>Load More</button>
-                    ) : (
-                      <p>No more movies to load</p>
-                    )
+                        <div className="loading-spinner">Loading more movies...</div>
+                      ) : hasMore ? (
+                        <button onClick={loadMoreMovies}>Load More</button>
+                      ) : (
+                        <p>No more movies to load</p>
+                      )
                     )}
                   </div>
                 </>
