@@ -13,6 +13,9 @@ import { getHomePageMovies } from "../controllers/movie.controller.js";
 
 const router = express.Router();
 
+// Get all movies
+router.get("/", getAllMovies);
+
 // Get all distinct filters
 router.get("/filters", getFilterOptions);
 

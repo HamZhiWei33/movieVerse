@@ -42,9 +42,9 @@ const {authUser}= useAuthStore();
   // Fetch initial data
   useEffect(() => {
     fetchGenres();
-    if (moviesType === "watchlist") {
-      fetchWatchlist();
-    }
+    // if (moviesType === "watchlist") {
+    //   fetchWatchlist();
+    // }
     // if (moviesType === "newReleased") {
     //   fetchMovies(1, 20, { sort: "-year" }); // Fetch newest movies
     // }
@@ -182,13 +182,13 @@ const {authUser}= useAuthStore();
   }[moviesType];
 
   // In your HeroSection component
-  useEffect(() => {
-    console.log('Current watchlist:', {
-      storeMovies: storeMovies.length,
-      watchlist: storeMovies.filter(m => isInWatchlist(m._id)),
-      watchlistMap: useMovieStore.getState().watchlistMap
-    });
-  }, [storeMovies, isInWatchlist]);
+  // useEffect(() => {
+  //   console.log('Current watchlist:', {
+  //     storeMovies: storeMovies.length,
+  //     watchlist: storeMovies.filter(m => isInWatchlist(m._id)),
+  //     watchlistMap: useMovieStore.getState().watchlistMap
+  //   });
+  // }, [storeMovies, isInWatchlist]);
 
   return (
     <section

@@ -6,7 +6,6 @@ import { BsFire } from "react-icons/bs";
 
 const RankingCard = ({ genre, isAllGenre = false, topMovies = [] }) => {
   const navigate = useNavigate();
-  console.log("RankingCard", genre, isAllGenre, topMovies);
 
   const genreName = isAllGenre ? "All Genres" : genre.name;
   const handleCardClick = () => {

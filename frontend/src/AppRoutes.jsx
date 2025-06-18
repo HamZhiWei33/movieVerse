@@ -51,7 +51,7 @@ export const AppRoutes = [
     meta: {
       title: 'Home',
       public: true,
-      protected: true,
+      // protected: true,
       requiresGenres: true, // Homepage accessible without genres
       publicSkipGenreCheck: true
     }
