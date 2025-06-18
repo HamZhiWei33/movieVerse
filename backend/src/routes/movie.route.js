@@ -13,7 +13,7 @@ import {
 const router = express.Router();
 
 // Get all movies
-router.get("/", protectRoute, getAllMovies);
+router.get("/", getAllMovies);
 
 // Get all distinct filters
 router.get("/filters", getFilterOptions);

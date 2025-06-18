@@ -16,6 +16,7 @@ import { useAuthStore } from "../store/useAuthStore.js";
 import useWatchlistStore from "../store/useWatchlistStore.js";
 import useGenreStore from "../store/useGenreStore";
 import useMovieStore from "../store/useMovieStore";
+import useRankingStore from "../store/useRankingStore";
 
 const HomePage = () => {
   // const userId = "U1";
@@ -23,19 +24,39 @@ const HomePage = () => {
   // const watchlist = getMovieObject(userId);
   const { authUser } = useAuthStore();
   const {
+    rankingMovies,
+    fetchRankingData,
+  } = useRankingStore();
+  const {
     movies: storeMovies,
     recommendedMovies,
-    getRecommendedMovies
+    getRecommendedMovies,
+    watchlist,
+    fetchWatchlist
   } = useMovieStore();
-  const { watchlist, fetchWatchlist } = useWatchlistStore();
+  // const { watchlist, fetchWatchlist } = useWatchlistStore();
   const { genreMap, fetchGenres } = useGenreStore();
 
 
   // Fetch watchlist movies
   useEffect(() => {
-    fetchWatchlist();
+    if (authUser) {
+      fetchWatchlist();
+    } else {
+      fetchRankingData();
+    }
+    // fetchGenres();
+    // if(authUser && recommendedMovies.length < 50) {
+    //   getRecommendedMovies();
+    // }
+  }, [fetchWatchlist]);
+
+  useEffect(() => {
+    // if(authUser) {
+    //   fetchWatchlist();
+    // }
     fetchGenres();
-    if(recommendedMovies.length < 50) {
+    if (authUser && recommendedMovies.length < 50) {
       getRecommendedMovies();
     }
   }, []);
@@ -47,9 +68,9 @@ const HomePage = () => {
     return [];
   }, [genreMap]);
 
-  useEffect(() => {
-    console.log(genres);
-  }, [genres]);
+  // useEffect(() => {
+  //   console.log(genres);
+  // }, [genres]);
 
   useScrollToHash();
 
@@ -83,7 +104,7 @@ const HomePage = () => {
         <HeroSection
           title="Recommendation"
           moviesType={"recommendation"}
-          items={recommendedMovies}
+          items={authUser ? recommendedMovies : rankingMovies}
         />
 
         {/* <RecommendationSection
