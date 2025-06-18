@@ -112,7 +112,7 @@ const HeroSection = ({ title, moviesType, items }) => {
 
     observer.observe(gridRef.current);
     return () => observer.disconnect();
-  }, [moviesType]);
+  }, [moviesType, movieList]);
 
   // Navigation handlers
   const navigateFullPage = () => {
