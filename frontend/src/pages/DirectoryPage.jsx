@@ -149,8 +149,8 @@ const DirectoryPage = () => {
         }
       },
       {
-        threshold: 0.1,
-        rootMargin: '1000px'
+        threshold: 0.2,
+        rootMargin: '300px'
       }
     );
 
@@ -253,6 +253,29 @@ const DirectoryPage = () => {
 
   const filteredMovies = movies;
 
+  const handleClearAllFilters = () => {
+    // 1. Clear local state for filters
+    setSelectedGenres([]);
+    setSelectedRegions([]);
+    setSelectedDecades([]);
+
+    // 2. Clear filter-related search parameters from the URL
+    // Create a new URLSearchParams object based on current params
+    const newSearchParams = new URLSearchParams(searchParams.toString());
+
+    // Delete the parameters related to filters and search query
+    newSearchParams.delete('genres');
+    newSearchParams.delete('regions');
+    newSearchParams.delete('years'); // If you were storing combined years directly
+    newSearchParams.delete('query'); // Crucial for clearing search results
+
+    // Update the URL without navigating, which will trigger the useEffect
+    setSearchParams(newSearchParams);
+
+    // Optional: Reset isSearchResult if it's explicitly tied to a query param
+    setIsSearchResult(false);
+  };
+
   const renderButtons = (items, selected, setSelected) => (
     <div className="filter-group">
       {items.map((item, index) => {
@@ -354,11 +377,7 @@ const DirectoryPage = () => {
               <div className="clear-filters-container">
                 <button
                   className="clear-filters-button active"
-                  onClick={() => {
-                    setSelectedGenres([]);
-                    setSelectedRegions([]);
-                    setSelectedDecades([]);
-                  }}
+                  onClick={handleClearAllFilters} // Use the new handler
                   aria-label="Clear all filters"
                 >
                   Clear all
@@ -376,7 +395,7 @@ const DirectoryPage = () => {
                   <div className="movie-grid">
                     {filteredMovies.map((movie) => (
                       <MovieCard
-                        key={`${movie._id}-${movie.tmdbId || ''}`}
+                        key={`${movie._id}-${movie.tmdbId}`}
                         movie={movie}
                         liked={isLiked(movie._id)}
                         likeCount={movie.likeCount}
@@ -393,7 +412,7 @@ const DirectoryPage = () => {
                   <div className="movie-list">
                     {filteredMovies.map((movie) => (
                       <MovieCardList
-                        key={`${movie._id}-${movie.tmdbId || ''}`}
+                        key={`${movie._id}-${movie.tmdbId}`}
                         movie={movie}
                         genres={movie.genre?.map(id => genreMap[id]) || []}
                         liked={isLiked(movie._id)}
