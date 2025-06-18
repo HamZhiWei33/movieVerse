@@ -1,6 +1,6 @@
 import "../styles/navbar.css";
 import { useState, useEffect, useRef, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import SearchIcon from "@mui/icons-material/Search";
 import ClearIcon from "@mui/icons-material/Clear";
 import useMovieStore from "../store/useMovieStore";
@@ -15,6 +15,8 @@ const SearchBar = () => {
         fetchMovies } = useMovieStore();
     const { setPreviousScrollPosition } = usePreviousScrollStore();
     const navigate = useNavigate();
+    const location = useLocation();
+    const [searchParams, setSearchParams] = useSearchParams();
 
     // const [movies, setMovies] = useState([]);
 
@@ -41,7 +43,7 @@ const SearchBar = () => {
         //   }
         // };
 
-        if (!loading && movies.length < 500) {
+        if (!loading && movies.length < 500 && !location.pathname.startsWith("/directory")) {
             fetchMovies(1, 1000, { sort: "-year" }); // Fetch newest movies
         }
 
@@ -64,8 +66,8 @@ const SearchBar = () => {
             setFilteredItems([]);
             // setIsDropdownOpen(false);
         } else {
-            console.log("searchTerm: " + searchTerm);
-            console.log(movies.length);
+            // console.log("searchTerm: " + searchTerm);
+            // console.log(movies.length);
             const itemsWithMatchPositions = movies
                 .map((movie) => {
                     const title = movie.title.toLowerCase();
@@ -124,6 +126,10 @@ const SearchBar = () => {
         setSearchTerm("");
         if (wasInputFocused) {
             inputRef.current.focus();
+        }
+        if (location.pathname.startsWith("/directory")) {
+            searchParams.delete("query");
+            setSearchParams(searchParams);
         }
     };
 

@@ -103,7 +103,7 @@ const GenreRankingSection = ({ movies = [], allGenres = [], allReviews = [] }) =
             block: "start",
           });
         }
-      }, 100); // Small delay to ensure DOM is ready
+      }, 2000); // Small delay to ensure DOM is ready
     }
   }, [location.hash]);
 

@@ -11,7 +11,8 @@ const AddToWatchlistIcon = ({ movie = {} }) => {
   const {
     watchlistStatuses,
     addToWatchlist,
-    removeFromWatchlist
+    removeFromWatchlist,
+    fetchWatchlist
   } = useMovieStore();
 
   const { authUser } = useAuthStore();
@@ -39,6 +40,7 @@ const AddToWatchlistIcon = ({ movie = {} }) => {
       } else {
         await addToWatchlist(movieId);
       }
+      fetchWatchlist();
     } catch (error) {
       console.error("Watchlist operation failed:", error);
     } finally {

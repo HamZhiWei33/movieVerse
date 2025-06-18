@@ -1,5 +1,11 @@
 import "./App.css";
-import { Routes, Route, useLocation, Navigate, useLoaderData } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  useLocation,
+  Navigate,
+  useLoaderData,
+} from "react-router-dom";
 import Navbar from "./components/Navbar";
 import HomePage from "./pages/HomePage";
 import SignupPage from "./pages/SignUpPage";
@@ -22,11 +28,12 @@ import {
 import FooterGuest from "./components/FooterGuest";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./store/useAuthStore";
-import { FaSpinner } from 'react-icons/fa';
-import { AppRoutes } from './AppRoutes';
+import { FaSpinner } from "react-icons/fa";
+import { AppRoutes } from "./AppRoutes";
 
 const ProtectedRoute = ({ children, intendedPath, meta = {} }) => {
-  const { authUser, isCheckingAuth, isAuthChecked, favouriteGenres } = useAuthStore();
+  const { authUser, isCheckingAuth, isAuthChecked, favouriteGenres } =
+    useAuthStore();
   const location = useLocation();
 
   if (isCheckingAuth || !isAuthChecked) return;
@@ -57,15 +64,20 @@ const ProtectedRoute = ({ children, intendedPath, meta = {} }) => {
     // return;
   }
 
-
-
   // Requires genres but doesn't have enough
   if (
-    (meta.requiresGenres &&
-      (!authUser?.favouriteGenres || authUser.favouriteGenres.length < 3) &&
-      !meta.skipGenreCheck)
+    meta.requiresGenres &&
+    (!authUser?.favouriteGenres || authUser.favouriteGenres.length < 3) &&
+    !meta.skipGenreCheck
   ) {
-    return <Navigate to={`/genre_selection?redirect=${encodeURIComponent(location.pathname)}`} replace />;
+    return (
+      <Navigate
+        to={`/genre_selection?redirect=${encodeURIComponent(
+          location.pathname
+        )}`}
+        replace
+      />
+    );
   }
 
   return children;
@@ -119,10 +131,8 @@ function AppContent() {
       } catch (error) {
         throw error;
       }
-
-    }
+    };
     check();
-
   }, []);
 
   return (

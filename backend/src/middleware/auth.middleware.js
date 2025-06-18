@@ -7,7 +7,10 @@ export const protectRoute = async (req, res, next) => {
     let token;
 
     // Priority: Authorization header
-    if (req.headers.authorization && req.headers.authorization.startsWith("Bearer ")) {
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith("Bearer ")
+    ) {
       token = req.headers.authorization.split(" ")[1];
     } else if (req.cookies?.jwt) {
       // Fallback to cookie
@@ -29,7 +32,7 @@ export const protectRoute = async (req, res, next) => {
     // Find user by ID
     const user = await User.findById(decoded.userId).select("-password");
     if (!user) {
-      console.log("User not found");
+      console.log("User not found in Middleware");
       return res.status(401).json({ message: "User not found" });
     }
 

@@ -11,110 +11,8 @@ import axios from "axios";
 import dotenv from "dotenv";
 dotenv.config();
 
-// @desc    Get all movies with optional pagination
-// @route   GET /api/movies
-// @access  Public
-export const getAllMovies = async (req, res) => {
-  try {
-    const { page = 1, limit = 20, genres, regions, years, fallback = 'true' } = req.query;
-    const skip = (page - 1) * limit;
-
-    const query = { trailerUrl: { $exists: true, $ne: "" } };
-
-    if (genres) query.genre = { $in: genres.split(',').map(Number) };
-    if (regions) query.region = { $in: regions.split(',') };
-    if (years) query.year = { $in: years.split(',').map(Number) };
-
-    // First try to get from database
-    const [movies, total] = await Promise.all([
-      Movie.find(query)
-        .sort({ releaseDate: -1 })
-        .skip(skip)
-        .limit(limit)
-        .lean(),
-      Movie.countDocuments(query)
-    ]);
-
-    // Calculate if we need more movies
-    const hasMoreInDB = (page * limit) < total;
-    const needsMore = movies.length < limit && fallback === 'true';
-
-    // If we don't have enough movies and fallback is enabled
-    if (needsMore) {
-      const needed = limit - movies.length;
-      const tmdbPage = Math.max(1, Math.ceil((skip + movies.length) / 20));
-
-      try {
-        // Fetch from TMDB
-        const { data } = await axios.get(`${TMDB_BASE_URL}/movie/popular`, {
-          params: {
-            api_key: TMDB_API_KEY,
-            page: tmdbPage,
-            language: 'en-US'
-          }
-        });
-
-        // Process and store TMDB movies
-        const tmdbMovies = data.results
-          .slice(0, needed)
-          .sort((a, b) => new Date(b.release_date) - new Date(a.release_date));
-        const processedMovies = [];
-
-        for (const tmdbMovie of tmdbMovies) {
-          try {
-            const savedMovie = await processTMDBMovie(tmdbMovie);
-            if (savedMovie) {
-              processedMovies.push(savedMovie);
-            }
-          } catch (err) {
-            console.error(`Error processing TMDB movie ${tmdbMovie.id}:`, err);
-          }
-        }
-
-        // Combine results
-        const combinedMovies = [...movies, ...processedMovies];
-
-        // Enrich combined results
-        const enrichedMovies = await enrichMovies(combinedMovies, req.user);
-
-        return res.status(200).json({
-          success: true,
-          data: enrichedMovies,
-          pagination: {
-            currentPage: Number(page),
-            totalPages: Math.ceil((total + processedMovies.length) / limit),
-            totalResults: total + processedMovies.length,
-            hasMore: true // TMDB has virtually infinite movies
-          }
-        });
-      } catch (tmdbError) {
-        console.error('TMDB fallback failed:', tmdbError);
-        // Continue with just DB results if TMDB fails
-      }
-    }
-
-    // Enrich and return results
-    const enrichedMovies = await enrichMovies(movies, req.user);
-
-    res.status(200).json({
-      success: true,
-      data: enrichedMovies,
-      pagination: {
-        currentPage: Number(page),
-        totalPages: Math.ceil(total / limit),
-        totalResults: total,
-        hasMore: hasMoreInDB
-      }
-    });
-
-  } catch (error) {
-    console.error("Error getting all movies:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch movies."
-    });
-  }
-};
+const TMDB_API_KEY = process.env.TMDB_API_KEY;
+const TMDB_BASE_URL = "https://api.themoviedb.org/3";
 
 // Helper function to enrich movies with likes/watchlist data
 async function enrichMovies(movies, user) {
@@ -123,7 +21,15 @@ async function enrichMovies(movies, user) {
   const likes = await Like.find({ movieId: { $in: movieIds } });
   const likeMap = {};
   const userLikedSet = new Set();
-  const watchlistSet = new Set(user?.watchlist?.map(id => id.toString()) || []);
+
+  // Fetch user's watchlist once if user is authenticated
+  let userWatchlistSet = new Set();
+  if (user) {
+    const userWatchlist = await Watchlist.findOne({ userId: user._id }).lean();
+    if (userWatchlist && userWatchlist.movies) {
+      userWatchlistSet = new Set(userWatchlist.movies.map(id => id.toString()));
+    }
+  }
 
   likes.forEach(like => {
     const id = like.movieId.toString();
@@ -136,13 +42,146 @@ async function enrichMovies(movies, user) {
   return movies.map(m => {
     const id = m._id.toString();
     return {
-      ...m,
+      ...m, // Ensure this is a plain JavaScript object if using .lean()
       likeCount: likeMap[id] || 0,
       liked: userLikedSet.has(id),
-      watchlisted: watchlistSet.has(id)
+      watchlisted: userWatchlistSet.has(id) // Use the fetched watchlist
     };
   });
 }
+
+// @desc    Get all movies with optional pagination
+// @route   GET /api/movies
+// @access  Public
+export const getAllMovies = async (req, res) => {
+  try {
+    const { page = 1, limit = 20, genres, regions, years, query: searchQuery } = req.query;
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    const dbQuery = { trailerUrl: { $exists: true, $ne: "" } };
+
+    // Filters
+    let genreIds = [];
+    if (genres) {
+      const genreNames = genres.split(',').map(g => decodeURIComponent(g.trim()));
+      const genreObjects = await Genre.find({ name: { $in: genreNames } }).select('id').lean();
+      genreIds = genreObjects.map(g => g.id);
+      if (genreIds.length) dbQuery.genre = { $in: genreIds };
+    }
+
+    if (regions) {
+      const regionCodes = regions.split(',').map(r => decodeURIComponent(r.trim()));
+      dbQuery.region = { $in: regionCodes };
+    }
+
+    if (years) {
+      const yearNums = years.split(',').map(y => parseInt(y.trim())).filter(n => !isNaN(n));
+      if (yearNums.length) dbQuery.year = { $in: yearNums };
+    }
+
+    if (searchQuery) {
+      const regex = new RegExp(decodeURIComponent(searchQuery), 'i');
+      dbQuery.$or = [ { title: regex }, { overview: regex } ];
+    }
+
+    const [movies, total] = await Promise.all([
+      Movie.find(dbQuery).sort({ releaseDate: -1 }).skip(skip).limit(Number(limit)).lean(),
+      Movie.countDocuments(dbQuery)
+    ]);
+
+    const hasMoreInDB = (parseInt(page) * parseInt(limit)) < total;
+    const needsTMDBFallback = movies.length < limit;
+
+    // TMDB fallback - always attempt if we have filters, even if we got enough from DB
+    // This ensures we can keep loading more pages from TMDB
+    if (needsTMDBFallback || genres || regions || years || searchQuery) {
+      const needed = parseInt(limit) - movies.length;
+      const tmdbPage = Math.max(1, Math.floor(skip / 20) + 1); // More accurate page calculation
+      
+      const tmdbParams = {
+        api_key: TMDB_API_KEY,
+        language: 'en-US',
+        page: tmdbPage,
+        sort_by: 'popularity.desc'
+      };
+
+      // Apply TMDB-supported filters
+      if (genreIds.length) tmdbParams.with_genres = genreIds.join(',');
+      if (years) {
+        const yearNums = years.split(',').map(y => parseInt(y.trim())).filter(n => !isNaN(n));
+        if (yearNums.length === 1) tmdbParams.primary_release_year = yearNums[0];
+        else if (yearNums.length > 1) {
+          // For multiple years, use release_date.gte/lte
+          const minYear = Math.min(...yearNums);
+          const maxYear = Math.max(...yearNums);
+          tmdbParams['primary_release_date.gte'] = `${minYear}-01-01`;
+          tmdbParams['primary_release_date.lte'] = `${maxYear}-12-31`;
+        }
+      }
+      if (searchQuery) tmdbParams.query = decodeURIComponent(searchQuery);
+
+      let processedMovies = [];
+      try {
+        const tmdbUrl = searchQuery
+          ? `${TMDB_BASE_URL}/search/movie`
+          : `${TMDB_BASE_URL}/discover/movie`;
+
+        const { data } = await axios.get(tmdbUrl, { params: tmdbParams });
+
+        const existingTmdb = new Set(movies.map(m => m.tmdbId).filter(Boolean));
+        const toProcess = data.results.filter(m => !existingTmdb.has(m.id));
+
+        for (const tmdbMovie of toProcess) {
+          if (processedMovies.length >= needed) break;
+
+          const saved = await processTMDBMovie(tmdbMovie);
+          if (!saved || !saved.trailerUrl) continue;
+
+          if (regions) {
+            const allowedRegions = regions.split(',').map(r => decodeURIComponent(r.trim()));
+            if (!allowedRegions.includes(saved.region)) continue;
+          }
+
+          processedMovies.push(saved);
+        }
+      } catch (err) {
+        console.error("TMDB fetch failed:", err.message);
+      }
+
+      const combined = [...movies, ...processedMovies];
+      const enriched = await enrichMovies(combined, req.user);
+      
+      // For TMDB fallback, we can't know the exact total, so we assume there might be more
+      const finalHasMore = processedMovies.length > 0 || hasMoreInDB;
+
+      return res.json({
+        success: true,
+        data: enriched,
+        pagination: {
+          currentPage: Number(page),
+          totalPages: Math.ceil((total + processedMovies.length) / limit),
+          totalResults: total + processedMovies.length,
+          hasMore: finalHasMore,
+        },
+      });
+    }
+
+    // If no filters and we got enough from DB
+    const enriched = await enrichMovies(movies, req.user);
+    return res.json({
+      success: true,
+      data: enriched,
+      pagination: {
+        currentPage: Number(page),
+        totalPages: Math.ceil(total / limit),
+        totalResults: total,
+        hasMore: hasMoreInDB,
+      },
+    });
+  } catch (err) {
+    console.error("getAllMovies error:", err);
+    res.status(500).json({ success: false, message: "Failed to fetch movies." });
+  }
+};
 
 // @desc    Get single movie by ID with reviews
 // @route   GET /api/movies/:id
@@ -194,9 +233,6 @@ export const getMovieById = async (req, res) => {
   }
 };
 
-// @desc    Get distinct filter options (genres, regions, years)
-// @route   GET /api/movies/filters
-// @access  Public
 // @desc    Get distinct filter options (genres, regions, years)
 // @route   GET /api/movies/filters
 // @access  Public
@@ -339,9 +375,6 @@ export const filterMovies = async (req, res) => {
   }
 };
 
-const TMDB_API_KEY = process.env.TMDB_API_KEY;
-const TMDB_BASE_URL = "https://api.themoviedb.org/3";
-
 // @desc    Fetch movies from TMDB and store in DB
 // @route   GET /api/movies/tmdb
 // @access  Public
@@ -462,10 +495,8 @@ async function processTMDBMovie(tmdbMovie) {
       .filter(id => !isNaN(id) && id !== 0);
 
     // Process region
-    let region = "US";
-    const releaseResults = releaseResponse.data.results || [];
-    const primary = releaseResults.find(r => r.iso_3166_1 === "US") || releaseResults[0];
-    region = primary?.iso_3166_1 || region;
+    const originCountries = detailData.origin_country || [];
+    const region = originCountries.length ? originCountries[0] : "US";
 
     // Process credits
     const crew = creditResponse.data.crew || [];
