@@ -70,29 +70,29 @@ const ProtectedRoute = ({ children, intendedPath, meta = {} }) => {
 
   return children;
 
-  // Still loading auth state
-  if (isCheckingAuth || !isAuthChecked) {
-    return <FaSpinner className="icon-spin" />;
-  }
+  // // Still loading auth state
+  // if (isCheckingAuth || !isAuthChecked) {
+  //   return <FaSpinner className="icon-spin" />;
+  // }
 
-  // Not authenticated - redirect to login with return URL
-  if (!authUser) {
-    console.log("Not login!");
-    if (intendedPath === "/") {
-      return children;
-    }
-    return <Navigate to={`/login`} replace />;
-  }
+  // // Not authenticated - redirect to login with return URL
+  // if (!authUser) {
+  //   console.log("Not login!");
+  //   if (intendedPath === "/") {
+  //     return children;
+  //   }
+  //   return <Navigate to={`/login`} replace />;
+  // }
 
-  console.log("Logged In!");
+  // console.log("Logged In!");
 
-  // Authenticated but missing genres - redirect to genre selection
-  if ((authUser.favouriteGenres?.length ?? 0) < 3 && !intendedPath.startsWith('/genre_selection')) {
-    return <Navigate to={`/genre_selection?redirect=${encodeURIComponent(intendedPath)}`} replace />;
-  }
+  // // Authenticated but missing genres - redirect to genre selection
+  // if ((authUser.favouriteGenres?.length ?? 0) < 3 && !intendedPath.startsWith('/genre_selection')) {
+  //   return <Navigate to={`/genre_selection?redirect=${encodeURIComponent(intendedPath)}`} replace />;
+  // }
 
-  // All checks passed - render the requested content
-  return children;
+  // // All checks passed - render the requested content
+  // return children;
 };
 
 // Define FooterSelector first since it's used in App
@@ -113,12 +113,17 @@ function AppContent() {
 
     // }
     const check = async () => {
-      const res = await checkAuth();
-      console.log("Checking Auth: ", res);
+      try {
+        const res = await checkAuth();
+        console.log("Checking Auth: ", res);
+      } catch (error) {
+        throw error;
+      }
+
     }
     check();
 
-  }, [checkAuth]);
+  }, []);
 
   return (
     <>
