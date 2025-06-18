@@ -11,7 +11,7 @@ const useGenreStore = create((set, get) => ({
       });
 
       const genres = response.data;
-      console.log("Fetched genres:", genres); // debug
+      // console.log("Fetched genres:", genres); // debug
 
       const map = genres.reduce((acc, genre) => {
         acc[genre.id] = genre.name;

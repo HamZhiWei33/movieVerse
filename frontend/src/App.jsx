@@ -90,7 +90,19 @@ const ProtectedRoute = ({ children, intendedPath, meta = {} }) => {
   // if (isCheckingAuth || !isAuthChecked) {
   //   return <FaSpinner className="icon-spin" />;
   // }
+  // // Still loading auth state
+  // if (isCheckingAuth || !isAuthChecked) {
+  //   return <FaSpinner className="icon-spin" />;
+  // }
 
+  // // Not authenticated - redirect to login with return URL
+  // if (!authUser) {
+  //   console.log("Not login!");
+  //   if (intendedPath === "/") {
+  //     return children;
+  //   }
+  //   return <Navigate to={`/login`} replace />;
+  // }
   // // Not authenticated - redirect to login with return URL
   // if (!authUser) {
   //   console.log("Not login!");
@@ -101,7 +113,12 @@ const ProtectedRoute = ({ children, intendedPath, meta = {} }) => {
   // }
 
   // console.log("Logged In!");
+  // console.log("Logged In!");
 
+  // // Authenticated but missing genres - redirect to genre selection
+  // if ((authUser.favouriteGenres?.length ?? 0) < 3 && !intendedPath.startsWith('/genre_selection')) {
+  //   return <Navigate to={`/genre_selection?redirect=${encodeURIComponent(intendedPath)}`} replace />;
+  // }
   // // Authenticated but missing genres - redirect to genre selection
   // if ((authUser.favouriteGenres?.length ?? 0) < 3 && !intendedPath.startsWith('/genre_selection')) {
   //   return <Navigate to={`/genre_selection?redirect=${encodeURIComponent(intendedPath)}`} replace />;
@@ -137,7 +154,7 @@ function AppContent() {
       }
     };
     check();
-  }, [checkAuth]);
+  }, []);
 
   return (
     <>

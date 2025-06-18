@@ -25,7 +25,7 @@ const HeroSection = ({ title, moviesType, items }) => {
     fetchMovies,
     fetchWatchlist,
     fetchLikedMovies,
-    recommendedMovies
+    recommendedMovies,
   } = useMovieStore();
 
   const { genreMap, fetchGenres } = useGenreStore();
@@ -39,9 +39,9 @@ const HeroSection = ({ title, moviesType, items }) => {
   // Fetch initial data
   useEffect(() => {
     fetchGenres();
-    if (moviesType === "watchlist") {
-      fetchWatchlist();
-    }
+    // if (moviesType === "watchlist") {
+    //   fetchWatchlist();
+    // }
     // if (moviesType === "newReleased") {
     //   fetchMovies(1, 20, { sort: "-year" }); // Fetch newest movies
     // }
@@ -55,7 +55,7 @@ const HeroSection = ({ title, moviesType, items }) => {
   // Get appropriate movie list based on type
   const movieList = useMemo(() => {
     if (moviesType === "watchlist") {
-      return storeMovies.filter(m => {
+      return storeMovies.filter((m) => {
         const inWatchlist = isInWatchlist(m._id);
         // console.log(`Movie ${m._id} in watchlist:`, inWatchlist);
         return inWatchlist;
@@ -110,9 +110,13 @@ const HeroSection = ({ title, moviesType, items }) => {
   };
 
   // Get top movies by genre for ranking section
-  const topMoviesByGenre = useMemo(() =>
-    moviesType === "ranking" ? getTopMoviesByGenre(storeMovies, items, 4) : {}
-  , [storeMovies]);
+  const topMoviesByGenre = useMemo(
+    () =>
+      moviesType === "ranking"
+        ? getTopMoviesByGenre(storeMovies, items, 4)
+        : {},
+    [storeMovies]
+  );
 
   // useEffect(() => {
   //   if (moviesType === "ranking") {
@@ -140,17 +144,17 @@ const HeroSection = ({ title, moviesType, items }) => {
     watchlist: "Your watchlist movies",
     newReleased: "Newly released movies",
     ranking: "Top ranked movies by genre",
-    recommendation: "List of recommended movies"
+    recommendation: "List of recommended movies",
   }[moviesType];
 
   // In your HeroSection component
-  useEffect(() => {
-    console.log('Current watchlist:', {
-      storeMovies: storeMovies.length,
-      watchlist: storeMovies.filter(m => isInWatchlist(m._id)),
-      watchlistMap: useMovieStore.getState().watchlistMap
-    });
-  }, [storeMovies, isInWatchlist]);
+  // useEffect(() => {
+  //   console.log('Current watchlist:', {
+  //     storeMovies: storeMovies.length,
+  //     watchlist: storeMovies.filter(m => isInWatchlist(m._id)),
+  //     watchlistMap: useMovieStore.getState().watchlistMap
+  //   });
+  // }, [storeMovies, isInWatchlist]);
 
   return (
     <section
@@ -193,7 +197,10 @@ const HeroSection = ({ title, moviesType, items }) => {
       </div>
       {(moviesType === "watchlist" ||
         moviesType === "newReleased" ||
-        moviesType === "recommendation") && (
+        moviesType === "recommendation") &&
+        (movieList.length === 0 ? (
+          <div className="no-movies-message">{`No movie in ${moviesType}`}</div>
+        ) : (
           <div
             id={moviesType}
             ref={gridRef}
@@ -211,7 +218,9 @@ const HeroSection = ({ title, moviesType, items }) => {
                   <MovieCard
                     movie={{
                       ...movie,
-                      genre: movie.genre?.map(id => genreMap[id] || "Unknown") || [],
+                      genre:
+                        movie.genre?.map((id) => genreMap[id] || "Unknown") ||
+                        [],
                       year: movie.year?.toString() || "",
                     }}
                     liked={isLiked(movie._id)}
@@ -221,14 +230,17 @@ const HeroSection = ({ title, moviesType, items }) => {
                   >
                     {moviesType === "recommendation" && (
                       <div className="movie-rating">
-                        <ReviewStars showNumber={true} rating={movie.rating || 0} />
+                        <ReviewStars
+                          showNumber={true}
+                          rating={movie.rating || 0}
+                        />
                       </div>
                     )}
                   </MovieCard>
                 </React.Fragment>
               ))}
           </div>
-        )}
+        ))}
 
       {/* <div className="home-card-section" role="region" aria-label={ariaLabel}> */}
       {moviesType === "ranking" && (
