@@ -44,7 +44,7 @@ const SearchBar = () => {
         // };
 
         if (!loading && movies.length < 500 && !location.pathname.startsWith("/directory")) {
-            fetchMovies(1, 100, { sort: "-year" }); // Fetch newest movies
+            fetchMovies(1, 1000, { sort: "-year" }); // Fetch newest movies
         }
 
     }, []);
