@@ -27,7 +27,8 @@ const HeroSection = ({ title, moviesType, items }) => {
     fetchWatchlist,
     fetchLikedMovies,
     recommendedMovies,
-    randomRecommendedMovies
+    randomRecommendedMovies,
+    getRecommendedMovies
   } = useMovieStore();
 
   const { genreMap, fetchGenres } = useGenreStore();
@@ -68,7 +69,8 @@ const HeroSection = ({ title, moviesType, items }) => {
   }, [moviesType, storeMovies, items, isInWatchlist]);
 
   // Handle recommendation reload
-  const handleReload = () => {
+  const handleReload = async() => {
+    // await getRecommendedMovies();
     const shuffled = [...recommendedMovies].sort(() => 0.5 - Math.random()).slice(0,20).sort((a, b)=>b.rating-a.rating);
     useMovieStore.setState({ randomRecommendedMovies: shuffled });
     // setDisplayed(shuffled.slice(0, 10));
