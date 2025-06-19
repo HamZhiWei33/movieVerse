@@ -31,6 +31,7 @@
 .home-icon {
   display: flex;
   margin-left: 1rem;
+  z-index: 1001;
 }
 .home-card-section {
   max-width: 100%;
@@ -145,9 +146,16 @@
 
 .no-movies-message {
   display: flex;
-  padding-left: 1rem;
+  flex-direction: row;
+  /* padding-left: 1rem; */
   color: #a7a0a0;
+  font-weight: 400;
+  font-size: 1.2rem;
   text-align: start;
+  justify-content: center;
+  border: 0.1rem solid #262626;
+  border-radius: 0.7rem;
+  padding: 3rem;
 }
 
 /* .home-card-container.grid .movie-card p {
