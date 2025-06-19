@@ -16,6 +16,13 @@ import {
   getWatchlistGenresAggregation,
 } from "../lib/genreAnalytics.js";
 import bcrypt from "bcryptjs";
+
+const isStrongPassword = (password) =>
+  password.length >= 8 &&
+  /[A-Z]/.test(password) &&
+  /[a-z]/.test(password) &&
+  /[0-9]/.test(password);
+
 export const getCurrentUser = (req, res) => {
   try {
     if (!req.user) {
@@ -94,10 +101,12 @@ export const checkWatchlistStatus = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const isInWatchlist = user.watchlist.some(id => id.toString() === movieId);
-    
-    res.status(200).json({ 
-      inWatchlist: isInWatchlist  
+    const isInWatchlist = user.watchlist.some(
+      (id) => id.toString() === movieId
+    );
+
+    res.status(200).json({
+      inWatchlist: isInWatchlist,
     });
   } catch (error) {
     console.error("Error checking watchlist status:", error);
@@ -348,8 +357,6 @@ export const updateFavouriteGenres = async (req, res) => {
 export const changeNewPassword = async (req, res) => {
   try {
     const { oldPassword, newPassword } = req.body;
-    console.log("👉 Received:", { oldPassword, newPassword });
-    console.log("👉 From user:", req.user);
 
     const userId = req.user._id;
 
@@ -357,10 +364,11 @@ export const changeNewPassword = async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    if (newPassword.length < 8) {
-      return res
-        .status(400)
-        .json({ message: "New password must be at least 8 characters long" });
+    if (!isStrongPassword(newPassword)) {
+      return res.status(400).json({
+        message:
+          "Password must be at least 8 characters long and include uppercase, lowercase, and a number",
+      });
     }
 
     const user = await User.findById(userId);
@@ -388,7 +396,7 @@ export const changeNewPassword = async (req, res) => {
 
     res.status(200).json({ message: "Password updated successfully" });
   } catch (error) {
-    console.error("❌ Error in changeNewPassword controller:", error); // ← LOG FULL ERROR OBJECT
+    console.error("Error in changeNewPassword controller:", error); // ← LOG FULL ERROR OBJECT
     res.status(500).json({ message: error.message || "Internal Server Error" });
   }
 };
