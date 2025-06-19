@@ -111,6 +111,7 @@ const TopMovieSection = ({ selectedMovie, setSelectedMovie }) => {
 
   if (loading)
     return (
+
       <div className="loading">
         <DotLottieReact
           src="https://lottie.host/6185175f-ee83-45a4-9244-03871961a1e9/yLmGLfSgYI.lottie"
@@ -119,6 +120,87 @@ const TopMovieSection = ({ selectedMovie, setSelectedMovie }) => {
           className="loading-icon"
         />
       </div>
+
+        <div className="blurred-banner-wrapper">
+            <div className="background-container">
+                <div
+                    className="background-blur"
+                    style={{
+                        backgroundImage: `url(${selectedMovie?.posterUrl || top3[0]?.posterUrl})`,
+                    }}
+                />
+                <div className="dark-overlay" />
+            </div>
+
+            <section className="top-section">
+                <section className="ranking-three-columns">
+                    {top3.map((movie, idx) => {
+                        if (!movie) return null;
+                        const label = idx === 0 ? "Top 2" : idx === 1 ? "Top 1" : "Top 3";
+                        const isActive = movie._id === selectedMovie._id;
+
+                        return (
+                            <div
+                                key={movie._id}
+                                className={`card ${isActive ? "main-card active" : "side-card"}`}
+                                onClick={() => handleCardClick(movie._id)}
+                                style={{ cursor: "pointer" }}
+                                onMouseEnter={() => setSelectedMovie(movie)}
+                            >
+                                <h2 className="rank-label">{label}</h2>
+                                <div className="image-container">
+                                    <img src={movie.posterUrl} alt={movie.title} />
+                                </div>
+                            </div>
+                        );
+                    })}
+                </section>
+
+                <section className="movie-details-two-column">
+                    <div className="left-column">
+                        <h3>{selectedMovie.title}</h3>
+                        <div className="rating-bar">
+                            <ReviewStars rating={averageRating} readOnly={true} showNumber={true} size="large" />
+                        </div>
+                        <div className="tags">
+                            <span className="badge">{genreNames}</span>
+                            <span className="badge">{selectedMovie.region}</span>
+                            <span className="badge">{selectedMovie.year}</span>
+                        </div>
+                        <div className="duration-like">
+                            <span className="badge-duration">
+                                <span className="badge-duration-icon">
+                                    <IoTime />
+                                </span>
+                                {selectedMovie.duration === "0h 0min" ? "To Be Announced" : selectedMovie.duration}
+                            </span>
+                        </div>
+                        <div className="action-buttons">
+                            <button
+                                className="watch-trailer"
+                                onClick={() => selectedMovie.trailerUrl ? window.open(selectedMovie.trailerUrl, "_blank") : null}
+                                disabled={!selectedMovie.trailerUrl}
+                            >
+                                ▶ Watch Trailer
+                            </button>
+                            <LikeIcon movie={selectedMovie} disabled={loadingLike} />
+                            <AddToWatchlistIcon movie={selectedMovie} disabled={loadingWatchlist} />
+                        </div>
+                    </div>
+                    <div className="right-column">
+                        <p>{selectedMovie.description}</p>
+                    </div>
+                </section>
+                <section className="rating-visual-summary">
+                    <RatingBarChart
+                        movieId={selectedMovie?._id}
+                        initialMovieData={selectedMovie} // Pass the selectedMovie directly
+                        initialReviews={reviewsByMovie[selectedMovie?._id]} // Pass the reviews directly
+                    />
+                </section>
+            </section>
+        </div>
+
     );
   if (error) return <div className="error">{error}</div>;
   if (!selectedMovie || top3.length === 0)
