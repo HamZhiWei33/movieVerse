@@ -14,6 +14,8 @@ import useHorizontalScroll from "../../store/useHorizontalScroll";
 import ReviewStars from "../directory/ReviewStars";
 import useGenreStore from "../../store/useGenreStore";
 import useMovieStore from "../../store/useMovieStore";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+
 const HeroSection = ({ title, moviesType, items }) => {
   const {
     movies: storeMovies,
@@ -29,6 +31,7 @@ const HeroSection = ({ title, moviesType, items }) => {
     recommendedMovies,
     randomRecommendedMovies,
     getRecommendedMovies,
+    updatingWatchlist
   } = useMovieStore();
 
   const { genreMap, fetchGenres } = useGenreStore();
@@ -113,7 +116,7 @@ const HeroSection = ({ title, moviesType, items }) => {
 
     observer.observe(gridRef.current);
     return () => observer.disconnect();
-  }, [moviesType, movieList]);
+  }, [moviesType, movieList, updatingWatchlist]);
 
   // Navigation handlers
   const navigateFullPage = () => {
@@ -178,12 +181,12 @@ const HeroSection = ({ title, moviesType, items }) => {
         moviesType === "watchlist"
           ? "watchlist-section"
           : moviesType === "newReleased"
-          ? "new-released-section"
-          : moviesType === "recommendation"
-          ? "recommendation-section"
-          : moviesType === "ranking"
-          ? "ranking-section"
-          : undefined
+            ? "new-released-section"
+            : moviesType === "recommendation"
+              ? "recommendation-section"
+              : moviesType === "ranking"
+                ? "ranking-section"
+                : undefined
       }
       role="region"
       aria-label={`Home section: ${title}`}
@@ -224,10 +227,20 @@ const HeroSection = ({ title, moviesType, items }) => {
       {(moviesType === "watchlist" ||
         moviesType === "newReleased" ||
         moviesType === "recommendation") &&
-        (movieList.length === 0 ? (
+        ((movieList.length === 0 || (moviesType === "watchlist" && updatingWatchlist)) ? (
           <div className="no-movies-message">
-            <span>{`No movie in ${moviesType.charAt(0).toUpperCase() + moviesType.slice(1)}`}</span>
+            {(moviesType === "watchlist" && updatingWatchlist) ? (
+                <DotLottieReact
+                  src="https://lottie.host/6185175f-ee83-45a4-9244-03871961a1e9/yLmGLfSgYI.lottie"
+                  loop
+                  autoplay
+                  className="loading-icon"
+                />
+            ) : (
+              <span>{`No movie in ${moviesType.charAt(0).toUpperCase() + moviesType.slice(1)}`}</span>
+            )}
           </div>
+
         ) : (
           <div
             id={moviesType}

@@ -20,6 +20,7 @@ const useMovieStore = create((set, get) => ({
     watchlistStatuses: {},
     recommendedMovies: [],
     randomRecommendedMovies: [],
+    updatingWatchlist: false,
 
     getState: () => get(),
 
@@ -104,60 +105,60 @@ const useMovieStore = create((set, get) => ({
     },
 
     loadMoreMovies: async () => {
-  const state = get();
-  if (state.isFetchingMore || !state.hasMore) return;
+        const state = get();
+        if (state.isFetchingMore || !state.hasMore) return;
 
-  set({ isFetchingMore: true, error: null });
+        set({ isFetchingMore: true, error: null });
 
-  try {
-    const response = await axiosInstance.get("/movies", {
-      params: {
-        page: state.currentPage + 1,
-        limit: 20,
-        ...state.lastUsedFilters,
-        fallback: 'true'
-      },
-    });
+        try {
+            const response = await axiosInstance.get("/movies", {
+                params: {
+                    page: state.currentPage + 1,
+                    limit: 20,
+                    ...state.lastUsedFilters,
+                    fallback: 'true'
+                },
+            });
 
-    const newMovies = response.data.data;
-    const hasMore = response.data.pagination?.hasMore ?? true;
+            const newMovies = response.data.data;
+            const hasMore = response.data.pagination?.hasMore ?? true;
 
-    // Only update state if we got new movies
-    if (newMovies.length > 0) {
-      const uniqueMovies = newMovies.reduce((acc, movie) => {
-        const exists = state.movies.some(m => 
-          m._id === movie._id || 
-          (m.tmdbId && movie.tmdbId && m.tmdbId === movie.tmdbId)
-        );
-        if (!exists) {
-          acc.push(movie);
+            // Only update state if we got new movies
+            if (newMovies.length > 0) {
+                const uniqueMovies = newMovies.reduce((acc, movie) => {
+                    const exists = state.movies.some(m =>
+                        m._id === movie._id ||
+                        (m.tmdbId && movie.tmdbId && m.tmdbId === movie.tmdbId)
+                    );
+                    if (!exists) {
+                        acc.push(movie);
+                    }
+                    return acc;
+                }, [...state.movies]);
+
+                set({
+                    movies: uniqueMovies,
+                    currentPage: state.currentPage + 1,
+                    hasMore,
+                    isFetchingMore: false
+                });
+            } else {
+                // No more movies available
+                set({
+                    hasMore: false,
+                    isFetchingMore: false
+                });
+            }
+
+            return { data: newMovies };
+        } catch (error) {
+            set({
+                error: error.message,
+                isFetchingMore: false
+            });
+            throw error;
         }
-        return acc;
-      }, [...state.movies]);
-
-      set({
-        movies: uniqueMovies,
-        currentPage: state.currentPage + 1,
-        hasMore,
-        isFetchingMore: false
-      });
-    } else {
-      // No more movies available
-      set({
-        hasMore: false,
-        isFetchingMore: false
-      });
-    }
-
-    return { data: newMovies };
-  } catch (error) {
-    set({
-      error: error.message,
-      isFetchingMore: false
-    });
-    throw error;
-  }
-},
+    },
 
     fetchMovieById: async (id) => {
         set({ loading: true, error: null });
@@ -326,7 +327,8 @@ const useMovieStore = create((set, get) => ({
                 [movieId]: {
                     inWatchlist: true
                 }
-            }
+            },
+            updatingWatchlist: true
         });
 
         try {
@@ -338,6 +340,12 @@ const useMovieStore = create((set, get) => ({
                 watchlistStatuses: state.watchlistStatuses
             });
             throw error;
+        } finally {
+            setTimeout(() => {
+                set({
+                    updatingWatchlist: false
+                });
+            }, 750);
         }
     },
 
@@ -351,7 +359,8 @@ const useMovieStore = create((set, get) => ({
                 [movieId]: {
                     inWatchlist: false
                 }
-            }
+            },
+            updatingWatchlist: true
         });
 
         try {
@@ -363,6 +372,12 @@ const useMovieStore = create((set, get) => ({
                 watchlistStatuses: state.watchlistStatuses
             });
             throw error;
+        } finally {
+            setTimeout(() => {
+                set({
+                    updatingWatchlist: false
+                });
+            }, 750);
         }
     },
 
@@ -425,18 +440,18 @@ const useMovieStore = create((set, get) => ({
     },
 
     getRecommendedMovies: async () => {
-      // set({ loading: true, error: null });
-      try {
-          const response = await axiosInstance.get("/movies/recommended");
-          // set({ currentUser: response.data, loading: false });
-          // console.log(response.data);
-          set({ recommendedMovies: response.data.movies });
-          return response.data;
-      } catch (error) {
-          set({ error: error.message, loading: false });
-          throw error;
-      }
-  },
+        // set({ loading: true, error: null });
+        try {
+            const response = await axiosInstance.get("/movies/recommended");
+            // set({ currentUser: response.data, loading: false });
+            // console.log(response.data);
+            set({ recommendedMovies: response.data.movies });
+            return response.data;
+        } catch (error) {
+            set({ error: error.message, loading: false });
+            throw error;
+        }
+    },
 
     // Utility functions
     clearError: () => set({ error: null }),

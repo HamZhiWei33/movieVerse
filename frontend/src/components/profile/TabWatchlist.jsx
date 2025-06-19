@@ -45,7 +45,9 @@ const TabWatchlist = () => {
   if (!Array.isArray(watchlist) || watchlist.length === 0) {
     return (
       <section className="watchlist-section" aria-label="profile-review">
-        <p className="no-watchlist">No watchlist available</p>
+        <div style={{"marginTop":"2rem"}} className="no-movies-message">
+          <span>{`No movie in Watchlist`}</span>
+        </div>
       </section>
     );
   }
