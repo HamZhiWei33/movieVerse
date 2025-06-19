@@ -45,7 +45,7 @@ const DirectoryPage = () => {
   const [error, setError] = useState(null);
   const [isSearchResult, setIsSearchResult] = useState(false);
   const [searchedMovies, setSearchedMovies] = useState([]);
-  const [collapsed, setCollapsed] = useState([true, false, true]);
+  const [collapsed, setCollapsed] = useState([true, true, true]);
 
   const location = useLocation();
 
