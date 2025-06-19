@@ -5,6 +5,10 @@ body {
   padding: 0;
 }
 
+.movie-container {
+  overflow: hidden !important; 
+}
+
 .directory-page {
   background-color: #141414;
   min-height: 100vh;

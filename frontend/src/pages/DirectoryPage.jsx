@@ -166,7 +166,7 @@ const DirectoryPage = () => {
       },
       {
         threshold: 0.2,
-        rootMargin: "400px",
+        rootMargin: "300px",
       }
     );
 
@@ -546,9 +546,12 @@ const DirectoryPage = () => {
                   >
                     {!isSearchResult &&
                       (isFetchingMore ? (
-                        <div className="loading-spinner">
-                          Loading more movies...
-                        </div>
+                        <DotLottieReact
+                          src="https://lottie.host/6185175f-ee83-45a4-9244-03871961a1e9/yLmGLfSgYI.lottie"
+                          loop
+                          autoplay
+                          className="loading-icon"
+                        />
                       ) : hasMore ? (
                         <button onClick={loadMoreMovies}>Load More</button>
                       ) : (
