@@ -226,7 +226,7 @@ const HeroSection = ({ title, moviesType, items }) => {
         moviesType === "recommendation") &&
         (movieList.length === 0 ? (
           <div className="no-movies-message">
-            <span>{`No movie in ${moviesType}`}</span>
+            <span>{`No movie in ${moviesType.charAt(0).toUpperCase() + moviesType.slice(1)}`}</span>
           </div>
         ) : (
           <div
