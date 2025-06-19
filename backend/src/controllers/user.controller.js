@@ -357,6 +357,8 @@ export const updateFavouriteGenres = async (req, res) => {
 export const changeNewPassword = async (req, res) => {
   try {
     const { oldPassword, newPassword } = req.body;
+    console.log("👉 Received:", { oldPassword, newPassword });
+    console.log("👉 From user:", req.user);
 
     const userId = req.user._id;
 
@@ -364,11 +366,10 @@ export const changeNewPassword = async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    if (!isStrongPassword(newPassword)) {
-      return res.status(400).json({
-        message:
-          "Password must be at least 8 characters long and include uppercase, lowercase, and a number",
-      });
+    if (newPassword.length < 8) {
+      return res
+        .status(400)
+        .json({ message: "New password must be at least 8 characters long" });
     }
 
     const user = await User.findById(userId);
@@ -396,7 +397,7 @@ export const changeNewPassword = async (req, res) => {
 
     res.status(200).json({ message: "Password updated successfully" });
   } catch (error) {
-    console.error("Error in changeNewPassword controller:", error); // ← LOG FULL ERROR OBJECT
+    console.error("❌ Error in changeNewPassword controller:", error); // ← LOG FULL ERROR OBJECT
     res.status(500).json({ message: error.message || "Internal Server Error" });
   }
 };

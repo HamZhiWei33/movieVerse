@@ -251,20 +251,6 @@ export const useAuthStore = create((set, get) => ({
         return;
       }
 
-      // Frontend validation before request
-      if (!oldPassword || !newPassword) {
-        toast.error("All fields are required");
-        return;
-      }
-
-      if (!isStrongPassword(newPassword)) {
-        toast.error(
-          "Password must be at least 8 characters long and include uppercase, lowercase, and a number"
-        );
-        return;
-      }
-
-      // Send to backend
       const res = await axiosInstance.put(`/users/change-password`, {
         oldPassword,
         newPassword,
@@ -281,6 +267,24 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
+  updateFavouriteGenres: async (genreSelected) => {
+    // set({ isUpdatingProfile: true });
+    try {
+      const userId = get().authUser?._id;
+      if (!userId) throw new Error("User ID not found");
+
+      const res = await axiosInstance.put(`/users/${userId}/favourite-genres`, {
+        favouriteGenres: genreSelected,
+      });
+      set({ authUser: res.data });
+
+      toast.success("Favourite genres saved successfully");
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.message || "Error while saving favourite genres"
+      );
+    }
+  },
   updateFavouriteGenres: async (genreSelected) => {
     // set({ isUpdatingProfile: true });
     try {
