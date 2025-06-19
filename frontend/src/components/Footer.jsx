@@ -3,17 +3,8 @@ import "../styles/footer.css";
 import { FaFacebook } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 import { FaLinkedin } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
 
 const Footer = () => {
-  const navigate = useNavigate();
-  const handleWatchlistClick = () => {
-    navigate("/profile", { state: { targetTab: "WatchList" } });
-  };
-  const handleRecommendationClick = () => {
-    navigate("/recommendation", { state: { targetTab: "Recommendation" } });
-  };
-
   return (
     <footer
       id="footer"
@@ -28,21 +19,23 @@ const Footer = () => {
               <ul role="list">
                 <li role="listitem">
                   <Link
-                    to="/watchlist"
+                    to="/#watchlist-section"
                     aria-label="Navigate to Watchlist page"
-                    onClick={handleWatchlistClick}
                   >
                     Watchlist
                   </Link>
                 </li>
                 <li role="listitem">
-                  <Link to="/ranking" aria-label="Navigate to Ranking page">
+                  <Link
+                    to="/#ranking-section"
+                    aria-label="Navigate to Ranking page"
+                  >
                     Ranking
                   </Link>
                 </li>
                 <li role="listitem">
                   <Link
-                    to="/directory/new"
+                    to="/#new-released-section"
                     aria-label="Navigate to New Releases page"
                   >
                     New Released
@@ -50,9 +43,8 @@ const Footer = () => {
                 </li>
                 <li role="listitem">
                   <Link
-                    to="/recommendation"
+                    to="/#recommendation-section"
                     aria-label="Navigate to Recommendations page"
-                    onClick={handleRecommendationClick}
                   >
                     Recommendation
                   </Link>

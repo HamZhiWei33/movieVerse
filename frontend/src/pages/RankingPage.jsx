@@ -1,9 +1,11 @@
-import {  useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import GenreRankingSection from "../components/ranking/GenreRankingSection";
 import GenreDonutChart from "../components/ranking/GenreDonutChart";
 import TopMovieSection from "../components/ranking/TopMovieSection";
 import useRankingStore from "../store/useRankingStore";
 import "../styles/ranking.css";
+import { FaSpinner } from "react-icons/fa";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 const RankingPage = () => {
   const {
@@ -35,7 +37,8 @@ const RankingPage = () => {
   }, [selectedMovie, rankingReviews]);
 
   const chartData = useMemo(() => {
-    if (!Array.isArray(rankingMovies) || !Array.isArray(rankingGenres)) return [];
+    if (!Array.isArray(rankingMovies) || !Array.isArray(rankingGenres))
+      return [];
 
     const genreCount = {};
     rankingMovies.forEach((movie) => {
@@ -49,10 +52,23 @@ const RankingPage = () => {
       }
     });
 
-    return Object.entries(genreCount).map(([genre, value]) => ({ genre, value }));
+    return Object.entries(genreCount).map(([genre, value]) => ({
+      genre,
+      value,
+    }));
   }, [rankingMovies, rankingGenres]);
 
-  if (rankingLoading) return <div className="loading">Loading rankings...</div>;
+  if (rankingLoading)
+    return (
+      <div className="loading" id="loading-spinner">
+        <DotLottieReact
+          src="https://lottie.host/6185175f-ee83-45a4-9244-03871961a1e9/yLmGLfSgYI.lottie"
+          loop
+          autoplay
+          className="loading-icon"
+        />
+      </div>
+    );
   if (rankingError) return <div className="error">{rankingError}</div>;
 
   return (

@@ -1,7 +1,11 @@
 import MovieCard from "../components/directory/MovieCard";
 import MovieCardList from "../components/directory/MovieCardList";
 import { useEffect, useState, useMemo } from "react";
-import { useNavigationType, useSearchParams, useLocation } from "react-router-dom";
+import {
+  useNavigationType,
+  useSearchParams,
+  useLocation,
+} from "react-router-dom";
 import "../styles/directory.css";
 import ViewDropdown from "../components/directory/ViewDropdown";
 import { FaListUl } from "react-icons/fa";
@@ -9,6 +13,7 @@ import "../styles/sidebar.css";
 import Sidebar from "../components/Sidebar";
 import usePreviousScrollStore from "../store/usePreviousScrollStore";
 import useMovieStore from "../store/useMovieStore";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 const DirectoryPage = () => {
   const {
@@ -19,10 +24,11 @@ const DirectoryPage = () => {
     loadMoreMovies,
     hasMore,
     isFetchingMore,
-    getState
+    getState,
   } = useMovieStore();
 
-  const movies = useMovieStore(state => state.movies); const [genres, setGenres] = useState([]);
+  const movies = useMovieStore((state) => state.movies);
+  const [genres, setGenres] = useState([]);
   const [regions, setRegions] = useState([]);
   const [decades, setDecades] = useState([]);
   const [selectedDecades, setSelectedDecades] = useState([]);
@@ -41,7 +47,8 @@ const DirectoryPage = () => {
 
   const location = useLocation();
 
-  const { previousScrollPosition, clearScrollPosition } = usePreviousScrollStore();
+  const { previousScrollPosition, clearScrollPosition } =
+    usePreviousScrollStore();
   const navigationType = useNavigationType();
 
   const [loadMoreRef, setLoadMoreRef] = useState(null);
@@ -53,13 +60,12 @@ const DirectoryPage = () => {
   };
 
   const decadeToYears = (value) => {
-    if (value.endsWith('s')) {
-      const base = parseInt(value.replace('s', ''), 10);
+    if (value.endsWith("s")) {
+      const base = parseInt(value.replace("s", ""), 10);
       return Array.from({ length: 10 }, (_, i) => base + i);
     }
     return [parseInt(value, 10)];
   };
-
 
   useEffect(() => {
     searchParams.set("view", view);
@@ -74,7 +80,7 @@ const DirectoryPage = () => {
       searchParams.set("view", view);
       setSearchParams(searchParams);
     }
-    setIsSearchResult(searchParams.get('query') !== null);
+    setIsSearchResult(searchParams.get("query") !== null);
     // const { filteredSearchMovies = [], searchQuery = '' } = location.state || {};
     // if (location.state !== null) {
 
@@ -90,7 +96,8 @@ const DirectoryPage = () => {
 
       try {
         // First load filter options if needed
-        const needsFilterOptions = genres.length === 0 || regions.length === 0 || decades.length === 0;
+        const needsFilterOptions =
+          genres.length === 0 || regions.length === 0 || decades.length === 0;
         if (needsFilterOptions) {
           const filterOptions = await fetchFilterOptions();
           setGenres(filterOptions.genres || []);
@@ -99,14 +106,14 @@ const DirectoryPage = () => {
           const groupedDecades = Array.from(
             new Set(
               allYears
-                .filter(y => parseInt(y) < 2020)
-                .map(year => getDecadeFromYear(year))
+                .filter((y) => parseInt(y) < 2020)
+                .map((year) => getDecadeFromYear(year))
             )
           ).sort((a, b) => b.localeCompare(a));
 
           const individualYears = allYears
-            .filter(y => parseInt(y) >= 2020)
-            .map(y => y.toString())
+            .filter((y) => parseInt(y) >= 2020)
+            .map((y) => y.toString())
             .sort((a, b) => b - a);
 
           setDecades([...individualYears, ...groupedDecades]);
@@ -114,13 +121,15 @@ const DirectoryPage = () => {
 
         const selectedYears = selectedDecades.flatMap(decadeToYears);
 
-        const searchQuery = searchParams.get('query'); // Get search query from URL
+        const searchQuery = searchParams.get("query"); // Get search query from URL
 
         const filters = {
-          genres: selectedGenres.length > 0 ? selectedGenres.join(',') : undefined, // Only send if selected
-          regions: selectedRegions.length > 0 ? selectedRegions.join(',') : undefined, // Only send if selected
-          years: selectedYears.length > 0 ? selectedYears.join(',') : undefined, // Send raw years to the API, only if selected
-          query: searchQuery || undefined // Pass search query
+          genres:
+            selectedGenres.length > 0 ? selectedGenres.join(",") : undefined, // Only send if selected
+          regions:
+            selectedRegions.length > 0 ? selectedRegions.join(",") : undefined, // Only send if selected
+          years: selectedYears.length > 0 ? selectedYears.join(",") : undefined, // Send raw years to the API, only if selected
+          query: searchQuery || undefined, // Pass search query
         };
 
         await fetchMovies(1, 20, filters); // Reduced initial load to 20 for better UX
@@ -139,18 +148,23 @@ const DirectoryPage = () => {
   useEffect(() => {
     const observer = new IntersectionObserver(
       async ([entry]) => {
-        if (entry.isIntersecting && !isFetchingMore && hasMore && !isSearchResult) {
-          console.log('Loading more movies...');
+        if (
+          entry.isIntersecting &&
+          !isFetchingMore &&
+          hasMore &&
+          !isSearchResult
+        ) {
+          console.log("Loading more movies...");
           try {
             await loadMoreMovies();
           } catch (error) {
-            console.error('Error loading more movies:', error);
+            console.error("Error loading more movies:", error);
           }
         }
       },
       {
         threshold: 0.2,
-        rootMargin: '400px'
+        rootMargin: "400px",
       }
     );
 
@@ -177,11 +191,22 @@ const DirectoryPage = () => {
   // }, [movies, hasMore, loading, isFetchingMore, getState]);
 
   useEffect(() => {
-    if (!loading && movies.length > 0 && previousScrollPosition > 0 && navigationType === 'POP') {
+    if (
+      !loading &&
+      movies.length > 0 &&
+      previousScrollPosition > 0 &&
+      navigationType === "POP"
+    ) {
       window.scrollTo(0, previousScrollPosition);
       clearScrollPosition();
     }
-  }, [navigationType, movies, loading, previousScrollPosition, clearScrollPosition]);
+  }, [
+    navigationType,
+    movies,
+    loading,
+    previousScrollPosition,
+    clearScrollPosition,
+  ]);
 
   const genreMap = useMemo(() => {
     return genres.reduce((map, genre) => {
@@ -264,10 +289,10 @@ const DirectoryPage = () => {
     const newSearchParams = new URLSearchParams(searchParams.toString());
 
     // Delete the parameters related to filters and search query
-    newSearchParams.delete('genres');
-    newSearchParams.delete('regions');
-    newSearchParams.delete('years'); // If you were storing combined years directly
-    newSearchParams.delete('query'); // Crucial for clearing search results
+    newSearchParams.delete("genres");
+    newSearchParams.delete("regions");
+    newSearchParams.delete("years"); // If you were storing combined years directly
+    newSearchParams.delete("query"); // Crucial for clearing search results
 
     // Update the URL without navigating, which will trigger the useEffect
     setSearchParams(newSearchParams);
@@ -284,7 +309,9 @@ const DirectoryPage = () => {
         return (
           <button
             key={index}
-            className={`filter-button ${selected.includes(value) ? "active" : ""}`}
+            className={`filter-button ${
+              selected.includes(value) ? "active" : ""
+            }`}
             onClick={() => toggleFilter(value, selected, setSelected)}
             aria-pressed={selected.includes(value)}
           >
@@ -296,18 +323,22 @@ const DirectoryPage = () => {
   );
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const toggleSidebar = () => setIsSidebarOpen(prev => !prev);
+  const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
 
   return (
     <main className="directory-page">
       <div id="toggle-sidebar-container">
         <button onClick={toggleSidebar}>
-          <span><FaListUl id="sidebar-icon" /></span>
+          <span>
+            <FaListUl id="sidebar-icon" />
+          </span>
         </button>
       </div>
 
       <div className="layout-container">
-        <div className={`sidebar-container ${isSidebarOpen ? "open" : "closed"}`}>
+        <div
+          className={`sidebar-container ${isSidebarOpen ? "open" : "closed"}`}
+        >
           <Sidebar
             sections={[
               {
@@ -327,7 +358,7 @@ const DirectoryPage = () => {
               {
                 id: "year",
                 title: "Year",
-                items: decades.map(d => ({ label: d, value: d })),
+                items: decades.map((d) => ({ label: d, value: d })),
                 selected: selectedDecades,
                 setSelected: setSelectedDecades,
               },
@@ -336,7 +367,11 @@ const DirectoryPage = () => {
         </div>
 
         {isSidebarOpen && (
-          <div className="sidebar-overlay" onClick={toggleSidebar} aria-hidden="true"></div>
+          <div
+            className="sidebar-overlay"
+            onClick={toggleSidebar}
+            aria-hidden="true"
+          ></div>
         )}
 
         <div className="content-area">
@@ -349,14 +384,22 @@ const DirectoryPage = () => {
               <section id="genre">
                 <fieldset>
                   <legend>Genre</legend>
-                  {renderButtons(genres.map(g => g.name), selectedGenres, setSelectedGenres)}
+                  {renderButtons(
+                    genres.map((g) => g.name),
+                    selectedGenres,
+                    setSelectedGenres
+                  )}
                 </fieldset>
               </section>
 
               <section id="region">
                 <fieldset>
                   <legend>Region</legend>
-                  {renderButtons(regions.map(r => ({ label: r.name, value: r.code })), selectedRegions, setSelectedRegions)}
+                  {renderButtons(
+                    regions.map((r) => ({ label: r.name, value: r.code })),
+                    selectedRegions,
+                    setSelectedRegions
+                  )}
                 </fieldset>
               </section>
 
@@ -364,16 +407,19 @@ const DirectoryPage = () => {
                 <fieldset>
                   <legend>Year</legend>
                   {renderButtons(
-                    decades.map(decade => ({ label: decade, value: decade })),
+                    decades.map((decade) => ({ label: decade, value: decade })),
                     selectedDecades,
                     setSelectedDecades
-                  )}                </fieldset>
+                  )}{" "}
+                </fieldset>
               </section>
 
               <ViewDropdown view={view} setView={setView} />
             </section>
 
-            {(selectedGenres.length > 0 || selectedRegions.length > 0 || selectedDecades.length > 0) && (
+            {(selectedGenres.length > 0 ||
+              selectedRegions.length > 0 ||
+              selectedDecades.length > 0) && (
               <div className="clear-filters-container">
                 <button
                   className="clear-filters-button active"
@@ -388,7 +434,16 @@ const DirectoryPage = () => {
 
           <section className={`movie-container ${view}`}>
             {loading ? (
-              <div className="loading-message"><p>Loading movies...</p></div>
+              <div className="loading-message">
+                <div className="directory-loading-movie">
+                  <DotLottieReact
+                    src="https://lottie.host/6185175f-ee83-45a4-9244-03871961a1e9/yLmGLfSgYI.lottie"
+                    loop
+                    autoplay
+                    className="loading-icon"
+                  />
+                </div>
+              </div>
             ) : filteredMovies.length > 0 ? (
               view === "grid" ? (
                 <>
@@ -404,7 +459,16 @@ const DirectoryPage = () => {
                     ))}
                   </div>
                   <div ref={setLoadMoreRef} className="load-more-trigger">
-                    {(isFetchingMore && !isSearchResult) && <p>Loading more movies...</p>}
+                    {isFetchingMore && !isSearchResult && (
+                      <div className="directory-loading-movie">
+                        <DotLottieReact
+                          src="https://lottie.host/6185175f-ee83-45a4-9244-03871961a1e9/yLmGLfSgYI.lottie"
+                          loop
+                          autoplay
+                          className="loading-icon"
+                        />
+                      </div>
+                    )}
                   </div>
                 </>
               ) : (
@@ -414,7 +478,7 @@ const DirectoryPage = () => {
                       <MovieCardList
                         key={`${movie._id}-${movie.tmdbId}`}
                         movie={movie}
-                        genres={movie.genre?.map(id => genreMap[id]) || []}
+                        genres={movie.genre?.map((id) => genreMap[id]) || []}
                         liked={isLiked(movie._id)}
                         likeCount={movie.likeCount}
                         onLike={() => toggleLike(movie._id)}
@@ -425,22 +489,23 @@ const DirectoryPage = () => {
                     ref={setLoadMoreRef}
                     className="load-more-trigger"
                     style={{
-                      minHeight: '20px',
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      padding: '20px'
+                      minHeight: "20px",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      padding: "20px",
                     }}
                   >
-                    {!isSearchResult && (
-                      (isFetchingMore) ? (
-                        <div className="loading-spinner">Loading more movies...</div>
+                    {!isSearchResult &&
+                      (isFetchingMore ? (
+                        <div className="loading-spinner">
+                          Loading more movies...
+                        </div>
                       ) : hasMore ? (
                         <button onClick={loadMoreMovies}>Load More</button>
                       ) : (
                         <p>No more movies to load</p>
-                      )
-                    )}
+                      ))}
                   </div>
                 </>
               )

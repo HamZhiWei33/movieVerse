@@ -737,10 +737,10 @@
   text-overflow: ellipsis;
   text-align: justify;
   text-justify: inter-word;
-  
+
   display: -webkit-box;
   line-clamp: initial;
-  -webkit-line-clamp: 4;        /* Number of lines to show */
+  -webkit-line-clamp: 4; /* Number of lines to show */
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -750,8 +750,15 @@
   text-align: center;
   padding: 2rem;
   color: #666;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 90vh;
 }
-
+.loading-icon {
+  width: 5rem;
+  height: 5rem;
+}
 .error {
   color: #721c24;
   background-color: #f8d7da;
@@ -902,3 +909,11 @@
     text-align: center;
   }
 }
+/* @keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+} */
