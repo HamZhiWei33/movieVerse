@@ -568,7 +568,7 @@ export const getRecommendedMovies = async (req, res) => {
     // Main recommendation: high-rated movies in those genres
     const recommendations = await Movie.find({
       genre: { $in: combinedGenres },
-      rating: { $gte: 3.0 },
+      rating: { $gte: 2.0 },
     })
       .sort({ rating: -1, reviewCount: -1, year: -1 })
       .limit(50);

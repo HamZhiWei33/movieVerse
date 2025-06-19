@@ -83,6 +83,7 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
     const user = await User.findOne({ email });
+    // console.log(email);
 
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });
@@ -110,7 +111,12 @@ export const login = async (req, res) => {
 
 export const logout = (req, res) => {
   try {
-    res.cookie("jwt", "", { maxAge: 0 });
+    // res.cookie("jwt", "", { maxAge: 0 });
+    res.clearCookie('jwt', {
+      httpOnly: true,
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: process.env.NODE_ENV === 'production'
+    });
     res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
     console.log("Error in logout controller", error.message);
