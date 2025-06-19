@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import usePreviousScrollStore from "../../store/usePreviousScrollStore";
 import useRatingStore from "../../store/useRatingStore"; // Import useRatingStore
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import TopMovieSectionSkeleton from "../skeletons/TopMovieSectionSkeleton";
 
 const TopMovieSection = ({ selectedMovie, setSelectedMovie }) => {
   const navigate = useNavigate();
@@ -101,14 +102,15 @@ const TopMovieSection = ({ selectedMovie, setSelectedMovie }) => {
   };
   if (loading)
     return (
-      <div className="loading">
-        <DotLottieReact
-          src="https://lottie.host/6185175f-ee83-45a4-9244-03871961a1e9/yLmGLfSgYI.lottie"
-          loop
-          autoplay
-          className="loading-icon"
-        />
-      </div>
+      // <div className="loading">
+      //   <DotLottieReact
+      //     src="https://lottie.host/6185175f-ee83-45a4-9244-03871961a1e9/yLmGLfSgYI.lottie"
+      //     loop
+      //     autoplay
+      //     className="loading-icon"
+      //   />
+      // </div>
+      <TopMovieSectionSkeleton />
     );
 
   if (error) return <div className="error">{error}</div>;
