@@ -201,6 +201,7 @@ const SearchBar = () => {
                                     movie={movie}
                                     key={index}
                                     onClick={() => handleSearchItemClick(movie)}
+                                    keyword={searchTerm}
                                 />
                                 // <div
                                 //     key={index}
