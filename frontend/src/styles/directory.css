@@ -191,6 +191,9 @@ legend {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  /* padding: 1rem auto; */
+  padding-top: 0.6rem;
+  padding-bottom: 0.6rem;
 }
 
 /* Active state */

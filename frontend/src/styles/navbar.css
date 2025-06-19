@@ -172,7 +172,6 @@ header {
     background-color: #888;
     border-radius: 4px;
   }
-  /* other dropdown styles */
 }
 
 .search-dropdown-item {
@@ -186,7 +185,7 @@ header {
   padding-left: 0.7rem;
 }
 
-.search-dropdown-item div {
+.search-dropdown-item>div {
   display: flex;
   flex-direction: row;
   gap: 1rem;
@@ -201,6 +200,11 @@ header {
   border-radius: 0.4rem;
 }
 
+.highlighted-keyword {
+  background-color: #c6ff00;
+  color: #0f0f0f;
+}
+
 .search-dropdown-item span {
   width: 100%;
   overflow: hidden;
@@ -210,8 +214,18 @@ header {
   font-size: 1.1rem;
 }
 
-.search-dropdown-item span:hover {
+.search-dropdown-item .search-movie-title-container:hover span {
   color: #c6ff00;
+}
+
+.search-dropdown-item span.highlighted-keyword {
+  background-color: #c6ff00;
+  color: #0f0f0f;
+}
+
+.search-dropdown-item .search-movie-title-container:hover .highlighted-keyword {
+  /* background-color: #ffffff; */
+  color: #0f0f0f;
 }
 
 #no-results {
