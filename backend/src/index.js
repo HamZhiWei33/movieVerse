@@ -42,8 +42,8 @@ app.use("/api/rating", ratingRoutes);
 app.use("/api/likes", likeRoutes);
 app.use("/api/movies", movieRoutes);
 app.use("/api/reviews", reviewRoutes);
-app.use("/api/recommendation", recommendationRoutes);
-app.listen(PORT, async () => {
+// app.use("/api/recommendation", recommendationRoutes);
+app.listen(PORT, async () => {7
   console.log("Server is running on port:" + PORT);
   await connectDB();
   // await fetchAndStorePopularMovies(); // Fetch TMDB data

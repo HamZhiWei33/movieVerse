@@ -1,21 +1,24 @@
 export const banners = [
   {
-    title: "New Release: Alive",
-    image: "/movie/home/banner1_2xl.jpg",
+    title: "New Release !!",
+    image:
+      "https://res.cloudinary.com/dmrveank4/image/upload/v1750244835/slide1_kh5kvz.jpg",
     description: "Check out the latest blockbuster!",
     className: "banner1",
-    onClickTarget: "/new-released", // First slide
+    onClickTarget: "/", // First slide
   },
   {
-    title: "Top Ranking: Parasite",
-    image: "/movie/home/banner2.png",
+    title: "Explore Top Ranking",
+    image:
+      "https://res.cloudinary.com/dmrveank4/image/upload/v1750244851/slide2_c5zt58.jpg",
     description: "Rank #1 Thriller Movie.",
     className: "banner2",
     onClickTarget: "/directory", // Second slide
   },
   {
     title: "See All Rankings",
-    image: "/movie/home/banner3_2xl.png",
+    image:
+      "https://res.cloudinary.com/dmrveank4/image/upload/v1750244883/slide3_tkpbe0.jpg",
     description: "Explore the top movies now.",
     className: "banner3",
     onClickTarget: "/ranking", // Third slide
