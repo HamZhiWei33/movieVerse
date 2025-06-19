@@ -97,9 +97,23 @@ export const useAuthStore = create((set, get) => ({
       // get().connectSocket(); // connect to socket after successful login
       return res.data;
     } catch (error) {
+      // console.error("Login error:", error.response?.data);
+      // toast.error(error.response?.data?.message || "Login failed");
+      // throw error;
       console.error("Login error:", error.response?.data);
-      toast.error(error.response?.data?.message || "Login failed");
-      throw error;
+
+      const status = error.response?.status;
+      const serverMessage = error.response?.data?.message;
+
+      let userMessage = "Login failed. Please try again.";
+      if (status === 400) {
+        userMessage = serverMessage || "Invalid email or password.";
+      } else if (status === 500) {
+        userMessage = "Server error. Please try again later.";
+      }
+
+      toast.error(userMessage);
+      throw new Error(userMessage);
     } finally {
       set({ isLoggingIn: false });
     }
@@ -237,6 +251,20 @@ export const useAuthStore = create((set, get) => ({
         return;
       }
 
+      // Frontend validation before request
+      if (!oldPassword || !newPassword) {
+        toast.error("All fields are required");
+        return;
+      }
+
+      if (!isStrongPassword(newPassword)) {
+        toast.error(
+          "Password must be at least 8 characters long and include uppercase, lowercase, and a number"
+        );
+        return;
+      }
+
+      // Send to backend
       const res = await axiosInstance.put(`/users/change-password`, {
         oldPassword,
         newPassword,
