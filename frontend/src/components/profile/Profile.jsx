@@ -198,7 +198,7 @@ const Profile = () => {
                       value={tempGender}
                       onChange={(e) => setTempGender(e.target.value)}
                     >
-                      <option value="">-</option>
+                      <option value="-">-</option>
                       <option value="male">male</option>
                       <option value="female">female</option>
                     </select>
