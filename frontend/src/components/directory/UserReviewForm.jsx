@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import ReviewStars from "./ReviewStars";
 import "../../styles/directory/UserReviewForm.css";
+import { useAuthStore } from "../../store/useAuthStore";
 
 const UserReviewForm = ({
   movie,
@@ -8,6 +9,8 @@ const UserReviewForm = ({
   existingRating = 0,
   onSubmit,
 }) => {
+  const { authUser } = useAuthStore();
+
   const [reviewText, setReviewText] = useState(existingReview);
   const [rating, setRating] = useState(existingRating);
   const [isModified, setIsModified] = useState(false);
@@ -21,6 +24,10 @@ const UserReviewForm = ({
     setIsModified(false);
     setTextColor(existingReview ? "#999999" : "#ffffff");
   }, [existingReview, existingRating]);
+
+  const userProfilePic = useMemo(() => {
+      return authUser?.profilePic || "/profile/placeholder_avatar.svg";
+    }, [authUser]);
 
   const handleTextChange = (e) => {
     const newText = e.target.value;
@@ -54,7 +61,7 @@ const UserReviewForm = ({
       <div className="user-review-body">
         <div className="user-review-rating">
           <img
-            src="/profile/default_profile_pic.png"
+            src={userProfilePic}
             alt="User Avatar"
             className="user-review-avatar"
           />
