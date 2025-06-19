@@ -229,7 +229,9 @@ const {authUser}= useAuthStore();
         moviesType === "newReleased" ||
         moviesType === "recommendation") &&
         (movieList.length === 0 ? (
-          <div className="no-movies-message">{`No movie in ${moviesType}`}</div>
+          <div className="no-movies-message">
+            <span>{`No movie in ${moviesType.charAt(0).toUpperCase() + moviesType.slice(1)}`}</span>
+          </div>
         ) : (
           <div
             id={moviesType}

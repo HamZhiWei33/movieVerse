@@ -14,6 +14,7 @@ import Sidebar from "../components/Sidebar";
 import usePreviousScrollStore from "../store/usePreviousScrollStore";
 import useMovieStore from "../store/useMovieStore";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import { FaAngleDown, FaAngleUp } from "react-icons/fa6";
 
 const DirectoryPage = () => {
   const {
@@ -44,6 +45,7 @@ const DirectoryPage = () => {
   const [error, setError] = useState(null);
   const [isSearchResult, setIsSearchResult] = useState(false);
   const [searchedMovies, setSearchedMovies] = useState([]);
+  const [collapsed, setCollapsed] = useState([true, true, true]);
 
   const location = useLocation();
 
@@ -301,26 +303,69 @@ const DirectoryPage = () => {
     setIsSearchResult(false);
   };
 
-  const renderButtons = (items, selected, setSelected) => (
-    <div className="filter-group">
-      {items.map((item, index) => {
-        const label = item.label || item;
-        const value = item.value || item;
-        return (
-          <button
-            key={index}
-            className={`filter-button ${
-              selected.includes(value) ? "active" : ""
+  useEffect(() => {
+    console.log(collapsed);
+  }, [collapsed]);
+
+  const renderButtons = (items, selected, setSelected, index = 0, collapseRow = 3) => {
+
+    const buttons = items.map((item, index) => {
+      const label = item.label || item;
+      const value = item.value || item;
+      return (
+        <div
+          key={index}
+          className={`filter-button ${selected.includes(value) ? "active" : ""
             }`}
-            onClick={() => toggleFilter(value, selected, setSelected)}
-            aria-pressed={selected.includes(value)}
-          >
-            {label}
-          </button>
-        );
-      })}
-    </div>
-  );
+          onClick={() => toggleFilter(value, selected, setSelected)}
+          aria-pressed={selected.includes(value)}
+        >
+          {label}
+        </div>
+      );
+    });
+
+    const toggleCollapse = () => {
+      setCollapsed(prevArray =>
+        prevArray.map((item, i) =>
+          i === index ? !item : item
+        )
+      );
+    }
+    return (
+      <div className="filter-group">
+        {/* {items.map((item, index) => {
+          const label = item.label || item;
+          const value = item.value || item;
+          return (
+            <button
+              key={index}
+              className={`filter-button ${selected.includes(value) ? "active" : ""
+                }`}
+              onClick={() => toggleFilter(value, selected, setSelected)}
+              aria-pressed={selected.includes(value)}
+            >
+              {label}
+            </button>
+          );
+        })} */}
+        {
+          buttons.slice(0, collapsed[index] ? collapseRow * 3 - 1 : buttons.length)
+        }
+        <div
+          className={`filter-button`}
+          onClick={toggleCollapse}
+        // aria-pressed={selected.includes(value)}
+        >
+          {collapsed[index] ? (
+            <FaAngleDown />
+          ) : (
+            <FaAngleUp />
+          )}
+        </div>
+      </div>
+    )
+  };
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
@@ -387,7 +432,8 @@ const DirectoryPage = () => {
                   {renderButtons(
                     genres.map((g) => g.name),
                     selectedGenres,
-                    setSelectedGenres
+                    setSelectedGenres,
+                    0
                   )}
                 </fieldset>
               </section>
@@ -398,7 +444,8 @@ const DirectoryPage = () => {
                   {renderButtons(
                     regions.map((r) => ({ label: r.name, value: r.code })),
                     selectedRegions,
-                    setSelectedRegions
+                    setSelectedRegions,
+                    1
                   )}
                 </fieldset>
               </section>
@@ -409,7 +456,8 @@ const DirectoryPage = () => {
                   {renderButtons(
                     decades.map((decade) => ({ label: decade, value: decade })),
                     selectedDecades,
-                    setSelectedDecades
+                    setSelectedDecades,
+                    2
                   )}{" "}
                 </fieldset>
               </section>
@@ -420,16 +468,16 @@ const DirectoryPage = () => {
             {(selectedGenres.length > 0 ||
               selectedRegions.length > 0 ||
               selectedDecades.length > 0) && (
-              <div className="clear-filters-container">
-                <button
-                  className="clear-filters-button active"
-                  onClick={handleClearAllFilters} // Use the new handler
-                  aria-label="Clear all filters"
-                >
-                  Clear all
-                </button>
-              </div>
-            )}
+                <div className="clear-filters-container">
+                  <button
+                    className="clear-filters-button active"
+                    onClick={handleClearAllFilters} // Use the new handler
+                    aria-label="Clear all filters"
+                  >
+                    Clear all
+                  </button>
+                </div>
+              )}
           </div>
 
           <section className={`movie-container ${view}`}>

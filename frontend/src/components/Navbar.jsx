@@ -8,6 +8,7 @@ import SearchBar from "../components/SearchBar";
 import useIsMobile from "../store/useIsMobile";
 import { UserValidationContext } from "../context/UserValidationProvider ";
 import { useAuthStore } from "../store/useAuthStore";
+
 const Navbar = () => {
   const isMobile = useIsMobile();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -29,16 +30,6 @@ const Navbar = () => {
 
   const profilePic = useMemo(() => {
     return authUser?.profilePic || "/profile/placeholder_avatar.svg";
-    if (moviesType === "recommendation") return displayed;
-    if (moviesType === "watchlist") {
-      return storeMovies.filter(m => {
-        const inWatchlist = isInWatchlist(m._id);
-        // console.log(`Movie ${m._id} in watchlist:`, inWatchlist);
-        return inWatchlist;
-      });
-    }
-    if (moviesType === "newReleased") return storeMovies.slice(0, 20);
-    return items;
   }, [authUser]);
 
   return (
