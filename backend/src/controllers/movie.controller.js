@@ -514,7 +514,7 @@ async function processTMDBMovie(tmdbMovie) {
       actors,
       posterUrl: tmdbMovie.poster_path
         ? `https://image.tmdb.org/t/p/w500${tmdbMovie.poster_path}`
-        : "/default-poster.jpg",
+        : "/profile/default-movie.png",
       trailerUrl,
       description: tmdbMovie.overview || "No description available",
       duration,
