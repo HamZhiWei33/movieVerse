@@ -1,36 +1,21 @@
 import "../styles/navbar.css";
-import { useState, useContext, useMemo } from "react";
-import { NavLink, useLocation } from "react-router-dom";
-import { FaAngleDown } from "react-icons/fa";
-import SearchIcon from "@mui/icons-material/Search";
+import { useState, useMemo } from "react";
+import { NavLink } from "react-router-dom";
 import MenuIcon from "@mui/icons-material/Menu";
 import SearchBar from "../components/SearchBar";
 import useIsMobile from "../store/useIsMobile";
-import { UserValidationContext } from "../context/UserValidationProvider ";
 import { useAuthStore } from "../store/useAuthStore";
 
 const Navbar = () => {
+  const { authUser, logout } = useAuthStore();
   const isMobile = useIsMobile();
   const [menuOpen, setMenuOpen] = useState(false);
-  const location = useLocation();
-  // const { isValidateUser, logout } = useContext(UserValidationContext);
-  const { authUser, logout } = useAuthStore();
-  // const guestRoutes = [
-  //   "/login",
-  //   "/signup",
-  //   "/forgot_password",
-  //   "/reset_password",
-  //   "/genre_selection",
-  // ];
-  // const isGuest = guestRoutes.includes(location.pathname);
+
+  const profilePic = useMemo(() => authUser?.profilePic || "/profile/placeholder_avatar.svg", [authUser]);
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
-
-  const profilePic = useMemo(() => {
-    return authUser?.profilePic || "/profile/placeholder_avatar.svg";
-  }, [authUser]);
 
   return (
     <header role="banner">
@@ -62,18 +47,7 @@ const Navbar = () => {
             aria-hidden="true"
           ></div>
         )}
-        {authUser && (
-          // <div className="search-bar" role="search" aria-label="Site search">
-          //   <input
-          //     id="searchInput"
-          //     type="text"
-          //     placeholder="Search"
-          //     aria-label="Search input"
-          //   />
-          //   <SearchIcon size={20} />
-          // </div>
-          <SearchBar />
-        )}
+        {authUser && <SearchBar />}
 
         <div
           style={{
@@ -122,7 +96,6 @@ const Navbar = () => {
                 <li style={{ display: "flex", flexDirection: "row" }}>
                   <NavLink to="/profile" aria-label="Profile page">
                     Profile
-                    {/* <FaAngleDown style={{ alignSelf: "center" }} /> */}
                   </NavLink>
                 </li>
                 {isMobile && (
