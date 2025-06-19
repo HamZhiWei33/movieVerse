@@ -104,7 +104,9 @@ const Top1Card = ({ movie, rank, image, title, rating, description, genre, regio
             <span className="badge-duration-icon">
               <IoTime />
             </span>
-            {duration}
+            {duration === "0h 0min"
+                  ? "To Be Announced"
+                  : duration}
           </span>
           <LikeIcon movie={movie} disabled={loadingLike} />
             <AddToWatchlistIcon 
