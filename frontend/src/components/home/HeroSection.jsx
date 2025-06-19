@@ -274,7 +274,11 @@ const HeroSection = ({ title, moviesType, items }) => {
       {moviesType === "ranking" && (
         <div className="home-card-container scroll-box" ref={containerRef}>
           <div className="genre-selection-grid">
-            <RankingCard isAllGenre topMovies={topMoviesByGenre.All} />
+            <RankingCard
+              isAllGenre
+              topMovies={topMoviesByGenre.All}
+              isLoading={loading}
+            />
 
             {items.slice(0, 5).map((genre) => (
               // <RankingCard key={genre.id} genre={genre} />
@@ -283,6 +287,7 @@ const HeroSection = ({ title, moviesType, items }) => {
                 key={genre.id}
                 genre={genre}
                 topMovies={topMoviesByGenre[genre.name] || []}
+                isLoading={loading} // Pass loading state
               />
             ))}
           </div>
