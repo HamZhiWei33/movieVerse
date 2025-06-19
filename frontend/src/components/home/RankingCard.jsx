@@ -65,6 +65,10 @@ const RankingCard = ({ genre, isAllGenre = false, topMovies = [] }) => {
           <h3>{isAllGenre ? "All Genres" : genre.name}</h3>
         </div>
 
+      </div>
+      <div>
+
+
         <div className="hover-overlay">
           <div className="home-hover-bottom">
             <div className="hover-left">

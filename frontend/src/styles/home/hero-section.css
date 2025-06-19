@@ -63,11 +63,11 @@
 .home-card-container.scroll-box .movie-card {
   flex: 0 0 auto;
 }
-.home-movie-card {
-  flex: 0 0 auto; /* Don't grow, don't shrink, keep natural width */
-  width: 200px; /* or your preferred fixed width */
+/* .home-movie-card {
+  flex: 0 0 auto;
+  width: 200px;
   height: 300px;
-}
+} */
 .home-card-container.scroll-box::-webkit-scrollbar {
   display: none; /* Chrome, Safari */
 }

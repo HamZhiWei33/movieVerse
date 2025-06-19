@@ -149,7 +149,7 @@ const TopMovieSection = ({ selectedMovie, setSelectedMovie }) => {
                                 <span className="badge-duration-icon">
                                     <IoTime />
                                 </span>
-                                {selectedMovie.duration}
+                                {selectedMovie.duration === "0h 0min" ? "To Be Announced" : selectedMovie.duration}
                             </span>
                         </div>
                         <div className="action-buttons">
