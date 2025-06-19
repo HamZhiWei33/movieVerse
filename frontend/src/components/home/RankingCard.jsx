@@ -5,7 +5,12 @@ import { PostersGrid } from "../general/GenreCard";
 import RankingGrid from "./RankingGrid";
 import { BsFire } from "react-icons/bs";
 
-const RankingCard = ({ genre, isAllGenre = false, topMovies = [] }) => {
+const RankingCard = ({
+  genre,
+  isAllGenre = false,
+  topMovies = [],
+  isLoading = false,
+}) => {
   const navigate = useNavigate();
 
   const genreName = isAllGenre ? "All Genres" : genre.name;
@@ -32,23 +37,19 @@ const RankingCard = ({ genre, isAllGenre = false, topMovies = [] }) => {
         if (e.key === "Enter") handleCardClick();
       }}
     >
-      {/* <PostersGrid genre={genre} /> */}
       <div className="home-poster-container">
-        {previewMovie ? (
+        {isLoading ? (
+          <div className="skeleton-poster shimmer">
+            <div className="skeleton-poster-inner"></div>
+          </div>
+        ) : previewMovie ? (
           <>
             <RankingGrid topMovies={topMovies} isAllGenre />
           </>
         ) : (
-          // <img
-          //   src={previewMovie.posterUrl}
-          //   alt={`Top ${genreName} movie: ${previewMovie.title}`}
-          //   className="home-poster-img"
-          // />
-          <img
-            src="/profile/default-movie.png"
-            alt="default movie poster"
-            className="home-poster-img"
-          />
+          <div className="skeleton-poster shimmer">
+            <div className="skeleton-poster-inner"></div>
+          </div>
         )}
 
         {/* Default movie title overlay (always visible) */}
@@ -64,11 +65,8 @@ const RankingCard = ({ genre, isAllGenre = false, topMovies = [] }) => {
         <div className="genre-name-overlay">
           <h3>{isAllGenre ? "All Genres" : genre.name}</h3>
         </div>
-
       </div>
       <div>
-
-
         <div className="hover-overlay">
           <div className="home-hover-bottom">
             <div className="hover-left">

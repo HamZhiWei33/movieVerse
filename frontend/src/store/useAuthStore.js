@@ -97,9 +97,23 @@ export const useAuthStore = create((set, get) => ({
       // get().connectSocket(); // connect to socket after successful login
       return res.data;
     } catch (error) {
+      // console.error("Login error:", error.response?.data);
+      // toast.error(error.response?.data?.message || "Login failed");
+      // throw error;
       console.error("Login error:", error.response?.data);
-      toast.error(error.response?.data?.message || "Login failed");
-      throw error;
+
+      const status = error.response?.status;
+      const serverMessage = error.response?.data?.message;
+
+      let userMessage = "Login failed. Please try again.";
+      if (status === 400) {
+        userMessage = serverMessage || "Invalid email or password.";
+      } else if (status === 500) {
+        userMessage = "Server error. Please try again later.";
+      }
+
+      toast.error(userMessage);
+      throw new Error(userMessage);
     } finally {
       set({ isLoggingIn: false });
     }
@@ -253,6 +267,24 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
+  updateFavouriteGenres: async (genreSelected) => {
+    // set({ isUpdatingProfile: true });
+    try {
+      const userId = get().authUser?._id;
+      if (!userId) throw new Error("User ID not found");
+
+      const res = await axiosInstance.put(`/users/${userId}/favourite-genres`, {
+        favouriteGenres: genreSelected,
+      });
+      set({ authUser: res.data });
+
+      toast.success("Favourite genres saved successfully");
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.message || "Error while saving favourite genres"
+      );
+    }
+  },
   updateFavouriteGenres: async (genreSelected) => {
     // set({ isUpdatingProfile: true });
     try {

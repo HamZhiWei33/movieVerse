@@ -30,7 +30,8 @@ const LoginPage = () => {
       toast.success(`Welcome back, ${user.name}!`);
       navigate("/"); // Redirect to home page after successful login
     } catch (err) {
-      toast.error(err.message || "Login failed");
+      // toast.error(err.message || "Login failed");
+      console.warn("Login failed", err.message);
     }
   };
 

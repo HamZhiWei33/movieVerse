@@ -16,6 +16,13 @@ import {
   getWatchlistGenresAggregation,
 } from "../lib/genreAnalytics.js";
 import bcrypt from "bcryptjs";
+
+const isStrongPassword = (password) =>
+  password.length >= 8 &&
+  /[A-Z]/.test(password) &&
+  /[a-z]/.test(password) &&
+  /[0-9]/.test(password);
+
 export const getCurrentUser = (req, res) => {
   try {
     if (!req.user) {
@@ -94,10 +101,12 @@ export const checkWatchlistStatus = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const isInWatchlist = user.watchlist.some(id => id.toString() === movieId);
-    
-    res.status(200).json({ 
-      inWatchlist: isInWatchlist  
+    const isInWatchlist = user.watchlist.some(
+      (id) => id.toString() === movieId
+    );
+
+    res.status(200).json({
+      inWatchlist: isInWatchlist,
     });
   } catch (error) {
     console.error("Error checking watchlist status:", error);
