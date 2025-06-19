@@ -1,12 +1,8 @@
-import React, { useState, memo, useEffect } from "react";
-// import LikeIcon from "./LikeIcon";
-// import AddToWatchlistIcon from "./AddToWatchlistIcon";
+import React, { useState, memo, useEffect, useMemo } from "react";
 import "../../styles/general/genre-card.css";
-import { movies } from "../../constant";
 import useMovieStore from "../../store/useMovieStore";
 
 export const PostersGrid = memo(({ movies }) => {
-  // const genreMovies = movies.filter((movie) => movie.genre.includes(genre.id));
   const randomMovies = movies
     .sort(() => 0.5 - Math.random()) // Shuffle
     .slice(0, Math.min(4, movies.length)); // Choose
@@ -28,9 +24,7 @@ export const PostersGrid = memo(({ movies }) => {
             <img
               className="poster-img"
               src={
-                moviesCount === 0
-                  ? "/profile/default-movie.png"
-                  : randomMovies[Math.max(1 - index, 0)].posterUrl
+                randomMovies[Math.max(1 - index, 0)]?.posterUrl ?? "/profile/default-movie.png"
               }
             />
           ) || ""}
@@ -41,38 +35,19 @@ export const PostersGrid = memo(({ movies }) => {
 });
 
 const GenreCard = ({ genre, onCardClicked, favouriteGenres }) => {
-  const {fetchMovies} = useMovieStore();
+  const { movies: storeMovies } = useMovieStore();
 
-  const [movies, setMovies] = useState([]);
   const [selected, setSelected] = useState(false);
 
   useEffect(() => {
     setSelected(favouriteGenres.includes(Number(genre.id)));
   }, [favouriteGenres]);
 
-  // Fetch 10 movies of the genre on mounted
-  useEffect(() => {
-    const fetchGenreMovies = async () => {
-      try {
-        const filters = {
-          genres: String(genre.id),
-          regions: "",
-          years: ""
-        };
-
-        const response = await fetchMovies(1, 10, filters);
-        setMovies(response.data);
-      } catch (err) {
-        console.error("Failed to fetch data:", err);
-      }
-    };
-
-    fetchGenreMovies();
-  }, [fetchMovies]);
+  const movies = useMemo(() => storeMovies.filter((movie) => movie.genre.includes(Number(genre.id))), [storeMovies]);
 
   const handleCardClick = () => {
     onCardClicked(!selected, genre);
-    setSelected(!selected, genre);
+    setSelected(!selected);
   };
 
   return (
