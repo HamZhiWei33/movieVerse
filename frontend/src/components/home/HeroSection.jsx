@@ -30,7 +30,7 @@ const HeroSection = ({ title, moviesType, items }) => {
     fetchLikedMovies,
     recommendedMovies,
     randomRecommendedMovies,
-    getRecommendedMovies
+    getRecommendedMovies,
   } = useMovieStore();
 const {authUser}= useAuthStore();
   const { genreMap, fetchGenres } = useGenreStore();
@@ -178,6 +178,17 @@ const {authUser}= useAuthStore();
   return (
     <section
       className="hero-section"
+      id={
+        moviesType === "watchlist"
+          ? "watchlist-section"
+          : moviesType === "newReleased"
+          ? "new-released-section"
+          : moviesType === "recommendation"
+          ? "recommendation-section"
+          : moviesType === "ranking"
+          ? "ranking-section"
+          : undefined
+      }
       role="region"
       aria-label={`Home section: ${title}`}
     >

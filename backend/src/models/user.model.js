@@ -21,11 +21,12 @@ const userSchema = new mongoose.Schema(
     passwordReset: {
       code: String,
       expiresAt: Date,
-      previousCodes: [String]
+      previousCodes: [String],
     },
     gender: {
       type: String,
-      enum: ["male", "female", "other"], // optional validation
+      enum: ["male", "female", "-"],
+      default: "-",
     },
     profilePic: {
       type: String,
@@ -34,7 +35,7 @@ const userSchema = new mongoose.Schema(
     watchlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Movie" }],
     likedMovies: [{ type: mongoose.Schema.Types.ObjectId, ref: "Movie" }],
     favouriteGenres: {
-      type: [{ type: Number, ref: "Genre"}],
+      type: [{ type: Number, ref: "Genre" }],
       default: [],
     },
   },

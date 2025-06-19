@@ -4,8 +4,12 @@ import axios from "axios";
 import GenreCard from "./GenreCard";
 import Top1Card from "./Top1Card";
 import { useSearchParams, useLocation } from "react-router-dom";
-
-const GenreRankingSection = ({ movies = [], allGenres = [], allReviews = [] }) => {
+import { FaSpinner } from "react-icons/fa";
+const GenreRankingSection = ({
+  movies = [],
+  allGenres = [],
+  allReviews = [],
+}) => {
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const [loading, setLoading] = useState(true);
@@ -19,14 +23,14 @@ const GenreRankingSection = ({ movies = [], allGenres = [], allReviews = [] }) =
 
   // Get genre from URL or default to "All"
   const urlGenre = searchParams.get("genre");
-  
+
   // Modified genreOptions to use allGenres prop and sort alphabetically
   const genreOptions = useMemo(() => {
     const genres = Array.isArray(allGenres) ? allGenres : [];
     const sortedGenres = genres
-      .map(genre => genre.name)
+      .map((genre) => genre.name)
       .sort((a, b) => a.localeCompare(b));
-    
+
     return ["All", ...sortedGenres];
   }, [allGenres]);
 
@@ -46,22 +50,25 @@ const GenreRankingSection = ({ movies = [], allGenres = [], allReviews = [] }) =
     const fetchData = async () => {
       try {
         setLoading(true);
-        console.log('Fetching data for genre:', selectedGenre); // Debug log
-        
-        const response = await axios.get("http://localhost:5001/api/rankings/genres", {
-          params: { genre: selectedGenre }
-        });
-        
-        console.log('Received data:', response.data); // Debug log
-        
+        console.log("Fetching data for genre:", selectedGenre); // Debug log
+
+        const response = await axios.get(
+          "http://localhost:5001/api/rankings/genres",
+          {
+            params: { genre: selectedGenre },
+          }
+        );
+
+        console.log("Received data:", response.data); // Debug log
+
         if (!response.data) {
-          throw new Error('No data received from server');
+          throw new Error("No data received from server");
         }
-        
+
         setData({
           movies: response.data.movies || [],
           reviews: response.data.reviews || [],
-          genres: response.data.genres || []
+          genres: response.data.genres || [],
         });
         setError(null);
       } catch (err) {
@@ -70,7 +77,7 @@ const GenreRankingSection = ({ movies = [], allGenres = [], allReviews = [] }) =
         setData({
           movies: [],
           reviews: [],
-          genres: []
+          genres: [],
         });
       } finally {
         setLoading(false);
@@ -109,14 +116,16 @@ const GenreRankingSection = ({ movies = [], allGenres = [], allReviews = [] }) =
 
   const sorted = useMemo(() => {
     if (!Array.isArray(movies)) return [];
-    
+
     return movies
-      .filter(movie => {
+      .filter((movie) => {
         if (selectedGenre === "All") return true;
-        
+
         // Find the genre ID for the selected genre name
-        const selectedGenreId = allGenres.find(g => g.name === selectedGenre)?.id;
-        
+        const selectedGenreId = allGenres.find(
+          (g) => g.name === selectedGenre
+        )?.id;
+
         // Check if the movie has this genre ID
         return selectedGenreId && movie.genre.includes(selectedGenreId);
       })
@@ -132,13 +141,18 @@ const GenreRankingSection = ({ movies = [], allGenres = [], allReviews = [] }) =
 
   const [top1, ...otherMovies] = sorted;
 
-  if (loading) return <div className="loading">Loading rankings...</div>;
+  if (loading)
+    return (
+      <div className="loading" id="spinner">
+        Loading rankings...
+      </div>
+    );
   if (error) return <div className="error">{error}</div>;
 
   // Update the genre mapping in the cards to use allGenres
   const getGenreName = (genreId) => {
-    const genre = allGenres.find(g => g.id === genreId);
-    return genre?.name || '';
+    const genre = allGenres.find((g) => g.id === genreId);
+    return genre?.name || "";
   };
 
   return (
@@ -185,7 +199,10 @@ const GenreRankingSection = ({ movies = [], allGenres = [], allReviews = [] }) =
                   image={top1.posterUrl}
                   title={top1.title}
                   rating={top1.rating}
-                  genre={top1.genre.map(getGenreName).filter(Boolean).join(", ")}
+                  genre={top1.genre
+                    .map(getGenreName)
+                    .filter(Boolean)
+                    .join(", ")}
                   region={top1.region}
                   year={top1.year}
                   duration={top1.duration}
@@ -199,7 +216,10 @@ const GenreRankingSection = ({ movies = [], allGenres = [], allReviews = [] }) =
                   image={movie.posterUrl}
                   title={movie.title}
                   rating={movie.rating}
-                  genre={movie.genre.map(getGenreName).filter(Boolean).join(", ")}
+                  genre={movie.genre
+                    .map(getGenreName)
+                    .filter(Boolean)
+                    .join(", ")}
                   region={movie.region}
                   year={movie.year}
                   duration={movie.duration}
@@ -217,7 +237,7 @@ const GenreRankingSection = ({ movies = [], allGenres = [], allReviews = [] }) =
 GenreRankingSection.defaultProps = {
   movies: [],
   allGenres: [],
-  allReviews: []
+  allReviews: [],
 };
 
 export default GenreRankingSection;

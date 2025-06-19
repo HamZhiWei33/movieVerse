@@ -14,13 +14,14 @@
 
 .footer-grid {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
   flex-wrap: wrap;
-  gap: 2rem;
+  /* gap: 2rem; */
   margin-bottom: 2rem;
+  width: 100%;
 }
 
-.footer-grid > div {
+.footer-grid>div {
   flex: 1 1 180px;
   max-width: 220px;
   text-align: left;
@@ -114,7 +115,7 @@
 
 /* ------------------ Guest Footer Specific ------------------ */
 
-.footer-grid.guest > div {
+.footer-grid.guest>div {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -125,11 +126,11 @@
 
 @media screen and (max-width: 1200px) {
   .footer-grid {
-    justify-content: center;
-    gap: 2rem;
+    justify-content: space-around;
+    /* gap: 2rem; */
   }
 
-  .footer-grid > div {
+  .footer-grid>div {
     max-width: 180px;
     flex: 1 1 150px;
   }
@@ -142,9 +143,15 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
+    /* display: flex; */
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    /* width: 100%; */
   }
 
-  .footer-grid > div {
+  .footer-grid>div {
     max-width: 100%;
     flex: none;
   }

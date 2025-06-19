@@ -162,7 +162,7 @@ legend {
   width: 6px;
 }
 
-.filter-group::-webkiFt-scrollbar-track {
+.filter-group::-webkift-scrollbar-track {
   background: #2a2a2a;
   border-radius: 3px;
 }
@@ -230,7 +230,13 @@ legend {
   grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
   gap: 1.5rem;
 }
-
+div.directory-loading-movie {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 3rem;
+}
 /* List View */
 .movie-container.list .movie-list {
   display: grid;
@@ -264,17 +270,21 @@ legend {
   .movie-card {
     transform: scale(1);
   }
-  
+
   .movie-grid {
     padding: 0;
-    gap: 0 ;
+    gap: 0;
   }
 
   .movie-container.list .movie-list {
     grid-template-columns: repeat(1, 1fr);
   }
 
-  .movie-container.list .movie-list .movie-card-list .movie-details-container-list .duration-and-icons-container {
+  .movie-container.list
+    .movie-list
+    .movie-card-list
+    .movie-details-container-list
+    .duration-and-icons-container {
     flex-direction: row !important;
   }
 }
@@ -294,10 +304,10 @@ legend {
   .movie-card {
     transform: scale(1);
   }
-  
+
   .movie-grid {
     padding: 0;
-    gap: 0 ;
+    gap: 0;
   }
 
   .movie-container.list .movie-list .movie-card-list {
@@ -310,7 +320,6 @@ legend {
     align-items: center !important;
     justify-content: center !important;
   } */
-
 }
 
 /* Small phones (adjust spacing) */
@@ -325,7 +334,7 @@ legend {
 
   .movie-container.grid .movie-grid {
     padding: 0;
-    gap: 0 ;
+    gap: 0;
   }
 
   .movie-list {

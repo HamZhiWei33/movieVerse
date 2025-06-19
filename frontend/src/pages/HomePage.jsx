@@ -17,33 +17,30 @@ import useWatchlistStore from "../store/useWatchlistStore.js";
 import useGenreStore from "../store/useGenreStore";
 import useMovieStore from "../store/useMovieStore";
 import useRankingStore from "../store/useRankingStore";
-
+import { useLocation } from "react-router-dom";
 const HomePage = () => {
   // const userId = "U1";
   // const { isValidateUser } = useContext(UserValidationContext);
   // const watchlist = getMovieObject(userId);
+  const location = useLocation();
   const { authUser } = useAuthStore();
-  const {
-    rankingMovies,
-    fetchRankingData,
-  } = useRankingStore();
+  const { rankingMovies, fetchRankingData } = useRankingStore();
   const {
     movies: storeMovies,
     recommendedMovies,
     getRecommendedMovies,
     watchlist,
     fetchWatchlist,
-    randomRecommendedMovies
+    randomRecommendedMovies,
   } = useMovieStore();
   // const { watchlist, fetchWatchlist } = useWatchlistStore();
   const { genreMap, fetchGenres } = useGenreStore();
-
 
   // Fetch watchlist movies
   useEffect(() => {
     if (authUser) {
       fetchWatchlist();
-      if(recommendedMovies.length < 50) {
+      if (recommendedMovies.length < 50) {
         getRecommendedMovies();
       }
     } else if (rankingMovies.length === 0) {
@@ -60,7 +57,6 @@ const HomePage = () => {
     //   fetchWatchlist();
     // }
     fetchGenres();
-    
   }, []);
 
   const genres = useMemo(() => {
@@ -75,7 +71,20 @@ const HomePage = () => {
   // }, [genres]);
 
   useScrollToHash();
-
+  useEffect(() => {
+    if (location.hash) {
+      const id = location.hash.substring(1); // Remove '#' from hash
+      const element = document.getElementById(id);
+      if (element) {
+        setTimeout(() => {
+          element.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        }, 500); // Delay ensures DOM is mounted
+      }
+    }
+  }, [location]);
   useGuestUser(authUser);
 
   return (
@@ -108,7 +117,11 @@ const HomePage = () => {
         <HeroSection
           title="Recommendation"
           moviesType={"recommendation"}
-          items={(authUser && authUser.favouriteGenres?.length >= 3) ? randomRecommendedMovies : rankingMovies}
+          items={
+            authUser && authUser.favouriteGenres?.length >= 3
+              ? randomRecommendedMovies
+              : rankingMovies
+          }
         />
 
         {/* <RecommendationSection

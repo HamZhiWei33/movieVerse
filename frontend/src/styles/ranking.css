@@ -463,12 +463,40 @@
   gap: 1rem;
   overflow-x: auto;
   /* margin-bottom: 2rem; */
-  padding-bottom: 0.5rem;
+  padding: 0 1rem;
+  padding-bottom: 0.8rem;
   border-bottom: 0.1rem solid #262626;
   border-top: 0.1rem solid #262626;
-  scrollbar-width: thin;
-  scrollbar-color: #bfbfbf #1a1a1a;
+  /* scrollbar-width: thin;
+  scrollbar-color: #bfbfbf #1a1a1a; */
   white-space: nowrap;
+
+  &::-webkit-scrollbar {
+    width: 2px;
+    height: 6px;
+    /* margin-bottom: 0.5rem; */
+    /* margin-top: 1rem; */
+    margin-right: 1rem;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+    /* padding-top: 1rem; */
+    margin-left: 0.2rem;
+    margin-right: 0.2rem;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #88888869;
+    /* margin-top: 0.5rem; */
+    border-radius: 10rem;
+    cursor: pointer;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: #888888;
+    /* border-radius: 4px; */
+  }
 }
 
 .genre-nav button:focus {
@@ -487,13 +515,15 @@
   width: fit-content;
   white-space: nowrap;
   transition: color 0.3s;
+  padding: 0.7rem 0.7rem;
+  padding-bottom: 0.3rem;
 }
 
 .genre-tab::after {
   content: "";
   position: absolute;
   left: 0;
-  bottom: -5px;
+  bottom: -2px;
   width: 0;
   height: 3px;
   background-color: #ccff00;
@@ -651,8 +681,8 @@
 .top1-card {
   border: 0.1rem solid #262626;
   background-color: #1a1a1a;
-  padding: 1rem;
-  border-radius: 0.7rem;
+  padding: 1.2rem 1.5rem;
+  border-radius: 1rem;
   color: #fff;
   max-width: 600px;
   width: 100%;
@@ -707,10 +737,10 @@
   text-overflow: ellipsis;
   text-align: justify;
   text-justify: inter-word;
-  
+
   display: -webkit-box;
   line-clamp: initial;
-  -webkit-line-clamp: 4;        /* Number of lines to show */
+  -webkit-line-clamp: 4; /* Number of lines to show */
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -720,8 +750,15 @@
   text-align: center;
   padding: 2rem;
   color: #666;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 90vh;
 }
-
+.loading-icon {
+  width: 5rem;
+  height: 5rem;
+}
 .error {
   color: #721c24;
   background-color: #f8d7da;
@@ -872,3 +909,11 @@
     text-align: center;
   }
 }
+/* @keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+} */
