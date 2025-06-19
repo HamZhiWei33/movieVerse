@@ -9,7 +9,6 @@ import SearchItem from "./SearchItem";
 
 const SearchBar = () => {
     const {
-        // movies: storeMovies,
         movies,
         loading,
         fetchMovies } = useMovieStore();
@@ -17,8 +16,6 @@ const SearchBar = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [searchParams, setSearchParams] = useSearchParams();
-
-    // const [movies, setMovies] = useState([]);
 
     const [searchTerm, setSearchTerm] = useState("");
     const [inputFocused, setInputFocused] = useState(false);
@@ -30,32 +27,28 @@ const SearchBar = () => {
     const formRef = useRef(null);
 
     useEffect(() => {
-        // const fetchAllMovies = async () => {
-        //   try {
-        //     const response = await fetchMovies(1, 1000, {
-        //       genres: "",
-        //       regions: "",
-        //       years: "",
-        //     });
-        //     setMovies(response.data);
-        //   } catch (err) {
-        //     console.error("Failed to fetch data:", err);
-        //   }
-        // };
-
         if (!loading && movies.length < 500 && !location.pathname.startsWith("/directory")) {
             fetchMovies(1, 1000, { sort: "-year" }); // Fetch newest movies
         }
-
     }, []);
 
-    // const movies = useMemo(() => {
-    //     return storeMovies||[];
-    // }, [storeMovies]);
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        if (!loading && movies.length < 500 && !location.pathname.startsWith("/directory")) {
+            fetchMovies(1, 1000, { sort: "-year" }); // Fetch newest movies
+        }
+        
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setIsDropdownOpen(false);
+            }
+        };
 
-    // useEffect(() => {
-    //     console.log(movies);
-    // }, [movies]);
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
 
     // Filter items based on search term
     useEffect(() => {
@@ -64,16 +57,13 @@ const SearchBar = () => {
         }
         if (searchTerm.trim() === "") {
             setFilteredItems([]);
-            // setIsDropdownOpen(false);
         } else {
-            // console.log("searchTerm: " + searchTerm);
-            // console.log(movies.length);
             const itemsWithMatchPositions = movies
                 .map((movie) => {
                     const title = movie.title.toLowerCase();
                     const matchIndex = title.indexOf(searchTerm.toLowerCase());
                     return {
-                        original: movie,
+                        movie: movie,
                         title: title,
                         matchIndex: matchIndex,
                     };
@@ -87,29 +77,10 @@ const SearchBar = () => {
                     // If same position, sort alphabetically
                     return a.title.localeCompare(b.title);
                 })
-                .map((item) => item.original);
+                .map((item) => item.movie);
             setFilteredItems(itemsWithMatchPositions.slice(0, 10));
-            // setIsDropdownOpen(itemsWithMatchPositions.length > 0);
         }
-    }, [searchTerm]);
-
-    useEffect(() => {
-        console.log(filteredItems);
-    }, [filteredItems]);
-
-    // Close dropdown when clicking outside
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                setIsDropdownOpen(false);
-            }
-        };
-
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, []);
+    }, [searchTerm, movies]);
 
     const handleSearchItemClick = (movie) => {
         setIsDropdownOpen(false);
@@ -127,6 +98,8 @@ const SearchBar = () => {
         if (wasInputFocused) {
             inputRef.current.focus();
         }
+
+        // Reset directory page when search is removed
         if (location.pathname.startsWith("/directory")) {
             searchParams.delete("query");
             setSearchParams(searchParams);
@@ -186,36 +159,20 @@ const SearchBar = () => {
                                 onClick={clearInput}
                             />
                         )}
-
-                        {/* <button onClick={() => console.log('Search for:', searchTerm)}>
-                        Search
-                    </button> */}
                     </div>
                 </form>
 
                 {isDropdownOpen && searchTerm.trim().length > 0 && (
                     <div className="dropdown">
-                        {filteredItems.length > 0
-                            ? filteredItems.map((movie, index) => (
-                                <SearchItem
-                                    movie={movie}
-                                    key={index}
-                                    onClick={() => handleSearchItemClick(movie)}
-                                    keyword={searchTerm}
-                                />
-                                // <div
-                                //     key={index}
-                                //     className="search-dropdown-item"
-                                //     onClick={() => handleSearchItemClick(movie)}
-                                // >
-                                //     {movie.title}
-                                // </div>
-                            ))
-                            : searchTerm.trim().length > 0 && (
+                        {filteredItems.length > 0 ? (
+                            filteredItems.map((movie, index) => <SearchItem movie={movie} key={index} onClick={() => handleSearchItemClick(movie)} keyword={searchTerm} />)
+                        ) : (
+                            searchTerm.trim().length > 0 && (
                                 <div className="search-dropdown-item" id="no-results">
                                     No results found
                                 </div>
-                            )}
+                            )
+                        )}
                     </div>
                 )}
             </div>
