@@ -1,80 +1,18 @@
-import React, { useState } from "react";
+import "../directory/MovieCard";
 import { useNavigate } from "react-router-dom";
+import { IoTime } from "react-icons/io5";
 import ReviewStars from "../directory/ReviewStars";
 import LikeIcon from "../directory/LikeIcon";
 import AddToWatchlistIcon from "../directory/AddToWatchlistIcon";
-import { IoTime } from "react-icons/io5";
 import usePreviousScrollStore from "../../store/usePreviousScrollStore";
-import useRankingStore from '../../store/useRankingStore';
-import "../directory/MovieCard";
 
 const Top1Card = ({ movie, rank, image, title, rating, description, genre, region, year, duration }) => {
   const navigate = useNavigate();
   const { setPreviousScrollPosition } = usePreviousScrollStore();
-  const {
-    likeMovie,
-    unlikeMovie,
-    addToWatchlist,
-    removeFromWatchlist,
-    hasUserLikedMovie,
-    isInWatchlist,
-  } = useRankingStore();
-
-  const [loadingLike, setLoadingLike] = useState(false);
-  const [loadingWatchlist, setLoadingWatchlist] = useState(false);
-  const [liked, setLiked] = useState(false);
-  const [watchlisted, setWatchlisted] = useState(false);
 
   const handleCardClick = () => {
     setPreviousScrollPosition(window.scrollY);
     navigate(`/movie/${movie._id}`);
-  };
-
-  const fetchLikeState = async () => {
-    const likedStatus = await hasUserLikedMovie(movie._id);
-    setLiked(likedStatus);
-  };
-
-  React.useEffect(() => {
-    fetchLikeState();
-    setWatchlisted(isInWatchlist(movie._id));
-  }, [movie._id]);
-
-  const handleLikeClick = async (e) => {
-    e.stopPropagation();
-    if (loadingLike) return;
-    setLoadingLike(true);
-    try {
-      if (liked) {
-        await unlikeMovie(movie._id);
-      } else {
-        await likeMovie(movie._id);
-      }
-      fetchLikeState();
-    } catch (error) {
-      console.error("Error updating like:", error);
-    } finally {
-      setLoadingLike(false);
-    }
-  };
-
-  const handleAddToWatchlistClick = async (e) => {
-    e.stopPropagation();
-    if (loadingWatchlist) return;
-    setLoadingWatchlist(true);
-    try {
-      if (watchlisted) {
-        await removeFromWatchlist(movie._id);
-        setWatchlisted(false);
-      } else {
-        await addToWatchlist(movie._id);
-        setWatchlisted(true);
-      }
-    } catch (error) {
-      console.error("Error updating watchlist:", error);
-    } finally {
-      setLoadingWatchlist(false);
-    }
   };
 
   return (
@@ -105,14 +43,11 @@ const Top1Card = ({ movie, rank, image, title, rating, description, genre, regio
               <IoTime />
             </span>
             {duration === "0h 0min"
-                  ? "To Be Announced"
-                  : duration}
+              ? "To Be Announced"
+              : duration}
           </span>
-          <LikeIcon movie={movie} disabled={loadingLike} />
-            <AddToWatchlistIcon 
-              movie={movie} 
-              disabled={loadingWatchlist}
-            />
+          <LikeIcon movie={movie} />
+          <AddToWatchlistIcon movie={movie} />
         </div>
         <p className="top1-description">{description}</p>
       </div>
