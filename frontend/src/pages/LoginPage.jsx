@@ -1,36 +1,28 @@
 import "../styles/general/general.css";
 import "../styles/general/genre-selection.css";
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import FormField from "../components/general/FormField";
-import { UserValidationContext } from "../context/UserValidationProvider ";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
 import toast from "react-hot-toast";
+
 const LoginPage = () => {
+  const navigate = useNavigate();
+  
+  const { login, isLoggingIn } = useAuthStore();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  // const { login } = useContext(UserValidationContext);
-  const navigate = useNavigate();
-  const { login, isLoggingIn } = useAuthStore();
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Fake authentication logic
-    // if (email === "u1@gmail.com" && password === "u1") {
-    //   login(); // update context
-    //   localStorage.setItem("profileImg", "/profile/my_avatar.png"); // optional
-    //   navigate("/");
-    // } else {
-    //   alert("Invalid credentials");
-    // }
     try {
-      const user = await login({ email, password });
-      console.log("Login success, navigating to home...");
+      await login({ email, password });
 
       toast.success(`Welcome back, ${user.name}!`);
       navigate("/"); // Redirect to home page after successful login
     } catch (err) {
-      // toast.error(err.message || "Login failed");
       console.warn("Login failed", err.message);
     }
   };
