@@ -1,93 +1,33 @@
+import "../../styles/directory/MovieCardList.css";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { IoTime } from "react-icons/io5";
+import { FaPlay } from "react-icons/fa6";
 import LikeIcon from "./LikeIcon";
 import AddToWatchlistIcon from "./AddToWatchlistIcon";
 import ReviewStars from "./ReviewStars";
-import { IoTime } from "react-icons/io5";
-import { FaPlay } from "react-icons/fa6";
-import "../../styles/directory/MovieCardList.css";
 import usePreviousScrollStore from "../../store/usePreviousScrollStore";
-import useMovieStore from "../../store/useMovieStore";
 
 const MovieCardList = ({
   movie,
-  liked: initialLiked = false,
-  likeCount: initialLikeCount = 0,
-  watchlisted: initialWatchlisted = false,
   genres = [],
   showRatingNumber = false,
   showBottomInteractiveIcon = false,
   showCastInfo = false,
 }) => {
-  const {
-    likeMovie,
-    unlikeMovie,
-    addToWatchlist,
-    removeFromWatchlist,
-    fetchWatchlist,
-    fetchMovieLikes,
-  } = useMovieStore();
-
   const navigate = useNavigate();
   const { setPreviousScrollPosition } = usePreviousScrollStore();
 
-  const [loadingLike, setLoadingLike] = useState(false);
-  const [loadingWatchlist, setLoadingWatchlist] = useState(false);
+  const liked = movie.liked || false;
+  const likeCount = movie.likeCount || 0;
+  const isInWatchlist = movie.watchlisted || false;
 
-  const [liked, setLiked] = useState(movie.liked || false);
-  const [likeCount, setLikeCount] = useState(movie.likeCount || 0);
-  const [isInWatchlist, setIsInWatchlist] = useState(movie.watchlisted || false);
-
-  const averageRating =
-    movie.rating && movie.rating > 0 ? Number(movie.rating.toFixed(1)) : 0;
+  const averageRating = movie.rating && movie.rating > 0 ? movie.rating : 0;
 
   const handleCardClick = () => {
     setPreviousScrollPosition(window.scrollY);
     navigate(`/movie/${movie._id}`, {
       state: { movie: { ...movie, liked, likeCount, watchlisted: isInWatchlist } },
     });
-  };
-
-  const handleLikeClick = async (e) => {
-    e.stopPropagation();
-    if (loadingLike) return;
-
-    setLoadingLike(true);
-    try {
-      if (liked) {
-        await unlikeMovie(movie._id);
-        setLikeCount(prev => prev - 1);
-      } else {
-        await likeMovie(movie._id);
-        setLikeCount(prev => prev + 1);
-      }
-      setLiked(!liked);
-      await fetchMovieLikes(movie._id);
-    } catch (error) {
-      console.error("Error updating like:", error);
-    } finally {
-      setLoadingLike(false);
-    }
-  };
-
-  const handleAddToWatchlistClick = async (e) => {
-    e.stopPropagation();
-    if (loadingWatchlist) return;
-
-    setLoadingWatchlist(true);
-    try {
-      if (isInWatchlist) {
-        await removeFromWatchlist(movie._id);
-      } else {
-        await addToWatchlist(movie._id);
-      }
-      setIsInWatchlist(!isInWatchlist);
-      await fetchWatchlist();
-    } catch (error) {
-      console.error("Error updating watchlist:", error);
-    } finally {
-      setLoadingWatchlist(false);
-    }
   };
 
   const handlePlayTrailerClick = (e) => {
@@ -125,8 +65,8 @@ const MovieCardList = ({
           </div>
           {!showBottomInteractiveIcon && (
             <div className="iteractive-icon-container" onClick={(e) => e.stopPropagation()}>
-                <LikeIcon movie={movie} disabled={loadingLike} />
-                <AddToWatchlistIcon movie={movie} disabled={loadingWatchlist} />
+                <LikeIcon movie={movie} />
+                <AddToWatchlistIcon movie={movie} />
             </div>
           )}
         </div>
@@ -163,8 +103,8 @@ const MovieCardList = ({
               <FaPlay className="play-icon" />
               Watch Trailer
             </button>
-              <LikeIcon movie={movie} showCount={true} disabled={loadingLike} />
-              <AddToWatchlistIcon movie={movie} disabled={loadingWatchlist} />
+              <LikeIcon movie={movie} showCount={true} />
+              <AddToWatchlistIcon movie={movie} />
           </div>
         )}
       </div>
