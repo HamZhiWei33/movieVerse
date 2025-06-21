@@ -1,12 +1,9 @@
-import { useState } from "react";
 import "../styles/sidebar.css";
-
+import { useState } from "react";
 import { FaAngleDown } from "react-icons/fa";
 import { FaAngleUp } from "react-icons/fa6";
 
-const Sidebar = ({
-  sections,
-}) => {
+const Sidebar = ({ sections }) => {
   const [openSections, setOpenSections] = useState([]);
 
   const toggleSection = (id) => {
@@ -15,7 +12,7 @@ const Sidebar = ({
     );
   };
 
-  const toggleFilter = (value, selected, setSelected) => {
+  const toggleFilter = (value, setSelected) => {
     setSelected((prev) =>
       prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
     );
@@ -28,7 +25,7 @@ const Sidebar = ({
           <input
             type="checkbox"
             checked={selected.includes(value)}
-            onChange={() => toggleFilter(value, selected, setSelected)}
+            onChange={() => toggleFilter(value, setSelected)}
           />
           <span>{label}</span>
         </label>
