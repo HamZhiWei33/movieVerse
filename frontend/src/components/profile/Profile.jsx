@@ -1,18 +1,15 @@
-import React, { useState, useEffect, useContext } from "react";
 import "../../styles/profile/profile.css";
+import React, { useState, useEffect, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import { RiEditLine } from "react-icons/ri";
 import { FaCamera, FaCheck, FaTimes } from "react-icons/fa";
 import { UserValidationContext } from "../../context/UserValidationProvider ";
-import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../store/useAuthStore";
-import InsertButton from "./InsertButton";
-import InsertReviewButton from "./InsertReviewButton";
-import LikeMovieButton from "./LikeMovieButton";
 const Profile = () => {
-  const { logout } = useContext(UserValidationContext);
   const navigate = useNavigate();
-  const { authUser, updateProfile, isUpdatingProfile, deleteAccount } =
-    useAuthStore();
+  const { logout } = useContext(UserValidationContext);
+  const { authUser, updateProfile, deleteAccount } = useAuthStore();
+
   // Local states synced with authUser
   const [name, setName] = useState("");
   const [tempName, setTempName] = useState("");
@@ -25,7 +22,6 @@ const Profile = () => {
   const [selectedImg, setSelectedImg] = useState(null);
 
   useEffect(() => {
-    console.log("Profile page authUser:", authUser);
     if (authUser) {
       setName(authUser.name || "");
       setTempName(authUser.name || "");
@@ -72,19 +68,8 @@ const Profile = () => {
   };
 
   const handlePasswordChange = () => {
-    // logout();
     navigate("/change_password");
   };
-
-  // const handleAccountDelete = () => {
-  //   const confirmation = window.confirm(
-  //     "Are you sure you want to delete your account? This action cannot be undone."
-  //   );
-  //   if (confirmation) {
-  //     logout();
-  //     navigate("/");
-  //   }
-  // };
 
   const handleDeleteAccount = async () => {
     const confirmation = window.confirm(
@@ -244,6 +229,15 @@ const Profile = () => {
             {/* Manage */}
             <div className="profile-row">
               <ul className="manage-container">
+              <li className="manage-item">
+                  <button
+                    type="button"
+                    className="btn-change-password"
+                    onClick={()=>{navigate("/genre_selection")}}
+                  >
+                    Favourite Genres
+                  </button>
+                </li>
                 <li className="manage-item">
                   <button
                     type="button"
@@ -265,15 +259,6 @@ const Profile = () => {
                     </span>
                   </button>
                 </li>
-                {/* <li>
-                  <InsertButton />
-                </li>
-                <li>
-                  <InsertReviewButton />
-                </li>
-                <li>
-                  <LikeMovieButton />
-                </li> */}
               </ul>
             </div>
           </div>
