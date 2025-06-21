@@ -1,11 +1,8 @@
 import React from "react";
-import ReviewChart from "./ReviewChart";
-import ReviewGenreChart from "./ReviewGenreChart";
 import LikesChart from "./LikesChart";
 import RateChart from "./RateChart";
 import WatchlistChart from "./WatchlistChart";
 import { useAuthStore } from "../../store/useAuthStore";
-// import "../../styles/profile/tab.css";
 
 const TabOverview = () => {
   const { authUser } = useAuthStore();
