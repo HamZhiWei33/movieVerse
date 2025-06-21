@@ -3,8 +3,7 @@ import { protectRoute } from "../middleware/auth.middleware.js";
 import {
   likeMovie,
   unlikeMovie,
-  getLikesForMovie,
-  // getLikesInfoForMovie
+  getLikesForMovie
 } from "../controllers/like.controller.js";
 
 const router = express.Router();
