@@ -15,6 +15,9 @@ section.review-section {
   flex: 1;
 }
 .review-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
   padding: 1rem;
   border-radius: 20px;
 
@@ -28,6 +31,9 @@ section.review-section {
   font-size: 1.5rem;
   font-weight: 600;
   color: #ffffff;
+}
+.review-rate {
+  padding-left: 0.8rem;
 }
 .review-content {
   padding-left: 1rem;
