@@ -1,40 +1,44 @@
-import HeroBanner from "../components/home/HeroBanner";
-// import MovieSectionHomePage from "../components/home/MovieSectionHomePage";
 import "../styles/home.css";
 import "swiper/css";
 import "swiper/css/navigation";
+
+import { useEffect, useMemo } from "react";
+
+import HeroBanner from "../components/home/HeroBanner";
 import HeroSection from "../components/home/HeroSection";
-import { getMovieObject } from "../components/home/watchlist.js";
-import { recentMovies } from "../components/home/newReleased.js";
-import HomeRanking from "../components/home/HomeRanking.jsx";
-import { UserValidationContext } from "../context/UserValidationProvider .jsx";
-import { useContext, useEffect, useMemo } from "react";
-import RecommendationSection from "../components/home/RecommendationSection.jsx";
-import useScrollToHash from "../store/useScrollToHash.js";
-import useGuestUser from "../store/useGuestUser.js";
-import { useAuthStore } from "../store/useAuthStore.js";
-import useWatchlistStore from "../store/useWatchlistStore.js";
+import HomeRanking from "../components/home/HomeRanking";
+
+import useGuestUser from "../store/useGuestUser";
+import useScrollToHash from "../store/useScrollToHash";
+import { useAuthStore } from "../store/useAuthStore";
 import useGenreStore from "../store/useGenreStore";
 import useMovieStore from "../store/useMovieStore";
 import useRankingStore from "../store/useRankingStore";
-import { useLocation } from "react-router-dom";
+
 const HomePage = () => {
-  // const userId = "U1";
-  // const { isValidateUser } = useContext(UserValidationContext);
-  // const watchlist = getMovieObject(userId);
-  const location = useLocation();
   const { authUser } = useAuthStore();
+  const { genreMap, fetchGenres } = useGenreStore();
   const { rankingMovies, fetchRankingData } = useRankingStore();
   const {
-    movies: storeMovies,
+    movies,
     recommendedMovies,
     getRecommendedMovies,
     watchlist,
     fetchWatchlist,
     randomRecommendedMovies,
   } = useMovieStore();
-  // const { watchlist, fetchWatchlist } = useWatchlistStore();
-  const { genreMap, fetchGenres } = useGenreStore();
+
+  // Scroll to specific section tab when link at footer is clicked
+  useScrollToHash(-20);
+
+  // Prevent clicking when user is not logged in
+  useGuestUser(authUser);
+
+  useEffect(() => {
+    if (Object.keys(genreMap).length <= 0) {
+      fetchGenres();
+    }
+  }, []);
 
   // Fetch watchlist movies
   useEffect(() => {
@@ -46,18 +50,7 @@ const HomePage = () => {
     } else if (rankingMovies.length === 0) {
       fetchRankingData();
     }
-    // fetchGenres();
-    // if(authUser && recommendedMovies.length < 50) {
-    //   getRecommendedMovies();
-    // }
   }, [authUser]);
-
-  useEffect(() => {
-    // if(authUser) {
-    //   fetchWatchlist();
-    // }
-    fetchGenres();
-  }, []);
 
   const genres = useMemo(() => {
     if (Object.keys(genreMap).length > 0) {
@@ -66,26 +59,17 @@ const HomePage = () => {
     return [];
   }, [genreMap]);
 
-  // useEffect(() => {
-  //   console.log(genres);
-  // }, [genres]);
-
-  useScrollToHash();
-  useEffect(() => {
-    if (location.hash) {
-      const id = location.hash.substring(1); // Remove '#' from hash
-      const element = document.getElementById(id);
-      if (element) {
-        setTimeout(() => {
-          element.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-          });
-        }, 500); // Delay ensures DOM is mounted
-      }
-    }
-  }, [location]);
-  useGuestUser(authUser);
+  const recentMovies = useMemo(() => {
+    const currentDate = new Date();
+    const sixMonthsAgo = new Date(currentDate);
+    sixMonthsAgo.setMonth(currentDate.getMonth() - 6);
+    return movies
+      .filter((movie) => {
+        const movieDate = new Date(movie.releaseDate);
+        return movieDate >= sixMonthsAgo && movieDate <= currentDate;
+      })
+      .sort((a, b) => new Date(b.releaseDate) - new Date(a.releaseDate));
+  }, [movies]);
 
   return (
     <div
@@ -97,20 +81,12 @@ const HomePage = () => {
 
       <div className="hero-section-container">
         {authUser && (
-          <HeroSection
-            title="Watchlist"
-            moviesType={"watchlist"}
-            items={watchlist}
-          />
+          <HeroSection title="Watchlist" moviesType={"watchlist"} items={watchlist} />
         )}
 
         <HeroSection title="Ranking" moviesType={"ranking"} items={genres} />
 
-        <HeroSection
-          title="New Released"
-          moviesType={"newReleased"}
-          items={recentMovies}
-        />
+        <HeroSection title="New Released" moviesType={"newReleased"} items={recentMovies} />
 
         <HeroSection
           title="Recommendation"
@@ -121,12 +97,6 @@ const HomePage = () => {
               : rankingMovies
           }
         />
-
-        {/* <RecommendationSection
-              title="Recommendation"
-              moviesType={"recommendation"}
-              items={movies}
-            /> */}
       </div>
     </div>
   );
