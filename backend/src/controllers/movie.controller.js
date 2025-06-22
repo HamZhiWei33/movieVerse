@@ -3,12 +3,10 @@ import Genre from "../models/genre.model.js";
 import Region from "../models/region.model.js";
 import Like from "../models/like.model.js";
 import Watchlist from "../models/watchlist.model.js";
-import Review from "../models/review.model.js";
 import User from "../models/user.model.js";
-
-
 import axios from "axios";
 import dotenv from "dotenv";
+
 dotenv.config();
 
 const TMDB_API_KEY = process.env.TMDB_API_KEY;
@@ -187,8 +185,6 @@ export const getAllMovies = async (req, res) => {
 // @route   GET /api/movies/:id
 // @access  Public
 export const getMovieById = async (req, res) => {
-  // console.log("Backend Debug 2");
-  // console.log(req);
   try {
     const movie = await Movie.findById(req.params.id)
       .select('title posterUrl rating year genre description region duration trailerUrl director actors')
@@ -543,12 +539,6 @@ async function processTMDBMovie(tmdbMovie) {
     return null;
   }
 }
-
-// - getTopRatedMovies(req, res)
-
-// tzw
-// - getNewReleases(req, res)
-
 
 // Recommendation
 export const getRecommendedMovies = async (req, res) => {
