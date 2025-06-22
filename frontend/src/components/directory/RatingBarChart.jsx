@@ -1,18 +1,14 @@
+import '../../styles/directory/RatingBarChart.css';
+import { useMemo, useEffect, useState } from "react";
 import Rating from '@mui/material/Rating';
 import StarIcon from '@mui/icons-material/Star';
-import '../../styles/directory/RatingBarChart.css';
 import useRatingStore from '../../store/useRatingStore';
 import useMovieStore from '../../store/useMovieStore';
-import { useMemo, useEffect, useState } from "react";
 
 // For MovieDetailPage, we mainly rely on data from stores.
 // For TopMovieSection, we pass initialMovieData/initialReviews to avoid extra fetches.
 const RatingBarChart = ({ movieId, initialMovieData, initialReviews }) => {
-    const {
-        reviewsByMovie,
-        fetchReviewsByMovie,
-    } = useRatingStore();
-
+    const { reviewsByMovie, fetchReviewsByMovie } = useRatingStore();
     const { fetchMovieById } = useMovieStore();
 
     // Use a single state for movie data, and another for reviews data,
@@ -40,7 +36,6 @@ const RatingBarChart = ({ movieId, initialMovieData, initialReviews }) => {
                 fetchedReviews = reviewsByMovie[movieId];
             }
 
-
             setLocalMovieData(fetchedMovie);
             setLocalReviews(fetchedReviews);
         };
@@ -56,9 +51,7 @@ const RatingBarChart = ({ movieId, initialMovieData, initialReviews }) => {
 
     const formattedAverage = totalRatings === 0
         ? '0'
-        : isNaN(Number(average))
-            ? '0'
-            : Number(average).toFixed(1);
+        : Number(average).toFixed(1);
 
     const breakdown = useMemo(() => {
         const breakdown = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
