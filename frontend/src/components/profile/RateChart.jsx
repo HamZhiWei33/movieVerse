@@ -19,7 +19,7 @@ const RateChart = ({ userId }) => {
 
     const fetchData = async () => {
       setLoading(true);
-      const genres = await fetchReviewGenres(userId);
+      const genres = await fetchReviewGenres();
       setGenreStats(genres);
       setLoading(false);
     };
