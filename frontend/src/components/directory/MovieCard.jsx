@@ -5,8 +5,8 @@ import AddToWatchlistIcon from "./AddToWatchlistIcon";
 import usePreviousScrollStore from "../../store/usePreviousScrollStore";
 
 const MovieCard = ({ movie, children }) => {
-  const { setPreviousScrollPosition } = usePreviousScrollStore();
   const navigate = useNavigate();
+  const { setPreviousScrollPosition } = usePreviousScrollStore();
 
   const handleCardClick = () => {
     setPreviousScrollPosition(window.scrollY);

@@ -16,18 +16,12 @@ const MovieCardList = ({
 }) => {
   const navigate = useNavigate();
   const { setPreviousScrollPosition } = usePreviousScrollStore();
-
-  const liked = movie.liked || false;
-  const likeCount = movie.likeCount || 0;
-  const isInWatchlist = movie.watchlisted || false;
-
-  const averageRating = movie.rating && movie.rating > 0 ? movie.rating : 0;
+  
+  const averageRating = Math.max(movie?.rating ?? 0, 0);
 
   const handleCardClick = () => {
     setPreviousScrollPosition(window.scrollY);
-    navigate(`/movie/${movie._id}`, {
-      state: { movie: { ...movie, liked, likeCount, watchlisted: isInWatchlist } },
-    });
+    navigate(`/movie/${movie._id}`);
   };
 
   const handlePlayTrailerClick = (e) => {
@@ -65,8 +59,8 @@ const MovieCardList = ({
           </div>
           {!showBottomInteractiveIcon && (
             <div className="iteractive-icon-container" onClick={(e) => e.stopPropagation()}>
-                <LikeIcon movie={movie} />
-                <AddToWatchlistIcon movie={movie} />
+              <LikeIcon movie={movie} />
+              <AddToWatchlistIcon movie={movie} />
             </div>
           )}
         </div>
@@ -103,8 +97,8 @@ const MovieCardList = ({
               <FaPlay className="play-icon" />
               Watch Trailer
             </button>
-              <LikeIcon movie={movie} showCount={true} />
-              <AddToWatchlistIcon movie={movie} />
+            <LikeIcon movie={movie} showCount={true} />
+            <AddToWatchlistIcon movie={movie} />
           </div>
         )}
       </div>
