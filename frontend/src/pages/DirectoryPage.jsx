@@ -1,31 +1,29 @@
-import MovieCard from "../components/directory/MovieCard";
-import MovieCardList from "../components/directory/MovieCardList";
-import { useEffect, useState, useMemo } from "react";
-import {
-  useNavigationType,
-  useSearchParams,
-  useLocation,
-} from "react-router-dom";
 import "../styles/directory.css";
-import ViewDropdown from "../components/directory/ViewDropdown";
-import { FaListUl } from "react-icons/fa";
 import "../styles/sidebar.css";
-import Sidebar from "../components/Sidebar";
-import usePreviousScrollStore from "../store/usePreviousScrollStore";
-import useMovieStore from "../store/useMovieStore";
+
+import { useEffect, useState, useMemo } from "react";
+import { useNavigationType, useSearchParams } from "react-router-dom";
+
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa6";
+import { FaListUl } from "react-icons/fa";
+
+import Sidebar from "../components/Sidebar";
+import MovieCard from "../components/directory/MovieCard";
+import MovieCardList from "../components/directory/MovieCardList";
+import ViewDropdown from "../components/directory/ViewDropdown";
+
+import usePreviousScrollStore from "../store/usePreviousScrollStore";
+import useMovieStore from "../store/useMovieStore";
+
 
 const DirectoryPage = () => {
   const {
     fetchMovies,
     fetchFilterOptions,
-    isLiked,
-    toggleLike,
     loadMoreMovies,
     hasMore,
     isFetchingMore,
-    getState,
   } = useMovieStore();
 
   const movies = useMovieStore((state) => state.movies);
@@ -33,24 +31,16 @@ const DirectoryPage = () => {
   const [regions, setRegions] = useState([]);
   const [decades, setDecades] = useState([]);
   const [selectedDecades, setSelectedDecades] = useState([]);
-  const [years, setYears] = useState([]);
-  const [selectedYears, setSelectedYears] = useState([]);
-  const [reviews, setReviews] = useState([]);
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [selectedRegions, setSelectedRegions] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const initialView = searchParams.get("view") || "grid";
   const [view, setView] = useState(initialView);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [isSearchResult, setIsSearchResult] = useState(false);
-  const [searchedMovies, setSearchedMovies] = useState([]);
   const [collapsed, setCollapsed] = useState([true, true, true]);
 
-  const location = useLocation();
-
-  const { previousScrollPosition, clearScrollPosition } =
-    usePreviousScrollStore();
+  const { previousScrollPosition, clearScrollPosition } = usePreviousScrollStore();
   const navigationType = useNavigationType();
 
   const [loadMoreRef, setLoadMoreRef] = useState(null);
@@ -72,29 +62,19 @@ const DirectoryPage = () => {
   useEffect(() => {
     searchParams.set("view", view);
     setSearchParams(searchParams);
-    console.log("view: " + view);
-    console.log(isSearchResult);
   }, [view]);
 
-  // Debug
   useEffect(() => {
     if (searchParams.get("view") === null) {
       searchParams.set("view", view);
       setSearchParams(searchParams);
     }
     setIsSearchResult(searchParams.get("query") !== null);
-    // const { filteredSearchMovies = [], searchQuery = '' } = location.state || {};
-    // if (location.state !== null) {
-
-    //   console.log(filteredSearchMovies);
-    //   console.log(searchQuery);
-    // }
   }, [searchParams]);
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      setError(null);
 
       try {
         // First load filter options if needed
@@ -137,7 +117,6 @@ const DirectoryPage = () => {
         await fetchMovies(1, 20, filters); // Reduced initial load to 20 for better UX
       } catch (err) {
         console.error("Failed to fetch data:", err);
-        setError("Failed to load data. Please try again later.");
       } finally {
         setLoading(false);
       }
@@ -181,17 +160,6 @@ const DirectoryPage = () => {
     };
   }, [loadMoreRef, hasMore, isFetchingMore, loadMoreMovies]);
 
-  // Add debug effect
-  // useEffect(() => {
-  //   console.log('Movie state updated:', {
-  //     count: movies.length,
-  //     page: getState().currentPage,
-  //     hasMore,
-  //     loading,
-  //     isFetchingMore
-  //   });
-  // }, [movies, hasMore, loading, isFetchingMore, getState]);
-
   useEffect(() => {
     if (
       !loading &&
@@ -217,66 +185,11 @@ const DirectoryPage = () => {
     }, {});
   }, [genres]);
 
-  const regionMap = useMemo(() => {
-    return regions.reduce((map, region) => {
-      map[region.code] = region.name;
-      return map;
-    }, {});
-  }, [regions]);
-
-  const toggleFilter = (value, selected, setSelected) => {
+  const toggleFilter = (value, setSelected) => {
     setSelected((prev) =>
       prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
     );
   };
-
-  // In your filteredMovies useMemo:
-  // const filteredMovies = useMemo(() => {
-  //   // For search
-  //   if (location.state !== null) {
-  //     const { filteredSearchMovies = [], searchQuery = '' } = location.state || {};
-  //     setSearchedMovies(filteredSearchMovies);
-  //     return filteredSearchMovies;
-  //   }
-
-  //   if(isSearchResult) {
-  //     // console.error(filteredMovies);
-  //     return searchedMovies;
-  //   }
-  //   console.error("Outsie Triggered!");
-  //   // console.error(location.state);
-
-  //   if (!movies || movies.length === 0) return [];
-
-  //   return movies.filter((movie) => {
-  //     // First ensure the movie has a trailer
-  //     if (!movie.trailerUrl) return false;
-
-  //     // Then apply other filters
-  //     if (selectedGenres.length === 0 &&
-  //       selectedRegions.length === 0 &&
-  //       selectedDecades.length === 0) {
-  //       return true;
-  //     }
-
-  //     const genreMatch = selectedGenres.length === 0 ||
-  //       (movie.genre && movie.genre.some(id => {
-  //         const genreName = genreMap[id];
-  //         return genreName && selectedGenres.includes(genreName);
-  //       }));
-
-  //     const regionMatch = selectedRegions.length === 0 ||
-  //       (movie.region && selectedRegions.includes(movie.region));
-
-  //     const decadeMatch = selectedDecades.length === 0 ||
-  //       (movie.year != null && selectedDecades.some(selected => {
-  //         const targetYears = decadeToYears(selected);
-  //         return targetYears.includes(parseInt(movie.year, 10));
-  //       }));
-
-  //     return genreMatch && regionMatch && decadeMatch;
-  //   });
-  // }, [movies, selectedGenres, selectedRegions, selectedDecades, genreMap]);
 
   const filteredMovies = movies;
 
@@ -303,21 +216,15 @@ const DirectoryPage = () => {
     setIsSearchResult(false);
   };
 
-  useEffect(() => {
-    console.log(collapsed);
-  }, [collapsed]);
-
   const renderButtons = (items, selected, setSelected, index = 0, collapseRow = 3) => {
-
     const buttons = items.map((item, index) => {
       const label = item.label || item;
       const value = item.value || item;
       return (
         <div
           key={index}
-          className={`filter-button ${selected.includes(value) ? "active" : ""
-            }`}
-          onClick={() => toggleFilter(value, selected, setSelected)}
+          className={`filter-button ${selected.includes(value) ? "active" : ""}`}
+          onClick={() => toggleFilter(value, setSelected)}
           aria-pressed={selected.includes(value)}
         >
           {label}
@@ -334,28 +241,10 @@ const DirectoryPage = () => {
     }
     return (
       <div className="filter-group">
-        {/* {items.map((item, index) => {
-          const label = item.label || item;
-          const value = item.value || item;
-          return (
-            <button
-              key={index}
-              className={`filter-button ${selected.includes(value) ? "active" : ""
-                }`}
-              onClick={() => toggleFilter(value, selected, setSelected)}
-              aria-pressed={selected.includes(value)}
-            >
-              {label}
-            </button>
-          );
-        })} */}
-        {
-          buttons.slice(0, collapsed[index] ? collapseRow * 3 - 1 : buttons.length)
-        }
+        {buttons.slice(0, collapsed[index] ? collapseRow * 3 - 1 : buttons.length)}
         <div
           className={`filter-button`}
           onClick={toggleCollapse}
-        // aria-pressed={selected.includes(value)}
         >
           {collapsed[index] ? (
             <FaAngleDown />
@@ -500,9 +389,6 @@ const DirectoryPage = () => {
                       <MovieCard
                         key={`${movie._id}-${movie.tmdbId}`}
                         movie={movie}
-                        liked={isLiked(movie._id)}
-                        likeCount={movie.likeCount}
-                        onLike={() => toggleLike(movie._id)}
                       />
                     ))}
                   </div>
@@ -527,9 +413,6 @@ const DirectoryPage = () => {
                         key={`${movie._id}-${movie.tmdbId}`}
                         movie={movie}
                         genres={movie.genre?.map((id) => genreMap[id]) || []}
-                        liked={isLiked(movie._id)}
-                        likeCount={movie.likeCount}
-                        onLike={() => toggleLike(movie._id)}
                       />
                     ))}
                   </div>
