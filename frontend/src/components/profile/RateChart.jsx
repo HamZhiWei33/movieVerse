@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Doughnut } from "react-chartjs-2";
 import { Chart, ArcElement, Tooltip, Legend } from "chart.js";
-import ChartDataLabels from "chartjs-plugin-datalabels"; // ✅ Add this import
+import ChartDataLabels from "chartjs-plugin-datalabels";
 import useIsMobile from "../../store/useIsMobile";
 import { useAuthStore } from "../../store/useAuthStore.js";
 
-Chart.register(ArcElement, Tooltip, Legend, ChartDataLabels); // ✅ Register the plugin
+// Register the plugin
+Chart.register(ArcElement, Tooltip, Legend, ChartDataLabels);
 
 const RateChart = ({ userId }) => {
   const isMobile = useIsMobile();
@@ -39,43 +40,43 @@ const RateChart = ({ userId }) => {
 
   const chartData = isEmpty
     ? {
-        labels: ["No Data"],
-        datasets: [
-          {
-            label: "No Reviews Yet",
-            data: [1],
-            backgroundColor: ["#888"],
-            borderWidth: 1,
-          },
-        ],
-      }
+      labels: ["No Data"],
+      datasets: [
+        {
+          label: "No Reviews Yet",
+          data: [1],
+          backgroundColor: ["#888"],
+          borderWidth: 1,
+        },
+      ],
+    }
     : {
-        labels: genreStats.map((item) => {
-          const percentage = totalCount
-            ? Math.round((item.count / totalCount) * 100)
-            : 0;
-          return `${item.genre} (${percentage}%)`;
-        }),
-        datasets: [
-          {
-            label: "Reviewed Genres",
-            data: genreStats.map((item) => item.count),
-            backgroundColor: [
-              "rgba(0, 114, 114, 0.88)",
-              "rgba(0, 171, 171, 0.88)",
-              "rgba(206, 255, 255, 0.88)",
-              "rgba(109, 229, 201, 0.88)",
-              "rgba(65, 197, 166, 0.88)",
-              "rgba(65, 188, 197, 0.88)",
-              "rgba(53, 127, 170, 0.88)",
-              "rgba(5, 68, 146, 0.88)",
-              "rgba(14, 52, 99, 0.88)",
-              "rgba(5, 68, 146, 0.88)",
-            ],
-            borderWidth: 1,
-          },
-        ],
-      };
+      labels: genreStats.map((item) => {
+        const percentage = totalCount
+          ? Math.round((item.count / totalCount) * 100)
+          : 0;
+        return `${item.genre} (${percentage}%)`;
+      }),
+      datasets: [
+        {
+          label: "Reviewed Genres",
+          data: genreStats.map((item) => item.count),
+          backgroundColor: [
+            "rgba(0, 114, 114, 0.88)",
+            "rgba(0, 171, 171, 0.88)",
+            "rgba(206, 255, 255, 0.88)",
+            "rgba(109, 229, 201, 0.88)",
+            "rgba(65, 197, 166, 0.88)",
+            "rgba(65, 188, 197, 0.88)",
+            "rgba(53, 127, 170, 0.88)",
+            "rgba(5, 68, 146, 0.88)",
+            "rgba(14, 52, 99, 0.88)",
+            "rgba(5, 68, 146, 0.88)",
+          ],
+          borderWidth: 1,
+        },
+      ],
+    };
 
   const chartOptions = {
     plugins: {
@@ -108,22 +109,22 @@ const RateChart = ({ userId }) => {
           },
         },
       },
-      // ✅ Add datalabels plugin config
+      // Add datalabels plugin config
       datalabels: isEmpty
         ? false
         : {
-            color: "#fff",
-            formatter: (value) => {
-              const percentage = totalCount
-                ? ((value / totalCount) * 100).toFixed(1)
-                : 0;
-              return `${percentage}%`;
-            },
-            font: {
-              weight: "bold",
-              size: isMobile ? 8 : 14,
-            },
+          color: "#fff",
+          formatter: (value) => {
+            const percentage = totalCount
+              ? ((value / totalCount) * 100).toFixed(1)
+              : 0;
+            return `${percentage}%`;
           },
+          font: {
+            weight: "bold",
+            size: isMobile ? 8 : 14,
+          },
+        },
     },
     cutout: isMobile ? "40%" : "60%",
     responsive: true,
