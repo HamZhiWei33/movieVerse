@@ -1,9 +1,8 @@
 import "../../styles/home/ranking-card.css";
 import { useNavigate } from "react-router-dom";
 import { FaArrowRight } from "react-icons/fa";
-import { PostersGrid } from "../general/GenreCard";
-import RankingGrid from "./RankingGrid";
 import { BsFire } from "react-icons/bs";
+import RankingGrid from "./RankingGrid";
 
 const RankingCard = ({
   genre,
@@ -44,7 +43,7 @@ const RankingCard = ({
           </div>
         ) : previewMovie ? (
           <>
-            <RankingGrid topMovies={topMovies} isAllGenre />
+            <RankingGrid topMovies={topMovies} />
           </>
         ) : (
           <div className="skeleton-poster shimmer">
