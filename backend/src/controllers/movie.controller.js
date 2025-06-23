@@ -374,7 +374,6 @@ export const filterMovies = async (req, res) => {
 // @desc    Fetch movies from TMDB and store in DB
 // @route   GET /api/movies/tmdb
 // @access  Public
-// In your movie.controller.js
 export const fetchFromTMDB = async (req, res) => {
   try {
     const { page = 1, limit = 20 } = req.query;
@@ -473,7 +472,7 @@ async function processTMDBMovie(tmdbMovie) {
 
     const trailerUrl = `https://www.youtube.com/watch?v=${trailer.key}`;
 
-    // Now fetch other details in parallel
+    // Fetch other details in parallel
     const [detailResponse, releaseResponse, creditResponse] = await Promise.all([
       axios.get(`${TMDB_BASE_URL}/movie/${tmdbMovie.id}`, { params: { api_key: TMDB_API_KEY } }),
       axios.get(`${TMDB_BASE_URL}/movie/${tmdbMovie.id}/release_dates`, { params: { api_key: TMDB_API_KEY } }),
