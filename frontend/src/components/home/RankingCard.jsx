@@ -51,19 +51,23 @@ const RankingCard = ({
           </div>
         )}
 
-        {/* Default movie title overlay (always visible) */}
-        <div className="movie-title-overlay">
-          {previewMovie && (
-            <p className="movie-title">
-              <BsFire /> {previewMovie.title}
-            </p>
-          )}
+        <div className="home-ranking-title-container">
+          {/* Default movie title overlay (always visible) */}
+          <div className="movie-title-overlay">
+            {previewMovie && (
+              <p className="movie-title">
+                <BsFire /> {previewMovie.title}
+              </p>
+            )}
+          </div>
+
+          {/* Genre name overlay (visible on hover) */}
+          <div className="genre-name-overlay">
+            <h3>{isAllGenre ? "All Genres" : genre.name}</h3>
+          </div>
         </div>
 
-        {/* Genre name overlay (visible on hover) */}
-        <div className="genre-name-overlay">
-          <h3>{isAllGenre ? "All Genres" : genre.name}</h3>
-        </div>
+
       </div>
       <div>
         <div className="hover-overlay">
