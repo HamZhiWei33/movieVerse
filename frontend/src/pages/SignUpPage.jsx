@@ -6,11 +6,9 @@ import { useAuthStore } from "../store/useAuthStore";
 import toast from "react-hot-toast";
 
 const SignupPage = () => {
-  // const [name, setName] = useState("");
-  // const [email, setEmail] = useState("");
-  // const [password, setPassword] = useState("");
-  // const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
+  const { signup, isSigningUp } = useAuthStore();
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -24,8 +22,6 @@ const SignupPage = () => {
     password: "",
     confirm_password: "",
   });
-
-  const { signup, isSigningUp, authUser, checkAuth } = useAuthStore();
 
   const validateForm = () => {
     // Name validation
@@ -106,56 +102,23 @@ const SignupPage = () => {
     }
   };
 
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-
-  //   // Fake authentication logic
-  //   if (
-  //     name === "u1" &&
-  //     email === "u1@gmail.com" &&
-  //     password === "u1" &&
-  //     password === confirmPassword
-  //   ) {
-  //     navigate("/genre_selection");
-  //   } else {
-  //     alert("Invalid credentials");
-  //   }
-  // };
-
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   const success = validateForm();
-  //   if (success === true) {
-  //     signup(formData);
-  //     navigate("/genre_selection");
-  //   }
-  // };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Starting signup..."); // Debug 1
-    console.log("Form Data:", formData);
 
     if (!validateForm()) {
-      console.log("Validation failed"); // Debug 2
       return;
     }
 
     try {
-      // console.log("Calling signup API..."); // Debug 3
-      const result = await signup({
+      await signup({
         name: formData.name,
         email: formData.email,
         password: formData.password,
-        // confirm_password: formData.confirm_password,
       });
-      console.log("Signup result:", result); // Debug 4
-      console.log("Signup AuthUser:", authUser);
 
-      console.log("Navigating to /genre_selection"); // Debug 5
       navigate("/login");
     } catch (error) {
-      console.error("SIGNUP ERROR:", error); // Debug 6
+      console.error("SIGNUP ERROR:", error);
     }
   };
 
@@ -197,7 +160,7 @@ const SignupPage = () => {
             error={errors.confirm_password}
           />
           <button className="submitButton" type="submit" disabled={isSigningUp}>
-            {isSigningUp ? <>Loading...</> : "Sign Up"}
+            {isSigningUp ? "Loading..." : "Sign Up"}
           </button>
         </form>
         <p>

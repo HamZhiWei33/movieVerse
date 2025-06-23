@@ -19,7 +19,7 @@ const WatchlistChart = ({ userId }) => {
 
     const fetchData = async () => {
       setLoading(true);
-      const genres = await fetchWatchlistGenres(userId);
+      const genres = await fetchWatchlistGenres();
       setGenreStats(genres);
       setLoading(false);
     };

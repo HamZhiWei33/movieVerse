@@ -1,13 +1,13 @@
-import { useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "../../styles/home/HeroBanner.css";
 import "../../styles/home.css";
-import { banners } from "./banner.js";
+import { useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination, Autoplay } from "swiper/modules";
+import { banners } from "./banner";
 
 export default function HeroBanner() {
   const prevRef = useRef(null);

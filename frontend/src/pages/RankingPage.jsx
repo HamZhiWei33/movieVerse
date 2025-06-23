@@ -1,11 +1,10 @@
+import "../styles/ranking.css";
 import { useEffect, useMemo } from "react";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import GenreRankingSection from "../components/ranking/GenreRankingSection";
 import GenreDonutChart from "../components/ranking/GenreDonutChart";
 import TopMovieSection from "../components/ranking/TopMovieSection";
 import useRankingStore from "../store/useRankingStore";
-import "../styles/ranking.css";
-import { FaSpinner } from "react-icons/fa";
-import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 const RankingPage = () => {
   const {
@@ -14,7 +13,6 @@ const RankingPage = () => {
     rankingGenres,
     selectedMovie,
     fetchRankingData,
-    fetchWatchlist,
     setSelectedMovie,
     rankingLoading,
     rankingError,
@@ -22,7 +20,6 @@ const RankingPage = () => {
 
   useEffect(() => {
     fetchRankingData();
-    fetchWatchlist();
   }, []);
 
   const ratingDistribution = useMemo(() => {
@@ -37,8 +34,9 @@ const RankingPage = () => {
   }, [selectedMovie, rankingReviews]);
 
   const chartData = useMemo(() => {
-    if (!Array.isArray(rankingMovies) || !Array.isArray(rankingGenres))
+    if (!Array.isArray(rankingMovies) || !Array.isArray(rankingGenres)) {
       return [];
+    }
 
     const genreCount = {};
     rankingMovies.forEach((movie) => {

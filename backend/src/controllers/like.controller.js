@@ -69,7 +69,6 @@ export const getLikesForMovie = async (req, res) => {
   // Validate ObjectId format
   if (!mongoose.Types.ObjectId.isValid(movieId)) {
     return res.status(200).json({ count: 0, likes: [] });
-    // return res.status(400).json({ error: "Invalid movie ID format." });
   }
 
   try {
@@ -78,25 +77,5 @@ export const getLikesForMovie = async (req, res) => {
   } catch (error) {
     console.error("Get likes error:", error);
     return res.status(500).json({ details: error.message });
-  }
-};
-
-export const hasUserLiked = async (req, res) => {
-  const userId = req.user?.id;
-  const { movieId } = req.params;
-
-  if (!userId) {
-    return res.status(401).json({ error: "Unauthorized: user not authenticated." });
-  }
-  if (!movieId) {
-    return res.status(400).json({ error: "Movie ID is required." });
-  }
-
-  try {
-    const like = await Like.findOne({ userId, movieId });
-    return res.status(200).json({ liked: !!like });
-  } catch (error) {
-    console.error("Check like error:", error);
-    return res.status(500).json({ error: "Failed to check like status." });
   }
 };

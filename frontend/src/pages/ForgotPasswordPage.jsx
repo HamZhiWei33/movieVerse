@@ -5,17 +5,17 @@ import FormField from "../components/general/FormField";
 import { useAuthStore } from "../store/useAuthStore";
 
 const ForgotPasswordPage = () => {
+  const navigate = useNavigate();
   const { requestResetCode, verifyResetCode, resetPassword } = useAuthStore();
+  
   const [email, setEmail] = useState("");
   const [code, setCode] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [step, setStep] = useState(1); // 1 = request code, 2 = verify code, 3 = reset password
-  const [message, setMessage] = useState({ text: '', type: '' });
   const [timeLeft, setTimeLeft] = useState(0);
   const [expiresAt, setExpiresAt] = useState(null);
-  const navigate = useNavigate();
-
+  
   useEffect(() => {
     if (!expiresAt || timeLeft <= 0) return;
 
@@ -39,12 +39,8 @@ const ForgotPasswordPage = () => {
       setExpiresAt(new Date(responseData.expiresAt));
       setTimeLeft(Math.floor((new Date(responseData.expiresAt) - new Date()) / 1000));
       setStep(2);
-      setMessage({ text: 'Reset code sent to your email', type: 'success' });
     } catch (error) {
-      setMessage({
-        text: error.response?.data?.message || 'Failed to send reset code',
-        type: 'error'
-      });
+      console.log(error.response?.data?.message || 'Failed to send reset code');
     }
   };
 
@@ -63,31 +59,15 @@ const ForgotPasswordPage = () => {
 
   const handlePasswordReset = async (e) => {
     e.preventDefault();
-    // if (newPassword !== confirmPassword) {
-    //   setMessage({ text: 'Passwords do not match', type: 'error' });
-    //   return;
-    // }
 
     try {
       const response = await resetPassword(email, code, newPassword, confirmPassword);
-      // await axios.post('/api/auth/reset-password', { email, code, newPassword, confirmPassword });
       
       if (response) {
-        console.log(response);
-        console.log("Success");
-        setMessage({ text: 'Password reset successfully', type: 'success' });
-        setTimeout(() => navigate('/login'), 2000);
-        return;
+        navigate('/login');
       }
 
-      console.error("Error");
-      console.log(response);
-
     } catch (error) {
-      setMessage({
-        text: error.response?.data?.message || 'Failed to reset password',
-        type: 'error'
-      });
       console.error(error.response?.data?.message || 'Failed to reset password');
       console.error(error);
     }
@@ -143,12 +123,6 @@ const ForgotPasswordPage = () => {
           </p>
         </div>
       )}
-      {/* <h1>Forgot Password</h1>
-
-      <form>
-        <input type="email" name="email" placeholder="Email" required />
-        <button type="submit">Send Reset Link</button>
-      </form> */}
     </main>
   );
 };

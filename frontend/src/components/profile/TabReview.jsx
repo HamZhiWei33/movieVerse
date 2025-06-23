@@ -1,10 +1,10 @@
-import React, { useEffect } from "react";
 import "../../styles/profile/tab-review.css";
-import useRatingStore from "../../store/useRatingStore"; // make sure the path is correct
+import React, { useEffect } from "react";
 import ReviewStars from "../directory/ReviewStars.jsx";
+import useRatingStore from "../../store/useRatingStore";
 
 const TabReview = () => {
-  const { userReviews, fetchUserReviews, isLoading, error } = useRatingStore();
+  const { userReviews, fetchUserReviews } = useRatingStore();
 
   useEffect(() => {
     fetchUserReviews();
@@ -13,7 +13,9 @@ const TabReview = () => {
   if (!Array.isArray(userReviews) || userReviews.length === 0) {
     return (
       <section className="review-section" aria-label="profile-review">
-        <p className="no-reviews">No reviews available</p>
+        <div style={{ "marginTop": "2rem" }} className="no-movies-message">
+          <span>No reviews available</span>
+        </div>
       </section>
     );
   }

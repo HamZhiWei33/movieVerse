@@ -1,30 +1,26 @@
-import React, { useEffect, useMemo, useState } from "react";
-import ReviewStars from "../directory/ReviewStars";
-import LikeIcon from "../directory/LikeIcon";
-import { IoTime } from "react-icons/io5";
-import AddToWatchlistIcon from "../directory/AddToWatchlistIcon";
-import RatingBarChart from "../directory/RatingBarChart"; // Correct path
 import axios from "axios";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import usePreviousScrollStore from "../../store/usePreviousScrollStore";
-import useRatingStore from "../../store/useRatingStore"; // Import useRatingStore
-import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import { IoTime } from "react-icons/io5";
+import LikeIcon from "../directory/LikeIcon";
+import AddToWatchlistIcon from "../directory/AddToWatchlistIcon";
+import ReviewStars from "../directory/ReviewStars";
+import RatingBarChart from "../directory/RatingBarChart";
 import TopMovieSectionSkeleton from "../skeletons/TopMovieSectionSkeleton";
+import usePreviousScrollStore from "../../store/usePreviousScrollStore";
+import useRatingStore from "../../store/useRatingStore";
 
 const TopMovieSection = ({ selectedMovie, setSelectedMovie }) => {
   const navigate = useNavigate();
+
+  // Get reviewsByMovie from useRatingStore
+  const { reviewsByMovie, fetchReviewsByMovie } = useRatingStore();
   const { setPreviousScrollPosition } = usePreviousScrollStore();
-  const [liked, setLiked] = useState(false); // Consider managing like status via useMovieStore
-  const [loadingLike, setLoadingLike] = useState(false); // Consider managing like status via useMovieStore
-  const [loadingWatchlist, setLoadingWatchlist] = useState(false); // Consider managing watchlist status via a store
-  const [addedToWatchlist, setAddedToWatchlist] = useState(false); // Consider managing watchlist status via a store
+
   const [genres, setGenres] = useState([]);
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // Get reviewsByMovie from useRatingStore
-  const { reviewsByMovie, fetchReviewsByMovie } = useRatingStore();
 
   // Fetch reviews for the selected movie when it changes
   useEffect(() => {
@@ -37,11 +33,6 @@ const TopMovieSection = ({ selectedMovie, setSelectedMovie }) => {
     selectedMovie.rating && selectedMovie.rating > 0
       ? Number(selectedMovie.rating.toFixed(1))
       : 0;
-
-  useEffect(() => {
-    setLiked(false);
-    setAddedToWatchlist(false);
-  }, [selectedMovie]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -100,22 +91,14 @@ const TopMovieSection = ({ selectedMovie, setSelectedMovie }) => {
     setPreviousScrollPosition(window.scrollY);
     navigate(`/movie/${movieId}`);
   };
-  if (loading)
-    return (
-      // <div className="loading">
-      //   <DotLottieReact
-      //     src="https://lottie.host/6185175f-ee83-45a4-9244-03871961a1e9/yLmGLfSgYI.lottie"
-      //     loop
-      //     autoplay
-      //     className="loading-icon"
-      //   />
-      // </div>
-      <TopMovieSectionSkeleton />
-    );
+
+  if (loading) return <TopMovieSectionSkeleton />;
 
   if (error) return <div className="error">{error}</div>;
+
   if (!selectedMovie || top3.length === 0)
     return <div className="no-movies">No movies available</div>;
+
   return (
     <div className="blurred-banner-wrapper">
       <div className="background-container">
@@ -194,11 +177,8 @@ const TopMovieSection = ({ selectedMovie, setSelectedMovie }) => {
               >
                 ▶ Watch Trailer
               </button>
-              <LikeIcon movie={selectedMovie} disabled={loadingLike} />
-              <AddToWatchlistIcon
-                movie={selectedMovie}
-                disabled={loadingWatchlist}
-              />
+              <LikeIcon movie={selectedMovie} />
+              <AddToWatchlistIcon movie={selectedMovie} />
             </div>
           </div>
           <div className="right-column">

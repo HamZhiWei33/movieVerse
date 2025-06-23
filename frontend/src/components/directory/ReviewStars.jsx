@@ -1,22 +1,23 @@
-import * as React from 'react';
+import "../../styles/directory/ReviewStars.css";
+import { useState, useEffect } from 'react';
 import Rating from '@mui/material/Rating';
 import StarIcon from '@mui/icons-material/Star';
 import Box from '@mui/material/Box';
-import "../../styles/directory/ReviewStars.css";
 
 const ReviewStars = ({
   rating = 0,
   readOnly = true,
   showNumber = false,
   size = 'medium',
-  alignRight = false,
   onChange
 }) => {
-  const [hover, setHover] = React.useState(-1);
-  const [value, setValue] = React.useState(Number(rating.toFixed(1)));
+  const [hover, setHover] = useState(-1);
+  const [value, setValue] = useState(Number(rating?.toFixed(1)));
 
   const handleChange = (event, newValue) => {
-    setValue(newValue);
+    if (newValue) {
+      setValue(newValue);
+    }
     if (onChange) {
       onChange(event, newValue);
     }
@@ -24,11 +25,11 @@ const ReviewStars = ({
 
   const formatRating = (num) => {
     if (num === 0) return "0";
-    return Number.isInteger(num) ? `${num}.0` : num.toString();
+    return Number.isInteger(num) ? `${num}.0` : num?.toString();
   };
 
-  React.useEffect(() => {
-    setValue(Number(rating.toFixed(1)));
+  useEffect(() => {
+      setValue(Number(rating?.toFixed(1)));
   }, [rating]);
 
   return (
@@ -48,9 +49,7 @@ const ReviewStars = ({
       />
       {showNumber && (
         <span className="rating-number">
-          {hover !== -1
-            ? formatRating(hover)
-            : formatRating(value)}
+          {formatRating(hover !== -1 ? hover : value)}
         </span>
       )}
     </Box>

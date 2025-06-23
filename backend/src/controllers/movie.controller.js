@@ -3,12 +3,10 @@ import Genre from "../models/genre.model.js";
 import Region from "../models/region.model.js";
 import Like from "../models/like.model.js";
 import Watchlist from "../models/watchlist.model.js";
-import Review from "../models/review.model.js";
 import User from "../models/user.model.js";
-
-
 import axios from "axios";
 import dotenv from "dotenv";
+
 dotenv.config();
 
 const TMDB_API_KEY = process.env.TMDB_API_KEY;
@@ -511,7 +509,7 @@ async function processTMDBMovie(tmdbMovie) {
       actors,
       posterUrl: tmdbMovie.poster_path
         ? `https://image.tmdb.org/t/p/w500${tmdbMovie.poster_path}`
-        : "/default-poster.jpg",
+        : "/profile/default-movie.png",
       trailerUrl,
       description: tmdbMovie.overview || "No description available",
       duration,
@@ -540,12 +538,6 @@ async function processTMDBMovie(tmdbMovie) {
     return null;
   }
 }
-
-// - getTopRatedMovies(req, res)
-
-// tzw
-// - getNewReleases(req, res)
-
 
 // Recommendation
 export const getRecommendedMovies = async (req, res) => {

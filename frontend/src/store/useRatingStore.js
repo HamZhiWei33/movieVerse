@@ -1,9 +1,9 @@
 // src/store/useRatingStore.js
 import { create } from "zustand";
 import { axiosInstance } from "../lib/axios.js";
+import { useAuthStore } from './useAuthStore.js';
 
 const useRatingStore = create((set, get) => ({
-  user: null,
   userReviews: [], // reviews made by current user
   reviewsByMovie: {}, // { [movieId]: Review[] }
   userReview: {}, // { [movieId]: Review }
@@ -11,7 +11,6 @@ const useRatingStore = create((set, get) => ({
   error: null,
   isLoading: false,
 
-  setUser: (userData) => set({ user: userData }),
 
   fetchUserReviews: async () => {
     set({ isLoading: true, error: null });
@@ -115,7 +114,7 @@ const useRatingStore = create((set, get) => ({
       
       set((state) => {
         const updatedList = state.reviewsByMovie[movieId]?.map((r) =>
-          r.userId === state.user?.id ? response.data.review : r
+          r.userId === useAuthStore.getState().authUser?.id ? response.data.review : r
         ) || [];
         
         return {
@@ -138,20 +137,6 @@ const useRatingStore = create((set, get) => ({
     }
   },
 
-  setMovieData: (movie) => {
-    if (!movie?._id) return;
-    set((state) => ({
-      moviesById: {
-        ...state.moviesById,
-        [movie._id]: movie,
-      },
-    }));
-  },
-
-  getAverageRatingByMovieId: (movieId) => {
-    const movie = get().moviesById?.[movieId];
-    return movie?.rating ?? 0;
-  },
 }));
 
 export default useRatingStore;

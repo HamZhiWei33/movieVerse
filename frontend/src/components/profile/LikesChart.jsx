@@ -17,7 +17,7 @@ const LikesChart = ({ userId }) => {
 
     const fetchData = async () => {
       setLoading(true);
-      const genres = await fetchLikedGenres(userId);
+      const genres = await fetchLikedGenres();
       setGenreStats(genres);
       setLoading(false);
     };

@@ -1,49 +1,19 @@
-import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
-import ReviewStars from "../directory/ReviewStars";
-import { IoTime } from "react-icons/io5";
-import { GoHeartFill } from "react-icons/go";
-import LikeIcon from "../directory/LikeIcon";
 import "../../styles/profile/watchlist.css";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { IoTime } from "react-icons/io5";
+import ReviewStars from "../directory/ReviewStars";
+import LikeIcon from "../directory/LikeIcon";
 import useMovieStore from "../../store/useMovieStore";
 
-const WatchList = ({ movie, showRatingNumber = false, onRemove }) => {
+const WatchList = ({ movie, onRemove }) => {
   const navigate = useNavigate();
-  const {
-    removeFromWatchlist,
-    fetchWatchlist,
-    likeMovie,
-    unlikeMovie,
-    fetchMovieLikes,
-    hasUserLikedMovie,
-  } = useMovieStore();
+  const { removeFromWatchlist } = useMovieStore();
 
   const [loadingRemove, setLoadingRemove] = useState(false);
-  const [liked, setLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(movie.likeCount || 0);
-  const [loadingLike, setLoadingLike] = useState(false);
-
-  // Initialize like status
-  useEffect(() => {
-    const checkLikeStatus = async () => {
-      try {
-        const isLiked = await hasUserLikedMovie(movie._id);
-        setLiked(isLiked);
-
-        const likesData = await fetchMovieLikes(movie._id);
-        setLikeCount(likesData.count || 0);
-      } catch (error) {
-        console.error("Error checking like status:", error);
-      }
-    };
-
-    checkLikeStatus();
-  }, [movie._id, hasUserLikedMovie, fetchMovieLikes]);
 
   const handleCardClick = () => {
-    navigate(`/movie/${movie._id}`, {
-      state: { movie: { ...movie, liked, likeCount } },
-    });
+    navigate(`/movie/${movie._id}`);
   };
 
   const handleRemoveClick = async (e) => {
@@ -69,32 +39,10 @@ const WatchList = ({ movie, showRatingNumber = false, onRemove }) => {
     }
   };
 
-  const handleLikeClick = async (e) => {
-    e.stopPropagation();
-    if (loadingLike) return;
-
-    setLoadingLike(true);
-    try {
-      if (liked) {
-        await unlikeMovie(movie._id);
-        setLikeCount((prev) => prev - 1);
-      } else {
-        await likeMovie(movie._id);
-        setLikeCount((prev) => prev + 1);
-      }
-      setLiked(!liked);
-    } catch (error) {
-      console.error("Error updating like:", error);
-    } finally {
-      setLoadingLike(false);
-    }
-  };
-
-  const rating =
-    movie.rating && movie.rating > 0 ? Number(movie.rating.toFixed(1)) : 0;
+  const rating = movie.rating && movie.rating > 0 ? Number(movie.rating.toFixed(1)) : 0;
 
   return (
-    <article id="watchlist" style={{ cursor: "pointer" }}>
+    <article id="watchlist" style={{ cursor: "pointer" }} onClick={handleCardClick}>
       <div className="movie-card-list">
         <div className="poster-container-list">
           <img
@@ -103,12 +51,11 @@ const WatchList = ({ movie, showRatingNumber = false, onRemove }) => {
             className="poster-img-list"
           />
         </div>
-        <div className="movie-details-container-list" onClick={handleCardClick}>
+        <div className="movie-details-container-list">
           <h3>{movie.title}</h3>
           <ReviewStars
             rating={rating}
             readOnly={true}
-            showNumber={showRatingNumber}
           />
           <div className="genre-tags">
             {movie.genre?.map((genre, index) => (
@@ -124,7 +71,7 @@ const WatchList = ({ movie, showRatingNumber = false, onRemove }) => {
               </span>
               {movie.duration === "0h 0min" ? "To Be Announced" : movie.duration}
             </div>
-                <LikeIcon movie={movie} disabled={loadingLike} />
+            <LikeIcon movie={movie} />
           </div>
         </div>
         <div className="remove-watchlist-container">

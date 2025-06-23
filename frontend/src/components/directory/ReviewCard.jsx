@@ -1,13 +1,15 @@
-import ReviewStars from "./ReviewStars";
 import "../../styles/directory/ReviewCard.css";
+import ReviewStars from "./ReviewStars";
 
-const ReviewCard = ({ name, date, rating, reviewText, profilePic }) => {
+const ReviewCard = ({ review }) => {
+  const name = review.userId?.name ?? "Anonymous";
+  const date = new Date(review.updatedAt || review.createdAt).toLocaleDateString("en-GB");
   return (
     <div className="review-card">
       <div className="review-header">
         <div className="review-user">
           <img
-            src={profilePic || "/profile/default_profile_pic.png"}  // Ensure this path is correct
+            src={review.userId?.profilePic || "/profile/default_profile_pic.png"}  // Ensure this path is correct
             alt={`${name}'s profile picture`}
             className="user-profile-pic"
             onError={(e) => {
@@ -19,9 +21,9 @@ const ReviewCard = ({ name, date, rating, reviewText, profilePic }) => {
             <div className="review-date">{date}</div>
           </div>
         </div>
-        <ReviewStars rating={rating} readOnly={true} showNumber={true} />
+        <ReviewStars rating={review.rating} readOnly={true} showNumber={true} />
       </div>
-      <div className="review-text">{reviewText}</div>
+      <div className="review-text">{review.review}</div>
     </div>
   );
 };
