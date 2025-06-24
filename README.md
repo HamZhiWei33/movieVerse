@@ -1,4 +1,5 @@
 # 🎬 movieVerse
+![App Preview](frontend/public/Logo.svg)
 
 **movieVerse** is a full-stack movie discovery web application that allows users to explore trending films, save favorites to a watchlist, and like movies. It features user authentication, external movie data integration using TMDB, and email support via Mailgun.
 
