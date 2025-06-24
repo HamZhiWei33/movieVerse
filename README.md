@@ -75,85 +75,48 @@ Backend runs at: [http://localhost:5000](http://localhost:5000)
 
 ---
 
-## 🔧 Core Features
+## Core Features
 
-### 🎞️ Movie Module
+### User Registration & Authentication
 
-* Fetches movie data using TMDB API
-* View detailed movie info (title, description, actors, genres)
-* Watch trailers via embedded YouTube links
+* Secure user sign-up and login with JWT.
+* User access control to personalized content.
+* Data stored securely in MongoDB.
 
-### ❤️ Likes
+### Likes
 
 * Like or unlike movies
 * Track and update like counts
 
-### 📌 Watchlist
+### Profile Management
 
-* Add favorite movies to a personal watchlist
-* Remove items from the watchlist
-* Access saved movies via the profile page
+* View and edit profile details including username, password, gender, and profile picture.
+* Visualized insights with donut charts: genre preference, ratings, watchlist stats.
 
-### 🔐 Authentication
+### Top Entertainment Charts
 
-* JWT-based user registration and login
-* Secure protected routes for personal features
+* Highlight top-ranked and trending movies.
+* Genre-based movie categorization.
 
-### 📬 Email Integration
+### Search & Personalized Recommendations
 
-* Mailgun support for notifications and alerts
+* Personalized movie recommendations based on user favourite genre selection or random picks if not logged in.
+* Key word search by title
+
+### Movie Module
+
+* View detailed movie info: title, synopsis, genres, trailer.
+* Like/unlike movies with real-time like count.
+* Add/remove movies from watchlist.
+
+### User Ratings & Reviews
+
+* Rate movies from 1 to 5 stars.
+* Write and read community reviews to support shared decision-making and engagement.
+
 
 ---
 
 ## 📦 Tech Stack
 
-### Frontend
-
-* React
-* Vite
-* Axios
-
-### Backend
-
-* Node.js
-* Express
-* CORS
-* Nodemon
-* Express Rate Limit
-* Mailgun.js
-* Form-data
-* JSON Web Token (JWT)
-* MongoDB (via Mongoose if implemented)
-
----
-
-## 🛠 Future Improvements
-
-* Add movie review and rating features
-* Implement OAuth login (Google, Facebook)
-* UI/UX polishing with animations and transitions
-* Deployment to Vercel (frontend) and Render/Heroku (backend)
-
----
-
-## 🧑‍💻 Author
-
-Developed by [Ham Zhi Wei (HamZhiWei33)](https://github.com/HamZhiWei33)
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
-```
-
----
-
-Let me know if you'd like to include:
-- Screenshots or GIFs
-- API endpoint documentation
-- Contribution or code of conduct sections
-
-I’d be happy to add those too!
-```
+MERN Stack
