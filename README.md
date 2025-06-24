@@ -5,7 +5,7 @@
 
 ## 🎥 Demo Video
 
-[![Watch the demo](https://i.vimeocdn.com/video/1095895751-2b7e6d7c0d95ae90020179b6c7010911aa537188ccff1cdb0d12e0df9d9c9445-d_640)](https://vimeo.com/1095895751)
+[![Watch the demo](https:\/\/i.vimeocdn.com\/video\/2029813845-1123c05ecc37d636281140af1211cd79895ae091f3ef1251056d82d4973b2739-d_295x166)](https://vimeo.com/1095895751)
 
 ---
 
