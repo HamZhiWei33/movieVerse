@@ -68,7 +68,7 @@ MAILGUN_DOMAIN=your_mailgun_domain
 #### Start the backend server
 
 ```bash
-nodemon src/index.js
+npm run dev
 ```
 
 Backend runs at: [http://localhost:5000](http://localhost:5000)
