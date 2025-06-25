@@ -54,15 +54,12 @@ export const useAuthStore = create((set, get) => ({
   },
 
   login: async (data) => {
-    console.error("Logging in");
     set({ isLoggingIn: true });
     try {
       const res = await axiosInstance.post("/auth/login", {
         email: data.email,
         password: data.password,
       });
-
-      console.log("Login response:", res.data);
 
       const { token } = res.data;
       localStorage.setItem("token", token);
@@ -256,7 +253,7 @@ export const useAuthStore = create((set, get) => ({
       return res;
     } catch (error) {
       toast.error(
-        error?.response?.data?.message || "Error sending verification code"
+        error?.response?.data?.message || "Error verifying verification code"
       );
       return null;
     }

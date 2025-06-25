@@ -1,5 +1,5 @@
-import React, { useState, memo, useEffect, useMemo } from "react";
 import "../../styles/general/genre-card.css";
+import React, { useState, memo, useEffect, useMemo } from "react";
 import useMovieStore from "../../store/useMovieStore";
 
 export const PostersGrid = memo(({ movies }) => {
@@ -43,7 +43,9 @@ const GenreCard = ({ genre, onCardClicked, favouriteGenres }) => {
     setSelected(favouriteGenres.includes(Number(genre.id)));
   }, [favouriteGenres]);
 
-  const movies = useMemo(() => storeMovies.filter((movie) => movie.genre.includes(Number(genre.id))), [storeMovies]);
+  const movies = useMemo(() => (
+    storeMovies.filter((movie) => movie.genre.includes(Number(genre.id)))
+  ), [storeMovies]);
 
   const handleCardClick = () => {
     onCardClicked(!selected, genre);
