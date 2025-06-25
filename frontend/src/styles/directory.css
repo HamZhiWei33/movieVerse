@@ -6,7 +6,7 @@ body {
 }
 
 .movie-container {
-  overflow: hidden !important; 
+  overflow: hidden !important;
 }
 
 .directory-page {
@@ -237,6 +237,7 @@ legend {
   grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
   gap: 1.5rem;
 }
+
 div.directory-loading-movie {
   display: flex;
   justify-content: center;
@@ -244,6 +245,7 @@ div.directory-loading-movie {
   width: 100%;
   padding: 3rem;
 }
+
 /* List View */
 .movie-container.list .movie-list {
   display: grid;
@@ -287,11 +289,7 @@ div.directory-loading-movie {
     grid-template-columns: repeat(1, 1fr);
   }
 
-  .movie-container.list
-    .movie-list
-    .movie-card-list
-    .movie-details-container-list
-    .duration-and-icons-container {
+  .movie-container.list .movie-list .movie-card-list .movie-details-container-list .duration-and-icons-container {
     flex-direction: row !important;
   }
 }
@@ -414,15 +412,22 @@ div.directory-loading-movie {
 }
 
 .load-more-trigger {
-  width: 100%;
-  height: 50px;
+  min-height: 100px;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px 0;
+  padding: 20px;
 }
 
 .load-more-trigger p {
   color: #666;
   font-style: italic;
+}
+
+.directory-loading-movie {
+  min-height: fit-content;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
 }
