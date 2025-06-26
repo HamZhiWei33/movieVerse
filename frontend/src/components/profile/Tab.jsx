@@ -1,20 +1,13 @@
+import "../../styles/profile/tab.css";
+import "../../styles/profile/tab-manage.css";
 import React, { useState, useEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import TabOverview from "./TabOverview";
 import TabWatchlist from "./TabWatchlist";
 import TabReview from "./TabReview";
-import TabManage from "./TabManage";
-import "../../styles/profile/tab.css";
-import { useLocation } from "react-router-dom";
-// import { ReviewList } from "./constant";
-// import { movies } from "../../constant.js";
-// import { reviews } from "../../constant.js";
 
-// const currentUserId = "U2";
-
-// const userReviews = reviews.filter((review) => review.userId === currentUserId);
-
-// const tabList = ["Overview", "WatchList", "Review", "Manage"];
 const tabList = ["Overview", "WatchList", "Review"];
+
 const Tab = () => {
   const location = useLocation();
   const initialTab =
@@ -100,12 +93,11 @@ const Tab = () => {
         return <TabWatchlist />;
       case "Review":
         return <TabReview />;
-      // case "Manage":
-      //   return <TabManage />;
       default:
         return null;
     }
   };
+  
   return (
     <section className="tab-section" aria-label="profile-tab">
       <ul

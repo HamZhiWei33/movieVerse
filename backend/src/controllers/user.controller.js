@@ -1,11 +1,3 @@
-// hzw
-// Manages user-related features
-// - getUserProfile(req, res)
-// - updateUserPreferences(req, res)
-// - getWatchlist(req, res)
-// - addToWatchlist(req, res)
-// - removeFromWatchlist(req, res)
-// controllers/userController.js
 import User from "../models/user.model.js";
 import Movie from "../models/movie.model.js";
 import Review from "../models/review.model.js";
@@ -16,12 +8,6 @@ import {
   getWatchlistGenresAggregation,
 } from "../lib/genreAnalytics.js";
 import bcrypt from "bcryptjs";
-
-const isStrongPassword = (password) =>
-  password.length >= 8 &&
-  /[A-Z]/.test(password) &&
-  /[a-z]/.test(password) &&
-  /[0-9]/.test(password);
 
 export const getCurrentUser = (req, res) => {
   try {
@@ -203,7 +189,7 @@ export const addReview = async (req, res) => {
       return res.status(404).json({ message: "Movie not found" });
     }
 
-    // Optional: Check if the user has already reviewed the movie
+    // Check if the user has already reviewed the movie
     const existingReview = await Review.findOne({ movieId, userId });
     if (existingReview) {
       return res
@@ -229,6 +215,7 @@ export const addReview = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
 export const getUserReviews = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -268,6 +255,7 @@ export const getUserLikedGenres = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
 export const getUserReviewGenres = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -280,6 +268,7 @@ export const getUserReviewGenres = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
 export const getUserWatchlistGenres = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -317,43 +306,6 @@ export const updateFavouriteGenres = async (req, res) => {
   }
 };
 
-// export const changeNewPassword = async (req, res) => {
-//   try {
-//     const { oldPassword, newPassword } = req.body;
-//     const userId = req.user._id;
-
-//     if (!oldPassword || !newPassword) {
-//       return res.status(400).json({ message: "All fields are required" });
-//     }
-
-//     if (newPassword.length < 8) {
-//       return res
-//         .status(400)
-//         .json({ message: "New password must be at least 8 characters long" });
-//     }
-
-//     const user = await User.findById(userId);
-//     if (!user) {
-//       return res.status(404).json({ message: "User not found" });
-//     }
-
-//     const isMatch = await bcrypt.compare(oldPassword, user.password);
-//     if (!isMatch) {
-//       return res.status(400).json({ message: "Old password is incorrect" });
-//     }
-
-//     const salt = await bcrypt.genSalt(10);
-//     const hashedNewPassword = await bcrypt.hash(newPassword, salt);
-//     user.password = hashedNewPassword;
-
-//     await user.save();
-
-//     res.status(200).json({ message: "Password updated successfully" });
-//   } catch (error) {
-//     console.error("Error in changeNewPassword controller:", error.message);
-//     res.status(500).json({ message: "Internal Server Error" });
-//   }
-// };
 export const changeNewPassword = async (req, res) => {
   try {
     const { oldPassword, newPassword } = req.body;

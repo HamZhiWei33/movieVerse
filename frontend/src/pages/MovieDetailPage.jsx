@@ -1,33 +1,25 @@
+import "../styles/movieDetail.css";
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import { IoAdd } from "react-icons/io5";
 import { IoIosArrowBack } from "react-icons/io";
 import { GrFormPreviousLink, GrFormNextLink } from "react-icons/gr";
 import MovieCardList from "../components/directory/MovieCardList";
+import RatingBarChart from '../components/directory/RatingBarChart';
 import ReviewCard from "../components/directory/ReviewCard";
 import UserReviewForm from "../components/directory/UserReviewForm";
-import RatingBarChart from '../components/directory/RatingBarChart';
-import "../styles/movieDetail.css";
 import useRatingStore from "../store/useRatingStore";
 import useMovieStore from "../store/useMovieStore";
 
 const MovieDetailPage = () => {
-    const {
-        fetchMovieById,
-        getCurrentUser,
-        isLiked,
-        toggleLike,
-        fetchFilterOptions
-    } = useMovieStore();
-    const { state } = useLocation();
-    const { movieId } = useParams();
+    const location = useLocation();
     const navigate = useNavigate();
+    const { fetchMovieById } = useMovieStore();
+    const { movieId } = useParams();
 
     const [movie, setMovie] = useState(null);
-    const [currentUser, setCurrentUser] = useState(null);
-    const [loading, setLoading] = useState(!state?.movie);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [genres, setGenres] = useState([]);
 
     const [currentPage, setCurrentPage] = useState(0);
     const reviewsPerPage = 4;
@@ -40,21 +32,11 @@ const MovieDetailPage = () => {
         fetchUserReview,
         fetchReviewsByMovie,
         addReview,
-        updateReview,
-        setUser,
-        setMovieData, // Keep this if setMovieData is used elsewhere for general movie state
+        updateReview
     } = useRatingStore();
 
     const movieReviews = reviewsByMovie[movieId] || [];
     const existingReview = userReview[movieId] || null;
-
-    // Create genre map from all available genres
-    const genreMap = useMemo(() => {
-        return genres.reduce((map, genre) => {
-            map[genre.id] = genre.name;
-            return map;
-        }, {});
-    }, [genres]);
 
     // Get genre names for the current movie
     const movieGenreNames = useMemo(() => {
@@ -63,29 +45,22 @@ const MovieDetailPage = () => {
     }, [movie]);
 
     useEffect(() => {
+        console.log("test");
         const loadData = async () => {
             try {
                 setLoading(true);
 
-                const filterOptions = await fetchFilterOptions();
-                setGenres(filterOptions.genres || []);
-
-                const userData = await getCurrentUser();
-                setCurrentUser(userData);
-                setUser(userData);
-
                 // Always fetch the movie details for the initial load
                 const movieData = await fetchMovieById(movieId);
                 setMovie(movieData);
-                setMovieData(movieData); // Ensure global movie data is set if needed by other components
 
                 await fetchReviewsByMovie(movieId);
                 await fetchUserReview(movieId);
                 setCurrentPage(0);
-                setLoading(false);
             } catch (err) {
                 console.error("Error loading movie detail page", err);
                 setError("Failed to load movie details.");
+            } finally {
                 setLoading(false);
             }
         };
@@ -95,7 +70,7 @@ const MovieDetailPage = () => {
         return () => {
             setCurrentPage(0);
         };
-    }, [movieId, fetchMovieById, fetchFilterOptions, getCurrentUser, setUser, fetchReviewsByMovie, fetchUserReview, setMovieData]);
+    }, [location]);
 
 
     const handleBack = () => {
@@ -119,7 +94,7 @@ const MovieDetailPage = () => {
 
             const updatedMovie = await fetchMovieById(movieId);
             setMovie(updatedMovie);
-            setMovieData(updatedMovie);
+            // setMovieData(updatedMovie);
 
             // Reset to first page to ensure newest review is visible
             setCurrentPage(0);
@@ -164,13 +139,9 @@ const MovieDetailPage = () => {
                     key={`movie-card-${movie?._id}-${movie?.rating}`}
                     movie={movie}
                     genres={movieGenreNames}
-                    liked={isLiked(movie._id)}
-                    likeCount={movie.likeCount}
-                    onLike={() => toggleLike(movie._id)}
                     showRatingNumber={true}
                     showBottomInteractiveIcon={true}
                     showCastInfo={true}
-                    allReviews={movieReviews}
                 />
 
                 <div className="rating-container">
@@ -192,11 +163,7 @@ const MovieDetailPage = () => {
                                     <ReviewCard
                                         key={review._id}
                                         id={`review-${review._id}`}
-                                        name={review.userId?.name ?? "Anonymous"}
-                                        date={new Date(review.updatedAt || review.createdAt).toLocaleDateString("en-GB")}
-                                        rating={review.rating}
-                                        reviewText={review.review}
-                                        profilePic={review.userId?.profilePic}
+                                        review={review}
                                     />
                                 );
                             })

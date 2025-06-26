@@ -3,12 +3,10 @@ import Genre from "../models/genre.model.js";
 import Region from "../models/region.model.js";
 import Like from "../models/like.model.js";
 import Watchlist from "../models/watchlist.model.js";
-import Review from "../models/review.model.js";
 import User from "../models/user.model.js";
-
-
 import axios from "axios";
 import dotenv from "dotenv";
+
 dotenv.config();
 
 const TMDB_API_KEY = process.env.TMDB_API_KEY;
@@ -187,8 +185,6 @@ export const getAllMovies = async (req, res) => {
 // @route   GET /api/movies/:id
 // @access  Public
 export const getMovieById = async (req, res) => {
-  // console.log("Backend Debug 2");
-  // console.log(req);
   try {
     const movie = await Movie.findById(req.params.id)
       .select('title posterUrl rating year genre description region duration trailerUrl director actors')
@@ -378,7 +374,6 @@ export const filterMovies = async (req, res) => {
 // @desc    Fetch movies from TMDB and store in DB
 // @route   GET /api/movies/tmdb
 // @access  Public
-// In your movie.controller.js
 export const fetchFromTMDB = async (req, res) => {
   try {
     const { page = 1, limit = 20 } = req.query;
@@ -477,7 +472,7 @@ async function processTMDBMovie(tmdbMovie) {
 
     const trailerUrl = `https://www.youtube.com/watch?v=${trailer.key}`;
 
-    // Now fetch other details in parallel
+    // Fetch other details in parallel
     const [detailResponse, releaseResponse, creditResponse] = await Promise.all([
       axios.get(`${TMDB_BASE_URL}/movie/${tmdbMovie.id}`, { params: { api_key: TMDB_API_KEY } }),
       axios.get(`${TMDB_BASE_URL}/movie/${tmdbMovie.id}/release_dates`, { params: { api_key: TMDB_API_KEY } }),
@@ -514,7 +509,7 @@ async function processTMDBMovie(tmdbMovie) {
       actors,
       posterUrl: tmdbMovie.poster_path
         ? `https://image.tmdb.org/t/p/w500${tmdbMovie.poster_path}`
-        : "/default-poster.jpg",
+        : "/profile/default-movie.png",
       trailerUrl,
       description: tmdbMovie.overview || "No description available",
       duration,
@@ -544,12 +539,6 @@ async function processTMDBMovie(tmdbMovie) {
   }
 }
 
-// - getTopRatedMovies(req, res)
-
-// tzw
-// - getNewReleases(req, res)
-
-
 // Recommendation
 export const getRecommendedMovies = async (req, res) => {
   try {
@@ -568,7 +557,7 @@ export const getRecommendedMovies = async (req, res) => {
     // Main recommendation: high-rated movies in those genres
     const recommendations = await Movie.find({
       genre: { $in: combinedGenres },
-      rating: { $gte: 3.0 },
+      rating: { $gte: 2.0 },
     })
       .sort({ rating: -1, reviewCount: -1, year: -1 })
       .limit(50);

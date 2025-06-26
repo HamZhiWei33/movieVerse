@@ -160,13 +160,13 @@ const GenreRankingSection = ({
       <h2 className="genre-ranking-section-header">Order by Genre</h2>
 
       <nav className="genre-nav">
-        {genreOptions.map((g) => (
+        {genreOptions.map((genre) => (
           <button
-            key={g}
-            className={`genre-tab ${selectedGenre === g ? "active" : ""}`}
-            onClick={() => setSelectedGenre(g)}
+            key={genre}
+            className={`genre-tab ${selectedGenre === genre ? "active" : ""}`}
+            onClick={() => setSelectedGenre(genre)}
           >
-            {g}
+            {genre}
           </button>
         ))}
       </nav>
@@ -179,33 +179,17 @@ const GenreRankingSection = ({
             {top1 && windowWidth >= 1200 && (
               <Top1Card
                 movie={top1}
-                rank={1}
-                image={top1.posterUrl}
-                title={top1.title}
-                rating={top1.rating}
-                description={top1.description}
                 genre={top1.genre.map(getGenreName).filter(Boolean).join(", ")}
-                region={top1.region}
-                year={top1.year}
-                duration={top1.duration}
               />
             )}
 
             <div className="right-cards">
               {top1 && windowWidth < 1200 && (
                 <GenreCard
+                  key={top1._id}
                   movie={top1}
                   rank={1}
-                  image={top1.posterUrl}
-                  title={top1.title}
-                  rating={top1.rating}
-                  genre={top1.genre
-                    .map(getGenreName)
-                    .filter(Boolean)
-                    .join(", ")}
-                  region={top1.region}
-                  year={top1.year}
-                  duration={top1.duration}
+                  genre={top1.genre.map(getGenreName).filter(Boolean).join(", ")}
                 />
               )}
               {otherMovies.map((movie, index) => (
@@ -213,16 +197,7 @@ const GenreRankingSection = ({
                   key={movie._id}
                   movie={movie}
                   rank={index + 2}
-                  image={movie.posterUrl}
-                  title={movie.title}
-                  rating={movie.rating}
-                  genre={movie.genre
-                    .map(getGenreName)
-                    .filter(Boolean)
-                    .join(", ")}
-                  region={movie.region}
-                  year={movie.year}
-                  duration={movie.duration}
+                  genre={movie.genre.map(getGenreName).filter(Boolean).join(", ")}
                 />
               ))}
             </div>

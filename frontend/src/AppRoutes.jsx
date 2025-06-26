@@ -3,13 +3,11 @@ import SignupPage from "./pages/SignUpPage";
 import LoginPage from "./pages/LoginPage";
 import GenreSelectionPage from "./pages/GenreSelectionPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
-import ResetPasswordPage from "./pages/ResetPasswordPage";
 import ChangePasswordPage from "./pages/ChangePasswordPage";
 import DirectoryPage from "./pages/DirectoryPage";
 import RankingPage from "./pages/RankingPage";
 import ProfilePage from "./pages/ProfilePage";
 import MovieDetailPage from "./pages/MovieDetailPage";
-import NewReleasedPage from "./pages/NewReleasedPage";
 
 export const AppRoutes = [
   // Public routes
@@ -34,13 +32,6 @@ export const AppRoutes = [
     element: <ForgotPasswordPage />,
     meta: {
       title: "Forgot Password",
-    },
-  },
-  {
-    path: "/reset_password",
-    element: <ResetPasswordPage />,
-    meta: {
-      title: "Reset Password",
     },
   },
 
@@ -108,15 +99,6 @@ export const AppRoutes = [
     element: <MovieDetailPage />,
     meta: {
       title: "Movie Details",
-      protected: true,
-      requiresGenres: true,
-    },
-  },
-  {
-    path: "/new-released",
-    element: <NewReleasedPage />,
-    meta: {
-      title: "New Releases",
       protected: true,
       requiresGenres: true,
     },

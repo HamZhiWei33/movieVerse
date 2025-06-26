@@ -82,10 +82,12 @@
   display: flex;
   align-items: center;
   margin-bottom: 0.5rem;
+  cursor: pointer;
 }
 
 .sidebar-title {
   width: 3rem;
+  user-select: none;
 }
 
 .sidebar-icon {

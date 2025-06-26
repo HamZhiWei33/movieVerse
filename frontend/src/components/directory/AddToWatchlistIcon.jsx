@@ -1,8 +1,8 @@
-import { BsBookmarkPlus, BsBookmarkPlusFill } from 'react-icons/bs';
 import "../../styles/directory/InteractiveIcon.css";
-import useMovieStore from "../../store/useMovieStore";
-import { useAuthStore } from "../../store/useAuthStore";
 import { useState, useEffect } from "react";
+import { BsBookmarkPlus, BsBookmarkPlusFill } from 'react-icons/bs';
+import { useAuthStore } from "../../store/useAuthStore";
+import useMovieStore from "../../store/useMovieStore";
 
 const AddToWatchlistIcon = ({ movie = {} }) => {
   if (!movie?._id) return null;
@@ -10,9 +10,8 @@ const AddToWatchlistIcon = ({ movie = {} }) => {
   const movieId = movie._id;
   const {
     watchlistStatuses,
-    addToWatchlist,
-    removeFromWatchlist,
-    fetchWatchlist
+    toggleWatchlist,
+    checkWatchlistStatus
   } = useMovieStore();
 
   const { authUser } = useAuthStore();
@@ -23,7 +22,6 @@ const AddToWatchlistIcon = ({ movie = {} }) => {
 
   // Initialize status on mount
   useEffect(() => {
-    const { checkWatchlistStatus } = useMovieStore.getState();
     if (authUser) {
       checkWatchlistStatus(movieId);
     }
@@ -35,12 +33,7 @@ const AddToWatchlistIcon = ({ movie = {} }) => {
 
     setLoading(true);
     try {
-      if (isWatchlisted) {
-        await removeFromWatchlist(movieId);
-      } else {
-        await addToWatchlist(movieId);
-      }
-      fetchWatchlist();
+      await toggleWatchlist(movieId);
     } catch (error) {
       console.error("Watchlist operation failed:", error);
     } finally {

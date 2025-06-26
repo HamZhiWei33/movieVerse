@@ -1,14 +1,5 @@
-// lydia
-// Ratings & Reviews
-// rating.route and useRatingStore
-
-// -addRating(req, res)
-// - getMovieRatings(req, res)
-// - updateRating(req, res);
-// -addreview(req, res)
 import { updateMovieStats } from "../lib/movieStats.js";
 import Review from "../models/review.model.js";
-import Movie from "../models/movie.model.js";
 
 // Get all reviews for a movie
 export const getReviewsByMovieId = async (req, res) => {

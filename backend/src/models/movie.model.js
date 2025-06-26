@@ -68,7 +68,7 @@ const movieSchema = new mongoose.Schema({
     type: String,
     default: "None",
   },
-});
+}, { timestamps: true });
 
 const Movie = mongoose.model("Movie", movieSchema);
 export default Movie;

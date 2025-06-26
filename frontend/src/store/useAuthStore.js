@@ -1,19 +1,15 @@
 import { create } from "zustand"; //state management
 import { axiosInstance } from "../lib/axios.js";
 import toast from "react-hot-toast";
-import { io } from "socket.io-client";
 
-const BASE_URL =
-  import.meta.MODE === "development" ? "http://localhost:5001" : "/";
+const BASE_URL = import.meta.MODE === "development" ? "http://localhost:5001" : "/";
 
 export const useAuthStore = create((set, get) => ({
   authUser: null,
   isSigningUp: false,
   isLoggingIn: false,
-  isUpdatingProfile: false,
   isAuthChecked: false,
   isCheckingAuth: true,
-  socket: null,
 
   checkAuth: async () => {
     set({ isCheckingAuth: true, isAuthChecked: false });
@@ -28,7 +24,6 @@ export const useAuthStore = create((set, get) => ({
     try {
       const res = await axiosInstance.get("/auth/check");
       set({ authUser: res.data, isCheckingAuth: false });
-      // get().connectSocket();
     } catch (error) {
       console.error("Error in checking auth:", error);
       localStorage.removeItem("token");
@@ -42,26 +37,12 @@ export const useAuthStore = create((set, get) => ({
   signup: async (data) => {
     set({ isSigningUp: true });
     try {
-      //   const res = await axiosInstance.post("/auth/signup", data);
       const res = await axiosInstance.post("/auth/signup", {
-        name: data.name, // Use 'name' instead of 'fullName'
+        name: data.name,
         email: data.email,
         password: data.password,
       });
-      console.log("Signup response:", res.data);
-      const { token } = res.data;
-      // localStorage.setItem("token", token);
-      // axiosInstance.defaults.headers.common[
-      //   "Authorization"
-      // ] = `Bearer ${token}`;
-
-      // await get().checkAuth();
-      // console.log("Before setting authUser:", get().authUser);
-      // set({ authUser: res.data });
-      // console.log("After setting authUser:", get().authUser);
-
       toast.success("Signup successful!");
-      //   get().connectSocket();
       return get().authUser; // Return the response data
     } catch (error) {
       console.error("Signup error:", error);
@@ -90,16 +71,9 @@ export const useAuthStore = create((set, get) => ({
       ] = `Bearer ${token}`;
 
       await get().checkAuth();
-      // console.log("Before setting authUser:", get().authUser);
-      // set({ authUser: res.data });
-      // console.log("After setting authUser:", get().authUser);
       toast.success("Login successful!");
-      // get().connectSocket(); // connect to socket after successful login
       return res.data;
     } catch (error) {
-      // console.error("Login error:", error.response?.data);
-      // toast.error(error.response?.data?.message || "Login failed");
-      // throw error;
       console.error("Login error:", error.response?.data);
 
       const status = error.response?.status;
@@ -120,7 +94,6 @@ export const useAuthStore = create((set, get) => ({
   },
 
   updateProfile: async (data) => {
-    set({ isUpdatingProfile: true });
     try {
       const userId = get().authUser?._id;
       if (!userId) throw new Error("User ID not found");
@@ -132,8 +105,6 @@ export const useAuthStore = create((set, get) => ({
     } catch (error) {
       console.log("error in update profile:", error);
       toast.error(error?.response?.data?.message || "Profile update failed");
-    } finally {
-      set({ isUpdatingProfile: false });
     }
   },
 
@@ -146,32 +117,9 @@ export const useAuthStore = create((set, get) => ({
 
       set({ authUser: null });
       toast.success("Logged out successfully");
-      get().disconnectSocket();
     } catch (error) {
       toast.error(error.response.data.message);
     }
-  },
-
-  connectSocket: () => {
-    const { authUser } = get();
-    // if (!authUser || get().socket?.connected) return;
-
-    // const socket = io(BASE_URL, {
-    //   query: {
-    //     userId: authUser._id,
-    //   },
-    // });
-    // socket.connect();
-
-    // set({ socket: socket });
-
-    // socket.on("getOnlineUsers", (userIds) => {
-    //   set({ onlineUsers: userIds });
-    // });
-  },
-
-  disconnectSocket: () => {
-    if (get().socket?.connected) get().socket.disconnect();
   },
 
   deleteAccount: async () => {
@@ -182,16 +130,14 @@ export const useAuthStore = create((set, get) => ({
       await axiosInstance.delete(`users/${userId}`);
       set({ authUser: null });
       toast.success("Account deleted successfully");
-      get().disconnectSocket();
     } catch (error) {
       console.error("Error deleting account:", error);
       toast.error(error?.response?.data?.message || "Account deletion failed");
     }
   },
 
-  fetchLikedGenres: async (passedUserId) => {
-    const userId = get().authUser?._id || passedUserId;
-    console.log("Final userId used:", userId);
+  fetchLikedGenres: async () => {
+    const userId = get().authUser?._id;
     if (!userId) {
       toast.error("User not logged in");
       return [];
@@ -207,9 +153,8 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
-  fetchReviewGenres: async (passedUserId) => {
+  fetchReviewGenres: async () => {
     const userId = get().authUser?._id;
-    console.log("Final userId used:", userId);
     if (!userId) {
       toast.error("User not logged in");
       return [];
@@ -224,9 +169,9 @@ export const useAuthStore = create((set, get) => ({
       return [];
     }
   },
-  fetchWatchlistGenres: async (passedUserId) => {
+
+  fetchWatchlistGenres: async () => {
     const userId = get().authUser?._id;
-    console.log("Final userId used testing:", userId);
     if (!userId) {
       toast.error("User not logged in");
       return [];
@@ -268,25 +213,6 @@ export const useAuthStore = create((set, get) => ({
   },
 
   updateFavouriteGenres: async (genreSelected) => {
-    // set({ isUpdatingProfile: true });
-    try {
-      const userId = get().authUser?._id;
-      if (!userId) throw new Error("User ID not found");
-
-      const res = await axiosInstance.put(`/users/${userId}/favourite-genres`, {
-        favouriteGenres: genreSelected,
-      });
-      set({ authUser: res.data });
-
-      toast.success("Favourite genres saved successfully");
-    } catch (error) {
-      toast.error(
-        error?.response?.data?.message || "Error while saving favourite genres"
-      );
-    }
-  },
-  updateFavouriteGenres: async (genreSelected) => {
-    // set({ isUpdatingProfile: true });
     try {
       const userId = get().authUser?._id;
       if (!userId) throw new Error("User ID not found");
@@ -305,7 +231,6 @@ export const useAuthStore = create((set, get) => ({
   },
 
   requestResetCode: async (email) => {
-    // set({ isUpdatingProfile: true });
     try {
       const res = await axiosInstance.post(`/auth/request-reset-code`, {
         email: email,

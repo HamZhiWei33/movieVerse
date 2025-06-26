@@ -1,30 +1,26 @@
 import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import WatchList from "./WatchList.jsx";
-import { useLocation, useSearchParams } from "react-router-dom";
-// import useWatchlistStore from "../../store/useWatchlistStore.js";
-import useMovieStore from "../../store/useMovieStore.js";
-import useGenreStore from "../../store/useGenreStore.js"; // Assuming you have a genre store
+import useMovieStore from "../../store/useMovieStore";
+import useGenreStore from "../../store/useGenreStore";
+
 const TabWatchlist = () => {
   const location = useLocation();
-  const [searchParams] = useSearchParams();
-  const activeTab = searchParams.get("tab") || "default";
   const { watchlist: globalWatchlist, fetchWatchlist } = useMovieStore();
   const [watchlist, setWatchlist] = useState([]);
   const { genreMap, fetchGenres } = useGenreStore();
 
-  // Sync Zustand store to local state once it's fetched
+  // Fetch data on mount
+  useEffect(() => {
+    if (Object.keys(genreMap).length === 0) {
+      fetchGenres();
+    }
+    fetchWatchlist();
+  }, []);
+
   useEffect(() => {
     setWatchlist(globalWatchlist);
   }, [globalWatchlist]);
-
-  useEffect(() => {
-    fetchWatchlist(); // fetch on mount
-  }, [fetchWatchlist]);
-
-  // Fetch genres from your genre model
-  useEffect(() => {
-    fetchGenres();
-  }, []);
 
   // Scroll to #watchlist if hash changes
   useEffect(() => {
@@ -38,14 +34,12 @@ const TabWatchlist = () => {
     }
   }, [location.hash]);
 
-  // Fetch watchlist movies
-  useEffect(() => {
-    fetchWatchlist();
-  }, []);
   if (!Array.isArray(watchlist) || watchlist.length === 0) {
     return (
       <section className="watchlist-section" aria-label="profile-review">
-        <p className="no-watchlist">No watchlist available</p>
+        <div style={{ "marginTop": "2rem" }} className="no-movies-message">
+          <span>No movie in Watchlist</span>
+        </div>
       </section>
     );
   }

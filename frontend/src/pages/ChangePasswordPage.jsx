@@ -9,8 +9,7 @@ const ChangePasswordPage = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { authUser, changeNewPassword } = useAuthStore();
-  // const changeNewPassword = useAuthStore((state) => state.changeNewPassword);
+  const { changeNewPassword } = useAuthStore();
 
   const handleSubmit = async (e) => {
     e.preventDefault();

@@ -8,97 +8,27 @@ import usePreviousScrollStore from "../store/usePreviousScrollStore";
 import SearchItem from "./SearchItem";
 
 const SearchBar = () => {
-    const {
-        // movies: storeMovies,
-        movies,
-        loading,
-        fetchMovies } = useMovieStore();
+    const { movies, loading, fetchMovies } = useMovieStore();
     const { setPreviousScrollPosition } = usePreviousScrollStore();
+
     const navigate = useNavigate();
     const location = useLocation();
     const [searchParams, setSearchParams] = useSearchParams();
 
-    // const [movies, setMovies] = useState([]);
-
     const [searchTerm, setSearchTerm] = useState("");
-    const [inputFocused, setInputFocused] = useState(false);
     const [wasInputFocused, setWasInputFocused] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const [filteredItems, setFilteredItems] = useState([]);
+
     const dropdownRef = useRef(null);
     const inputRef = useRef(null);
     const formRef = useRef(null);
 
     useEffect(() => {
-        // const fetchAllMovies = async () => {
-        //   try {
-        //     const response = await fetchMovies(1, 1000, {
-        //       genres: "",
-        //       regions: "",
-        //       years: "",
-        //     });
-        //     setMovies(response.data);
-        //   } catch (err) {
-        //     console.error("Failed to fetch data:", err);
-        //   }
-        // };
-
         if (!loading && movies.length < 500 && !location.pathname.startsWith("/directory")) {
             fetchMovies(1, 1000, { sort: "-year" }); // Fetch newest movies
         }
 
-    }, []);
-
-    // const movies = useMemo(() => {
-    //     return storeMovies||[];
-    // }, [storeMovies]);
-
-    // useEffect(() => {
-    //     console.log(movies);
-    // }, [movies]);
-
-    // Filter items based on search term
-    useEffect(() => {
-        if (!inputFocused) {
-            return;
-        }
-        if (searchTerm.trim() === "") {
-            setFilteredItems([]);
-            // setIsDropdownOpen(false);
-        } else {
-            // console.log("searchTerm: " + searchTerm);
-            // console.log(movies.length);
-            const itemsWithMatchPositions = movies
-                .map((movie) => {
-                    const title = movie.title.toLowerCase();
-                    const matchIndex = title.indexOf(searchTerm.toLowerCase());
-                    return {
-                        original: movie,
-                        title: title,
-                        matchIndex: matchIndex,
-                    };
-                })
-                .filter((item) => item.matchIndex !== -1)
-                .sort((a, b) => {
-                    // First sort by match position (earlier matches first)
-                    if (a.matchIndex !== b.matchIndex) {
-                        return a.matchIndex - b.matchIndex;
-                    }
-                    // If same position, sort alphabetically
-                    return a.title.localeCompare(b.title);
-                })
-                .map((item) => item.original);
-            setFilteredItems(itemsWithMatchPositions.slice(0, 10));
-            // setIsDropdownOpen(itemsWithMatchPositions.length > 0);
-        }
-    }, [searchTerm]);
-
-    useEffect(() => {
-        console.log(filteredItems);
-    }, [filteredItems]);
-
-    // Close dropdown when clicking outside
-    useEffect(() => {
+        // Close dropdown when clicking outside
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
                 setIsDropdownOpen(false);
@@ -111,26 +41,43 @@ const SearchBar = () => {
         };
     }, []);
 
-    const handleSearchItemClick = (movie) => {
-        setIsDropdownOpen(false);
-        setSearchTerm(movie.title);
-        setFilteredItems([movie]);
-
-        setPreviousScrollPosition(window.scrollY);
-        navigate(`/movie/${movie._id}`, {
-            state: { movie },
-        });
-    };
+    // Filter movies based on search term
+    const filteredMovies = useMemo(() => searchTerm.trim() === "" ? [] : (
+        movies.map((movie) => {
+            const title = movie.title.toLowerCase();
+            const matchIndex = title.indexOf(searchTerm.toLowerCase());
+            return {
+                movie: movie,
+                title: title,
+                matchIndex: matchIndex,
+            };
+        })
+            .filter((item) => item.matchIndex !== -1)
+            .sort((a, b) => a.matchIndex !== b.matchIndex ? a.matchIndex - b.matchIndex : a.title.localeCompare(b.title))
+            .map((item) => item.movie)
+    ), [searchTerm, movies]);
 
     const clearInput = () => {
         setSearchTerm("");
         if (wasInputFocused) {
             inputRef.current.focus();
         }
+
+        // Reset directory page when search is removed
         if (location.pathname.startsWith("/directory")) {
             searchParams.delete("query");
             setSearchParams(searchParams);
         }
+    };
+
+    const handleSearchItemClick = (movie) => {
+        setIsDropdownOpen(false);
+        setSearchTerm(movie.title);
+
+        setPreviousScrollPosition(window.scrollY);
+        navigate(`/movie/${movie._id}`, {
+            state: { movie },
+        });
     };
 
     const handleSubmit = (e) => {
@@ -145,7 +92,7 @@ const SearchBar = () => {
         params.set("view", "grid");
         navigate(`/directory?${params.toString()}`, {
             state: {
-                filteredSearchMovies: filteredItems,
+                filteredSearchMovies: filteredMovies,
                 searchQuery: searchTerm,
             },
         });
@@ -167,12 +114,10 @@ const SearchBar = () => {
                             onChange={(e) => setSearchTerm(e.target.value)}
                             onFocus={() => {
                                 setIsDropdownOpen(true);
-                                setInputFocused(true);
-                                if (filteredItems.length > 0) {
+                                if (filteredMovies.length > 0) {
                                     setIsDropdownOpen(true);
                                 }
                             }}
-                            onBlur={() => setInputFocused(false)}
                         />
                         {searchTerm.trim().length > 0 && (
                             <ClearIcon
@@ -186,36 +131,20 @@ const SearchBar = () => {
                                 onClick={clearInput}
                             />
                         )}
-
-                        {/* <button onClick={() => console.log('Search for:', searchTerm)}>
-                        Search
-                    </button> */}
                     </div>
                 </form>
 
                 {isDropdownOpen && searchTerm.trim().length > 0 && (
                     <div className="dropdown">
-                        {filteredItems.length > 0
-                            ? filteredItems.map((movie, index) => (
-                                <SearchItem
-                                    movie={movie}
-                                    key={index}
-                                    onClick={() => handleSearchItemClick(movie)}
-                                    keyword={searchTerm}
-                                />
-                                // <div
-                                //     key={index}
-                                //     className="search-dropdown-item"
-                                //     onClick={() => handleSearchItemClick(movie)}
-                                // >
-                                //     {movie.title}
-                                // </div>
-                            ))
-                            : searchTerm.trim().length > 0 && (
+                        {filteredMovies.length > 0 ? (
+                            filteredMovies.map((movie, index) => <SearchItem movie={movie} key={index} onClick={() => handleSearchItemClick(movie)} keyword={searchTerm} />)
+                        ) : (
+                            searchTerm.trim().length > 0 && (
                                 <div className="search-dropdown-item" id="no-results">
                                     No results found
                                 </div>
-                            )}
+                            )
+                        )}
                     </div>
                 )}
             </div>
