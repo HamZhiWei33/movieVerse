@@ -16,6 +16,7 @@ import ReviewStars from "../directory/ReviewStars";
 import { getTopMoviesByGenre } from "./ranking";
 import useGenreStore from "../../store/useGenreStore";
 import useMovieStore from "../../store/useMovieStore";
+import { useAuthStore }  from "../../store/useAuthStore";
 
 
 const HeroSection = ({ title, moviesType, items }) => {
