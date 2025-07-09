@@ -48,16 +48,16 @@ async function enrichMovies(movies, user) {
   });
 }
 
-// @desc    Get all movies with optional pagination
-// @route   GET /api/movies
-// @access  Public
+// @desc      Get all movies with optional pagination
+// @route     GET /api/movies
+// @access    Public
 export const getAllMovies = async (req, res) => {
   try {
     const { page = 1, limit = 20, genres, regions, years, query: searchQuery } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
     const dbQuery = { trailerUrl: { $exists: true, $ne: "" } };
 
-    // Filters
+    // Filters for MongoDB
     let genreIds = [];
     if (genres) {
       const genreNames = genres.split(',').map(g => decodeURIComponent(g.trim()));
@@ -93,21 +93,24 @@ export const getAllMovies = async (req, res) => {
     // This ensures we can keep loading more pages from TMDB
     if (needsTMDBFallback || genres || regions || years || searchQuery) {
       const needed = parseInt(limit) - movies.length;
-      const tmdbPage = Math.max(1, Math.floor(skip / 20) + 1); // More accurate page calculation
-      
+      const tmdbPage = Math.max(1, Math.floor(skip / 20) + 1); // More accurate page calculation for TMDB
+
       const tmdbParams = {
         api_key: TMDB_API_KEY,
         language: 'en-US',
         page: tmdbPage,
-        sort_by: 'popularity.desc'
+        sort_by: 'popularity.desc', // Already set to fetch popular movies
+        include_adult: false // <--- Ensures TMDB API filters adult content at the source
       };
 
       // Apply TMDB-supported filters
       if (genreIds.length) tmdbParams.with_genres = genreIds.join(',');
+      
       if (years) {
         const yearNums = years.split(',').map(y => parseInt(y.trim())).filter(n => !isNaN(n));
-        if (yearNums.length === 1) tmdbParams.primary_release_year = yearNums[0];
-        else if (yearNums.length > 1) {
+        if (yearNums.length === 1) {
+          tmdbParams.primary_release_year = yearNums[0];
+        } else if (yearNums.length > 1) {
           // For multiple years, use release_date.gte/lte
           const minYear = Math.min(...yearNums);
           const maxYear = Math.max(...yearNums);
@@ -115,6 +118,13 @@ export const getAllMovies = async (req, res) => {
           tmdbParams['primary_release_date.lte'] = `${maxYear}-12-31`;
         }
       }
+      
+      // Added region filtering for TMDB
+      if (regions) {
+        // TMDB uses 'with_origin_country' for origin countries
+        tmdbParams.with_origin_country = regions.split(',').map(r => decodeURIComponent(r.trim())).join(',');
+      }
+      
       if (searchQuery) tmdbParams.query = decodeURIComponent(searchQuery);
 
       let processedMovies = [];
@@ -134,6 +144,7 @@ export const getAllMovies = async (req, res) => {
           const saved = await processTMDBMovie(tmdbMovie);
           if (!saved || !saved.trailerUrl) continue;
 
+          // Re-apply region filter after processing, as TMDB's with_origin_country might be broad
           if (regions) {
             const allowedRegions = regions.split(',').map(r => decodeURIComponent(r.trim()));
             if (!allowedRegions.includes(saved.region)) continue;
@@ -156,8 +167,8 @@ export const getAllMovies = async (req, res) => {
         data: enriched,
         pagination: {
           currentPage: Number(page),
-          totalPages: Math.ceil((total + processedMovies.length) / limit),
-          totalResults: total + processedMovies.length,
+          totalPages: Math.ceil((total + processedMovies.length) / limit), // Adjust totalPages calculation for combined results
+          totalResults: total + processedMovies.length, // Adjust totalResults calculation for combined results
           hasMore: finalHasMore,
         },
       });
@@ -181,9 +192,9 @@ export const getAllMovies = async (req, res) => {
   }
 };
 
-// @desc    Get single movie by ID with reviews
-// @route   GET /api/movies/:id
-// @access  Public
+// @desc      Get single movie by ID with reviews
+// @route     GET /api/movies/:id
+// @access    Public
 export const getMovieById = async (req, res) => {
   try {
     const movie = await Movie.findById(req.params.id)
@@ -229,9 +240,9 @@ export const getMovieById = async (req, res) => {
   }
 };
 
-// @desc    Get distinct filter options (genres, regions, years)
-// @route   GET /api/movies/filters
-// @access  Public
+// @desc      Get distinct filter options (genres, regions, years)
+// @route     GET /api/movies/filters
+// @access    Public
 export const getFilterOptions = async (req, res) => {
   try {
     const genreIds = await Movie.distinct("genre");
@@ -271,9 +282,9 @@ export const getFilterOptions = async (req, res) => {
 };
 
 
-// @desc    Get all genres
-// @route   GET /api/movies/genres
-// @access  Public
+// @desc      Get all genres
+// @route     GET /api/movies/genres
+// @access    Public
 export const getAllGenres = async (req, res) => {
   try {
     const genres = await Genre.find()
@@ -295,9 +306,9 @@ export const getAllGenres = async (req, res) => {
   }
 };
 
-// @desc    Get all regions
-// @route   GET /api/movies/regions
-// @access  Public
+// @desc      Get all regions
+// @route     GET /api/movies/regions
+// @access    Public
 export const getAllRegions = async (req, res) => {
   try {
     const regions = await Region.find()
@@ -319,61 +330,9 @@ export const getAllRegions = async (req, res) => {
   }
 };
 
-
-// @desc    Filter movies with pagination
-// @route   GET /api/movies/filter
-// @access  Public
-export const filterMovies = async (req, res) => {
-  try {
-    const { genre, year, rating, page = 1, limit = 10 } = req.query;
-    const skip = (page - 1) * limit;
-
-    const query = {};
-
-    if (genre) {
-      query.genre = { $in: genre.split(',').map(g => parseInt(g)) };
-    }
-
-    if (year) {
-      query.year = { $in: year.split(',').map(y => parseInt(y)) };
-    }
-
-    if (rating) {
-      query.rating = { $gte: parseFloat(rating) };
-    }
-
-    // Only include movies with trailerUrl
-    query.trailerUrl = { $exists: true, $ne: "" };
-
-    const movies = await Movie.find(query)
-      .sort({ releaseDate: -1 })
-      .select('title posterUrl rating year genre description region duration trailerUrl')
-      .skip(skip)
-      .limit(limit)
-      .lean();
-
-    const total = await Movie.countDocuments(query);
-
-    res.status(200).json({
-      success: true,
-      count: movies.length,
-      total,
-      pages: Math.ceil(total / limit),
-      currentPage: page,
-      data: movies
-    });
-  } catch (error) {
-    console.error("Error filtering movies:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to filter movies."
-    });
-  }
-};
-
-// @desc    Fetch movies from TMDB and store in DB
-// @route   GET /api/movies/tmdb
-// @access  Public
+// @desc      Fetch movies from TMDB and store in DB
+// @route     GET /api/movies/tmdb
+// @access    Public
 export const fetchFromTMDB = async (req, res) => {
   try {
     const { page = 1, limit = 20 } = req.query;
@@ -388,7 +347,8 @@ export const fetchFromTMDB = async (req, res) => {
         params: {
           api_key: TMDB_API_KEY,
           page: currentPage,
-          language: 'en-US'
+          language: 'en-US',
+          include_adult: false // <--- Ensures TMDB API filters adult content at the source
         }
       });
 
@@ -470,9 +430,10 @@ async function processTMDBMovie(tmdbMovie) {
       return null;
     }
 
-    const trailerUrl = `https://www.youtube.com/watch?v=${trailer.key}`;
+    // Corrected trailer URL format for YouTube
+    const trailerUrl = `https://www.youtube.com/watch?v=${trailer.key}`; 
 
-    // Fetch other details in parallel
+    // Now fetch other details in parallel
     const [detailResponse, releaseResponse, creditResponse] = await Promise.all([
       axios.get(`${TMDB_BASE_URL}/movie/${tmdbMovie.id}`, { params: { api_key: TMDB_API_KEY } }),
       axios.get(`${TMDB_BASE_URL}/movie/${tmdbMovie.id}/release_dates`, { params: { api_key: TMDB_API_KEY } }),
@@ -489,9 +450,20 @@ async function processTMDBMovie(tmdbMovie) {
       .map(g => Number(g.id))
       .filter(id => !isNaN(id) && id !== 0);
 
-    // Process region
-    const originCountries = detailData.origin_country || [];
-    const region = originCountries.length ? originCountries[0] : "US";
+    // Process region - getting primary release country from release dates for more accuracy
+    const releaseDatesData = releaseResponse.data.results;
+    let region = "US"; // Default to US if no specific region found
+    if (releaseDatesData && releaseDatesData.length > 0) {
+        // Find the US release first, then any other country
+        const usRelease = releaseDatesData.find(r => r.iso_3166_1 === "US");
+        if (usRelease) {
+            region = "US";
+        } else if (detailData.production_countries && detailData.production_countries.length > 0) {
+            region = detailData.production_countries[0].iso_3166_1;
+        } else if (tmdbMovie.origin_country && tmdbMovie.origin_country.length > 0) {
+            region = tmdbMovie.origin_country[0];
+        }
+    }
 
     // Process credits
     const crew = creditResponse.data.crew || [];

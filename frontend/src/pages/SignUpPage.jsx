@@ -16,13 +16,6 @@ const SignupPage = () => {
     confirm_password: "",
   });
 
-  const [errors, setErrors] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirm_password: "",
-  });
-
   const validateForm = () => {
     // Name validation
     if (!formData.name.trim()) {
@@ -34,9 +27,7 @@ const SignupPage = () => {
       return false;
     }
     if (/[^a-zA-Z0-9_]/.test(formData.name)) {
-      toast.error(
-        "Username can only contain letters, numbers, and underscores"
-      );
+      toast.error("Username can only contain letters, numbers, and underscores");
       return false;
     }
 
@@ -87,19 +78,6 @@ const SignupPage = () => {
       ...formData,
       [name]: value,
     });
-
-    // Real-time validation
-    if (name === "password" && value.length > 0 && value.length < 8) {
-      setErrors({ ...errors, password: "Password too short" });
-    } else if (
-      name === "email" &&
-      value &&
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
-    ) {
-      setErrors({ ...errors, email: "Invalid email format" });
-    } else {
-      setErrors({ ...errors, [name]: "" });
-    }
   };
 
   const handleSubmit = async (e) => {
@@ -118,7 +96,7 @@ const SignupPage = () => {
 
       navigate("/login");
     } catch (error) {
-      console.error("SIGNUP ERROR:", error);
+      console.error("SIGNUP ERROR:", error.response.data.message);
     }
   };
 
@@ -133,7 +111,6 @@ const SignupPage = () => {
             label="Your Name"
             value={formData.name}
             onChange={handleChange}
-            error={errors.name}
           />
           <FormField
             type="email"
@@ -141,7 +118,6 @@ const SignupPage = () => {
             label="Email"
             value={formData.email}
             onChange={handleChange}
-            error={errors.email}
           />
           <FormField
             type="password"
@@ -149,7 +125,6 @@ const SignupPage = () => {
             label="Password"
             value={formData.password}
             onChange={handleChange}
-            error={errors.password}
           />
           <FormField
             type="password"
@@ -157,7 +132,6 @@ const SignupPage = () => {
             label="Confirm Password"
             value={formData.confirm_password}
             onChange={handleChange}
-            error={errors.confirm_password}
           />
           <button className="submitButton" type="submit" disabled={isSigningUp}>
             {isSigningUp ? "Loading..." : "Sign Up"}

@@ -1,4 +1,4 @@
-import React, { useState, useId, useRef, useEffect } from "react";
+import React, { useState, useId, useRef } from "react";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
@@ -11,7 +11,6 @@ const FormField = ({ type, name, label, value, onChange }) => {
   const isPassword = type === "password";
 
   const [visible, setVisible] = useState(false);
-  // const [inputType, setInputType] = useState(isPassword && visible ? "text" : type);
 
   const focusInput = () => {
     if (!btnClicked) {
