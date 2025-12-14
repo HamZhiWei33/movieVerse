@@ -37,7 +37,6 @@ cd movieVerse
 ```bash
 cd frontend
 npm install
-npm install --save-dev vite
 npm run dev
 ```
 
@@ -50,11 +49,6 @@ Frontend runs at: [http://localhost:5173](http://localhost:5173)
 ```bash
 cd backend
 npm install
-npm install --save-dev nodemon
-npm install cors
-npm install express-rate-limit
-npm install axios
-npm install mailgun.js form-data
 ```
 
 #### Create `.env` file in the `backend` folder
