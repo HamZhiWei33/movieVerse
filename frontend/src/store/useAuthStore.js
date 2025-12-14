@@ -1,8 +1,6 @@
-import { create } from "zustand"; //state management
+import { create } from "zustand";
 import { axiosInstance } from "../lib/axios.js";
 import toast from "react-hot-toast";
-
-const BASE_URL = import.meta.MODE === "development" ? "http://localhost:5001" : "/";
 
 export const useAuthStore = create((set, get) => ({
   authUser: null,

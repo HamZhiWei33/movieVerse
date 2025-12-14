@@ -35,9 +35,11 @@ const GenreSelectionPage = () => {
     }, [authUser]);
 
     // Convert genreMap to array when it changes
-    const genres = useMemo(() => {
-        return Object.entries(genreMap).map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name));
-    }, [genreMap]);
+    const genres = useMemo(() => (
+        Object.entries(genreMap)
+            .map(([id, name]) => ({ id, name }))
+            .sort((a, b) => a.name.localeCompare(b.name))
+    ), [genreMap]);
 
     const updateGenreCount = (selected, genre) => {
         if (selected) {
@@ -50,9 +52,7 @@ const GenreSelectionPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (genreSelected.length < 3) {
-            return;
-        }
+        if (genreSelected.length < 3) return;
 
         try {
             await updateFavouriteGenres(genreSelected);

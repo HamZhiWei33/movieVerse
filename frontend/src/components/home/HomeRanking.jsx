@@ -1,11 +1,5 @@
-import { useState, useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import "../../styles/ranking.css";
-// import {
-//   movies as importedMovies,
-//   reviews as importedReviews,
-//   genres as allGenres,
-//   reviews as allReviews,
-// } from "../../constant";
 import TopMovieSection from "../ranking/TopMovieSection";
 import useRankingStore from "../../store/useRankingStore";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
