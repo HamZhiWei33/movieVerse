@@ -1,24 +1,18 @@
 // components/GenreRankingSection.jsx
 import { useState, useEffect, useMemo } from "react";
-import axios from "axios";
+import { axiosInstance } from "../../lib/axios";
 import GenreCard from "./GenreCard";
 import Top1Card from "./Top1Card";
 import { useSearchParams, useLocation } from "react-router-dom";
-import { FaSpinner } from "react-icons/fa";
+
 const GenreRankingSection = ({
   movies = [],
   allGenres = [],
-  allReviews = [],
 }) => {
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [data, setData] = useState({
-    movies: [],
-    reviews: [],
-    genres: [],
-  });
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   // Get genre from URL or default to "All"
@@ -52,8 +46,8 @@ const GenreRankingSection = ({
         setLoading(true);
         console.log("Fetching data for genre:", selectedGenre); // Debug log
 
-        const response = await axios.get(
-          "http://localhost:5001/api/rankings/genres",
+        const response = await axiosInstance.get(
+          "/rankings/genres",
           {
             params: { genre: selectedGenre },
           }
@@ -64,21 +58,10 @@ const GenreRankingSection = ({
         if (!response.data) {
           throw new Error("No data received from server");
         }
-
-        setData({
-          movies: response.data.movies || [],
-          reviews: response.data.reviews || [],
-          genres: response.data.genres || [],
-        });
         setError(null);
       } catch (err) {
         console.error("Error fetching rankings:", err);
         setError(`Failed to load rankings: ${err.message}`);
-        setData({
-          movies: [],
-          reviews: [],
-          genres: [],
-        });
       } finally {
         setLoading(false);
       }

@@ -1,5 +1,5 @@
-import axios from "axios";
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { axiosInstance } from "../../lib/axios";
 import { useNavigate } from "react-router-dom";
 import { IoTime } from "react-icons/io5";
 import LikeIcon from "../directory/LikeIcon";
@@ -38,7 +38,7 @@ const TopMovieSection = ({ selectedMovie, setSelectedMovie }) => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get("http://localhost:5001/api/rankings");
+        const response = await axiosInstance.get("/rankings");
         if (response.data) {
           setMovies(response.data.movies || []);
           setGenres(response.data.genres || []);
