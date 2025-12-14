@@ -11,7 +11,6 @@ import movieRoutes from "./routes/movie.route.js";
 import reviewRoutes from "./routes/review.route.js";
 import cors from "cors";
 import { updateAllMovies } from "./lib/movieUpdater.js";
-// import { fetchAndStorePopularMovies } from "./lib/tmdb.js";
 
 dotenv.config();
 const app = express();
@@ -22,7 +21,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: process.env.FRONTEND_ORIGIN || "http://localhost:5173",
     credentials: true,
   })
 );
@@ -42,5 +41,4 @@ app.listen(PORT, async () => {
   await updateAllMovies().catch(err => {
     console.error("Failed to update movies:", err);
   });
-  // await fetchAndStorePopularMovies(); // Fetch TMDB data
 });
