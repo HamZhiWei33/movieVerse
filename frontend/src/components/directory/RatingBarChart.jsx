@@ -22,22 +22,18 @@ const RatingBarChart = ({ movieId, initialMovieData, initialReviews }) => {
         const loadData = async () => {
             if (!movieId) return;
 
-            let fetchedMovie = initialMovieData;
-            let fetchedReviews = initialReviews;
-
             // If initial props are not provided, or are stale, fetch them.
             // Check if movieInternalData or initialMovieData match the current movieId
-            if (!fetchedMovie || fetchedMovie._id !== movieId) {
-                fetchedMovie = await fetchMovieById(movieId);
+            if (!localMovieData || localMovieData._id !== movieId) {
+                const movie = await fetchMovieById(movieId);
+                setLocalMovieData(movie);
             }
 
-            if (!fetchedReviews || reviewsByMovie[movieId]?.length !== fetchedReviews.length) {
+            if (!localReviews || reviewsByMovie[movieId]?.length !== localReviews.length) {
                 await fetchReviewsByMovie(movieId);
-                fetchedReviews = reviewsByMovie[movieId];
+                setLocalReviews(reviewsByMovie[movieId]);
             }
 
-            setLocalMovieData(fetchedMovie);
-            setLocalReviews(fetchedReviews);
         };
 
         loadData();
