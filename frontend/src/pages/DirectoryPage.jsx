@@ -392,18 +392,20 @@ const DirectoryPage = () => {
                       />
                     ))}
                   </div>
-                  <div ref={setLoadMoreRef} className="load-more-trigger">
-                    {isFetchingMore && !isSearchResult && (
-                      <div className="directory-loading-movie">
-                        <DotLottieReact
-                          src="https://lottie.host/6185175f-ee83-45a4-9244-03871961a1e9/yLmGLfSgYI.lottie"
-                          loop
-                          autoplay
-                          className="loading-icon"
-                        />
-                      </div>
-                    )}
-                  </div>
+                  {hasMore && (
+                    <div ref={setLoadMoreRef} className="load-more-trigger">
+                      {isFetchingMore && !isSearchResult && (
+                        <div className="directory-loading-movie">
+                          <DotLottieReact
+                            src="https://lottie.host/6185175f-ee83-45a4-9244-03871961a1e9/yLmGLfSgYI.lottie"
+                            loop
+                            autoplay
+                            className="loading-icon"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </>
               ) : (
                 <>
