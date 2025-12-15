@@ -4,6 +4,8 @@ import { axiosInstance } from "../../lib/axios";
 import GenreCard from "./GenreCard";
 import Top1Card from "./Top1Card";
 import { useSearchParams, useLocation } from "react-router-dom";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import "../../styles/ranking.css";
 
 const GenreRankingSection = ({
   movies = [],
@@ -124,12 +126,6 @@ const GenreRankingSection = ({
 
   const [top1, ...otherMovies] = sorted;
 
-  if (loading)
-    return (
-      <div className="loading" id="spinner">
-        Loading rankings...
-      </div>
-    );
   if (error) return <div className="error">{error}</div>;
 
   // Update the genre mapping in the cards to use allGenres
@@ -154,39 +150,50 @@ const GenreRankingSection = ({
         ))}
       </nav>
 
-      <div className="genre-list">
-        {!sorted.length ? (
-          <div className="no-movies">No movies available for this genre</div>
-        ) : (
-          <div className="genre-ranking-layout">
-            {top1 && windowWidth >= 1200 && (
-              <Top1Card
-                movie={top1}
-                genre={top1.genre.map(getGenreName).filter(Boolean).join(", ")}
-              />
-            )}
-
-            <div className="right-cards">
-              {top1 && windowWidth < 1200 && (
-                <GenreCard
-                  key={top1._id}
+      {loading ? (
+        <div className="loading" id="loading-spinner" style={{"height": "50vh"}}>
+          <DotLottieReact
+            src="https://lottie.host/6185175f-ee83-45a4-9244-03871961a1e9/yLmGLfSgYI.lottie"
+            loop
+            autoplay
+            className="loading-icon"
+          />
+        </div>
+      ) : (
+        <div className="genre-list">
+          {!sorted.length ? (
+            <div className="no-movies">No movies available for this genre</div>
+          ) : (
+            <div className="genre-ranking-layout">
+              {top1 && windowWidth >= 1200 && (
+                <Top1Card
                   movie={top1}
-                  rank={1}
                   genre={top1.genre.map(getGenreName).filter(Boolean).join(", ")}
                 />
               )}
-              {otherMovies.map((movie, index) => (
-                <GenreCard
-                  key={movie._id}
-                  movie={movie}
-                  rank={index + 2}
-                  genre={movie.genre.map(getGenreName).filter(Boolean).join(", ")}
-                />
-              ))}
+
+              <div className="right-cards">
+                {top1 && windowWidth < 1200 && (
+                  <GenreCard
+                    key={top1._id}
+                    movie={top1}
+                    rank={1}
+                    genre={top1.genre.map(getGenreName).filter(Boolean).join(", ")}
+                  />
+                )}
+                {otherMovies.map((movie, index) => (
+                  <GenreCard
+                    key={movie._id}
+                    movie={movie}
+                    rank={index + 2}
+                    genre={movie.genre.map(getGenreName).filter(Boolean).join(", ")}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
     </section>
   );
 };
