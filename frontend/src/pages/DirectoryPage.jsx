@@ -37,6 +37,7 @@ const DirectoryPage = () => {
   const initialView = searchParams.get("view") || "grid";
   const [view, setView] = useState(initialView);
   const [loading, setLoading] = useState(false);
+  const [loadedMore, setLoadedMore] = useState(false);
   const [isSearchResult, setIsSearchResult] = useState(false);
   const [collapsed, setCollapsed] = useState([true, true, true]);
 
@@ -141,6 +142,7 @@ const DirectoryPage = () => {
           console.log("Loading more movies...");
           try {
             await loadMoreMovies();
+            setLoadedMore(true);
           } catch (error) {
             console.error("Error loading more movies:", error);
           }
@@ -194,7 +196,9 @@ const DirectoryPage = () => {
     );
   };
 
-  const filteredMovies = movies;
+  const filteredMovies = useMemo(() => (
+    loadedMore ? movies : movies.slice(0, 20)
+  ), [loadedMore, movies]);
 
   const handleClearAllFilters = () => {
     // 1. Clear local state for filters
