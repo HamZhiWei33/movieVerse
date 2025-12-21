@@ -31,7 +31,7 @@ router.get("/tmdb", fetchFromTMDB);
 router.get("/recommended", protectRoute, getRecommendedMovies);
 
 // Get movies by id
-router.get("/:id", protectRoute, getMovieById);
+router.get("/:id", getMovieById);
 
 
 
