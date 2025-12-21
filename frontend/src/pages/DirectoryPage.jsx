@@ -4,7 +4,7 @@ import "../styles/sidebar.css";
 import { useEffect, useState, useMemo } from "react";
 import { useNavigationType, useSearchParams } from "react-router-dom";
 
-import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import CatLoading from "../components/general/CatLoading";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa6";
 import { FaListUl } from "react-icons/fa";
 
@@ -36,7 +36,7 @@ const DirectoryPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialView = searchParams.get("view") || "grid";
   const [view, setView] = useState(initialView);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [isSearchResult, setIsSearchResult] = useState(false);
   const [collapsed, setCollapsed] = useState([true, true, true]);
 
@@ -114,10 +114,13 @@ const DirectoryPage = () => {
           query: searchQuery || undefined, // Pass search query
         };
 
-        await fetchMovies(1, 20, filters); // Reduced initial load to 20 for better UX
+        const response = await fetchMovies(1, 20, filters); // Reduced initial load to 20 for better UX
+
+        if (response) {
+          setLoading(false);
+        }
       } catch (err) {
         console.error("Failed to fetch data:", err);
-      } finally {
         setLoading(false);
       }
     };
@@ -373,12 +376,7 @@ const DirectoryPage = () => {
             {loading ? (
               <div className="loading-message">
                 <div className="directory-loading-movie">
-                  <DotLottieReact
-                    src="https://lottie.host/6185175f-ee83-45a4-9244-03871961a1e9/yLmGLfSgYI.lottie"
-                    loop
-                    autoplay
-                    className="loading-icon"
-                  />
+                  <CatLoading />
                 </div>
               </div>
             ) : filteredMovies.length > 0 ? (
@@ -396,12 +394,7 @@ const DirectoryPage = () => {
                     <div ref={setLoadMoreRef} className="load-more-trigger">
                       {isFetchingMore && !isSearchResult && (
                         <div className="directory-loading-movie">
-                          <DotLottieReact
-                            src="https://lottie.host/6185175f-ee83-45a4-9244-03871961a1e9/yLmGLfSgYI.lottie"
-                            loop
-                            autoplay
-                            className="loading-icon"
-                          />
+                          <CatLoading />
                         </div>
                       )}
                     </div>
@@ -431,12 +424,7 @@ const DirectoryPage = () => {
                   >
                     {!isSearchResult &&
                       (isFetchingMore ? (
-                        <DotLottieReact
-                          src="https://lottie.host/6185175f-ee83-45a4-9244-03871961a1e9/yLmGLfSgYI.lottie"
-                          loop
-                          autoplay
-                          className="loading-icon"
-                        />
+                        <CatLoading />
                       ) : hasMore ? (
                         <button onClick={loadMoreMovies}>Load More</button>
                       ) : (

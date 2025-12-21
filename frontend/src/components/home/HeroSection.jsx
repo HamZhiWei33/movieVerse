@@ -7,10 +7,10 @@ import { useNavigate } from "react-router-dom";
 
 import { FaAngleRight } from "react-icons/fa6";
 import { TfiReload } from "react-icons/tfi";
-import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 import RankingCard from "./RankingCard";
 import MovieCard from "../directory/MovieCard";
+import CatLoading from "../general/CatLoading";
 import ReviewStars from "../directory/ReviewStars";
 
 import { getTopMoviesByGenre } from "./ranking";
@@ -164,12 +164,7 @@ const HeroSection = ({ title, moviesType, items }) => {
         ((movieList.length === 0 || (moviesType === "watchlist" && updatingWatchlist)) ? (
           <div className="no-movies-message">
             {(moviesType === "watchlist" && updatingWatchlist) ? (
-              <DotLottieReact
-                src="https://lottie.host/6185175f-ee83-45a4-9244-03871961a1e9/yLmGLfSgYI.lottie"
-                loop
-                autoplay
-                className="loading-icon"
-              />
+              <CatLoading />
             ) : (
               <span>{`No movie in ${moviesType.charAt(0).toUpperCase() + moviesType.slice(1)}`}</span>
             )}

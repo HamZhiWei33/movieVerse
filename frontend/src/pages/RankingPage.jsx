@@ -1,6 +1,6 @@
 import "../styles/ranking.css";
 import { useEffect, useMemo } from "react";
-import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import CatLoading from "../components/general/CatLoading";
 import GenreRankingSection from "../components/ranking/GenreRankingSection";
 import GenreDonutChart from "../components/ranking/GenreDonutChart";
 import TopMovieSection from "../components/ranking/TopMovieSection";
@@ -59,12 +59,7 @@ const RankingPage = () => {
   if (rankingLoading)
     return (
       <div className="loading" id="loading-spinner">
-        <DotLottieReact
-          src="https://lottie.host/6185175f-ee83-45a4-9244-03871961a1e9/yLmGLfSgYI.lottie"
-          loop
-          autoplay
-          className="loading-icon"
-        />
+        <CatLoading />
       </div>
     );
   if (rankingError) return <div className="error">{rankingError}</div>;
