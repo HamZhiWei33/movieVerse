@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import WatchList from "./WatchList.jsx";
 import useMovieStore from "../../store/useMovieStore";
@@ -6,8 +6,7 @@ import useGenreStore from "../../store/useGenreStore";
 
 const TabWatchlist = () => {
   const location = useLocation();
-  const { watchlist: globalWatchlist, fetchWatchlist } = useMovieStore();
-  const [watchlist, setWatchlist] = useState([]);
+  const { watchlist, fetchWatchlist } = useMovieStore();
   const { genreMap, fetchGenres } = useGenreStore();
 
   // Fetch data on mount
@@ -17,10 +16,6 @@ const TabWatchlist = () => {
     }
     fetchWatchlist();
   }, []);
-
-  useEffect(() => {
-    setWatchlist(globalWatchlist);
-  }, [globalWatchlist]);
 
   // Scroll to #watchlist if hash changes
   useEffect(() => {
@@ -44,10 +39,6 @@ const TabWatchlist = () => {
     );
   }
 
-  const handleRemove = (movieId) => {
-    setWatchlist((prev) => prev.filter((movie) => movie._id !== movieId));
-  };
-
   return (
     <div id="watchlist">
       {Array.isArray(watchlist) &&
@@ -59,7 +50,6 @@ const TabWatchlist = () => {
               ...movie,
               genre: movie.genre.map((id) => genreMap[id] || "Unknown"),
             }}
-            onRemove={handleRemove}
           />
         ))}
     </div>

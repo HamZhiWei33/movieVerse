@@ -6,7 +6,7 @@ import ReviewStars from "../directory/ReviewStars";
 import LikeIcon from "../directory/LikeIcon";
 import useMovieStore from "../../store/useMovieStore";
 
-const WatchList = ({ movie, onRemove }) => {
+const WatchList = ({ movie }) => {
   const navigate = useNavigate();
   const { removeFromWatchlist } = useMovieStore();
 
@@ -28,7 +28,6 @@ const WatchList = ({ movie, onRemove }) => {
     setLoadingRemove(true);
     try {
       await removeFromWatchlist(movie._id);
-      onRemove(movie._id);
     } catch (err) {
       console.error(
         "Failed to remove movie:",
