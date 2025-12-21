@@ -1,13 +1,13 @@
 import { create } from 'zustand';
 import { axiosInstance } from "../lib/axios.js";
 import { useAuthStore } from './useAuthStore.js';
+import useLikeStore from './useLikeStore.js';
 
 const useMovieStore = create((set, get) => ({
     // State
     movies: [],
     genres: [],
     filterOptions: {},
-    likes: {},
     watchlist: [],
     loading: false,
     error: null,
@@ -76,6 +76,9 @@ const useMovieStore = create((set, get) => ({
             }, append ? [...get().movies] : []);
 
             const hasMore = response.data.pagination?.hasMore ?? true; // Default to true for TMDB fallback
+
+            const likeStore = useLikeStore.getState();
+            await likeStore.fetchBulkMovieLikes(uniqueMovies.map(movie => movie._id).filter(id => !likeStore.likes[id]));
 
             set({
                 movies: uniqueMovies,
@@ -173,65 +176,6 @@ const useMovieStore = create((set, get) => ({
             return response.data.data || response.data;
         } catch (error) {
             set({ error: error.message, loading: false });
-            throw error;
-        }
-    },
-
-    fetchMovieLikes: async (movieId) => {
-        set({ loading: true, error: null });
-        try {
-            const response = await axiosInstance.get(`/likes/${movieId}`);
-            const { count, likes } = response.data;
-
-            const currentUser = useAuthStore.getState().authUser;
-            const liked = currentUser ? likes.some(like => like.userId === currentUser._id) : false;
-
-            set(state => ({
-                likes: {
-                    ...state.likes,
-                    [movieId]: { liked, likeCount: count }
-                },
-                loading: false
-            }));
-            return response.data;
-        } catch (error) {
-            set({ error: error.message, loading: false });
-            console.log(error);
-            throw error;
-        }
-    },
-
-    toggleLike: async (movieId) => {
-        const state = get();
-        const previous = state.likes[movieId];
-        const liked = previous.liked;
-
-        set({
-            likes: {
-                ...state.likes,
-                [movieId]: {
-                    liked: !liked,
-                    likeCount: (previous?.likeCount || 0) + (liked ? -1 : 1),
-                }
-            }
-        });
-
-        try {
-            if (!liked) {
-                await axiosInstance.post(`/likes/${movieId}`);
-            } else {
-                await axiosInstance.delete(`/likes/${movieId}`);
-            }
-        } catch (error) {
-            // Rollback if error
-            console.error("Rollback!")
-            set({
-                likes: {
-                    ...state.likes,
-                    [movieId]: previous || { liked: false, likeCount: 0 },
-                },
-                error: error.message
-            });
             throw error;
         }
     },

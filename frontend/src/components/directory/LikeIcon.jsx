@@ -2,19 +2,27 @@ import "../../styles/directory/InteractiveIcon.css";
 import { useState, useEffect, useMemo } from "react";
 import { GoHeart, GoHeartFill } from 'react-icons/go';
 import { useAuthStore } from "../../store/useAuthStore";
-import useMovieStore from "../../store/useMovieStore";
+import useLikeStore from "../../store/useLikeStore";
 
-const LikeIcon = ({ movie, showCount = false }) => {
+const LikeIcon = ({ movie, showCount = false, fetchSelf = false }) => {
   const movieId = movie._id;
 
-  const { fetchMovieLikes, likes, toggleLike } = useMovieStore();
+  const { likes, fetchMovieLikes, toggleLike, isFetchingAllMovieLikes, fetchAllMovieLikes } = useLikeStore();
   const { authUser } = useAuthStore();
 
   const [loadingLike, setLoadingLike] = useState(false);
 
   useEffect(() => {
-    fetchMovieLikes(movieId);
-  }, [fetchMovieLikes]);
+    if (movieId && !likes[movieId] && fetchSelf) {
+      fetchMovieLikes(movieId);
+    }
+  }, [fetchMovieLikes, movie]);
+
+  useEffect(() => {
+    if (!likes[movieId] && !isFetchingAllMovieLikes && !fetchSelf) {
+      fetchAllMovieLikes();
+    }
+  }, [fetchAllMovieLikes]);
 
   const liked = useMemo(() => {
     const item = likes[movieId];

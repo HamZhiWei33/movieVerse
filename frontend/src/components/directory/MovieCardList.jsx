@@ -1,11 +1,20 @@
 import "../../styles/directory/MovieCardList.css";
 import { useNavigate } from "react-router-dom";
+import { memo } from 'react';
 import { IoTime } from "react-icons/io5";
 import { FaPlay } from "react-icons/fa6";
 import LikeIcon from "./LikeIcon";
 import AddToWatchlistIcon from "./AddToWatchlistIcon";
 import ReviewStars from "./ReviewStars";
 import usePreviousScrollStore from "../../store/usePreviousScrollStore";
+
+const StaticStars = memo(({ rating, readOnly, showNumber }) => (
+  <ReviewStars
+    rating={rating}
+    readOnly={readOnly}
+    showNumber={showNumber}
+  />
+));
 
 const MovieCardList = ({
   movie,
@@ -16,10 +25,11 @@ const MovieCardList = ({
 }) => {
   const navigate = useNavigate();
   const { setPreviousScrollPosition } = usePreviousScrollStore();
-  
+
   const averageRating = Math.max(movie?.rating ?? 0, 0);
 
   const handleCardClick = () => {
+    if (showBottomInteractiveIcon) return;
     setPreviousScrollPosition(window.scrollY);
     navigate(`/movie/${movie._id}`);
   };
@@ -42,7 +52,7 @@ const MovieCardList = ({
       </div>
       <div className="movie-details-container-list">
         <h3>{movie.title}</h3>
-        <ReviewStars
+        <StaticStars
           rating={averageRating}
           readOnly={true}
           showNumber={showRatingNumber}
@@ -97,7 +107,7 @@ const MovieCardList = ({
               <FaPlay className="play-icon" />
               Watch Trailer
             </button>
-            <LikeIcon movie={movie} showCount={true} />
+            <LikeIcon movie={movie} showCount={true} fetchSelf={true} />
             <AddToWatchlistIcon movie={movie} />
           </div>
         )}

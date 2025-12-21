@@ -79,3 +79,47 @@ export const getLikesForMovie = async (req, res) => {
     return res.status(500).json({ details: error.message });
   }
 };
+
+export const bulkGetLikesForMovies = async (req, res) => {
+  const { movieIds } = req.body;
+
+  if (!movieIds) {
+    // If the query parameter is missing, treat it as an empty result set (or return 400 if strictly required)
+    return res.status(200).json({ success: true, likesByMovie: {} });
+  }
+
+  const validMovieIds = movieIds.map(id => id.trim())
+    .filter(id => mongoose.Types.ObjectId.isValid(id))
+    .map(id => new mongoose.Types.ObjectId(id));
+
+  if (validMovieIds.length === 0) {
+    return res.status(200).json({ success: true, likesByMovie: {} });
+  }
+
+  try {
+    const allLikes = await Like.find({ "movieId": { $in: validMovieIds } }).lean();
+
+    // 4. Aggregate results into the required map structure: { movieId: { count: N, likes: [...] } }
+    const likesByMovie = allLikes.reduce((acc, like) => {
+      const id = like.movieId.toString();
+      if (!acc[id]) {
+        acc[id] = { count: 0, likes: [] };
+      }
+      acc[id].count += 1;
+      acc[id].likes.push(like);
+      return acc;
+    }, {});
+
+    const finalResults = {};
+    validMovieIds.forEach(idObj => {
+      const idString = idObj.toString();
+      finalResults[idString] = likesByMovie[idString] || { count: 0, likes: [] };
+    });
+
+    return res.status(200).json({ success: true, likesByMovie: finalResults });
+
+  } catch (error) {
+    console.error("Bulk get likes error:", error);
+    return res.status(500).json({ message: "Failed to fetch bulk likes.", details: error.message });
+  }
+};

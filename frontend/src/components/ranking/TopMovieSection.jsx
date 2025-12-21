@@ -177,7 +177,7 @@ const TopMovieSection = ({ selectedMovie, setSelectedMovie }) => {
               >
                 ▶ Watch Trailer
               </button>
-              <LikeIcon movie={selectedMovie} />
+              <LikeIcon movie={selectedMovie} fetchSelf={true} />
               <AddToWatchlistIcon movie={selectedMovie} />
             </div>
           </div>
