@@ -24,6 +24,7 @@ const HomeRanking = () => {
       className="page-wrapper"
       role="region"
       aria-label="Top rated movie ranking section"
+      style={{minHeight: "auto"}}
     >
       {selectedMovie ? (
         <TopMovieSection

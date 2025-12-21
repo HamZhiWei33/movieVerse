@@ -43,27 +43,10 @@ body {
   overflow-y: auto;
 }
 
-#toggle-sidebar-container button {
-  outline: none;
-  border: none;
-  background: transparent;
-}
-
-#toggle-sidebar-container button:focus {
-  outline: none;
-  box-shadow: none;
-}
-
 #sidebar-icon {
   color: #fff;
   font-size: 1rem;
   cursor: pointer;
-}
-
-#toggle-sidebar-container {
-  padding: 1rem 0 0 3rem;
-  margin-bottom: -1rem;
-  /* Adjust as needed */
 }
 
 .view-toggle {
