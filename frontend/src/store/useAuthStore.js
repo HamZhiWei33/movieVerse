@@ -24,7 +24,11 @@ export const useAuthStore = create((set, get) => ({
       const res = await axiosInstance.get("/auth/check");
       set({ authUser: res.data, isCheckingAuth: false });
     } catch (error) {
-      console.error("Error in checking auth:", error);
+      if (error.status !== 401) {
+        console.error("Error in checking auth:", error);
+      } else {
+        console.warn("User not authenticated");
+      }
       localStorage.removeItem("token");
       delete axiosInstance.defaults.headers.common["Authorization"];
       set({ authUser: null, isCheckingAuth: false });
