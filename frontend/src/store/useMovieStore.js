@@ -371,6 +371,12 @@ const useMovieStore = create((set, get) => ({
     // Utility functions
     clearError: () => set({ error: null }),
     clearMovies: () => set({ movies: [] }),
+    resetMovieStore: () => set({
+        movies: [],
+        likes: {},
+        watchlist: [],
+        watchlistStatuses: {}
+    }),
 }));
 
 export default useMovieStore;

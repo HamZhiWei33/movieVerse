@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { axiosInstance } from "../lib/axios.js";
 import toast from "react-hot-toast";
+import useMovieStore from './useMovieStore.js'
 
 export const useAuthStore = create((set, get) => ({
   authUser: null,
@@ -111,6 +112,8 @@ export const useAuthStore = create((set, get) => ({
       delete axiosInstance.defaults.headers.common["Authorization"];
 
       set({ authUser: null });
+      useMovieStore.getState().resetMovieStore();
+
       toast.success("Logged out successfully");
     } catch (error) {
       toast.error(error.response.data.message);
