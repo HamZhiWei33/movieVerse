@@ -15,6 +15,7 @@ const useMovieStore = create((set, get) => ({
     hasMore: true,
     lastUsedFilters: {},
     isFetchingMore: false,
+    isFetchingMovies: false,
     isFetchingWatchlist: false,
     watchlistStatuses: {},
     recommendedMovies: [],
@@ -43,11 +44,14 @@ const useMovieStore = create((set, get) => ({
     },
 
     fetchMovies: async (page = 1, limit = 20, filters = {}, append = false) => {
-        if (get().isFetchingMore) return;
+        if (get().isFetchingMore || get().isFetchingMovies) {
+            return false
+        };
 
         set({
             loading: page === 1,
             isFetchingMore: page > 1,
+            isFetchingMovies: true,
             error: null,
             lastUsedFilters: filters
         });
@@ -89,7 +93,8 @@ const useMovieStore = create((set, get) => ({
                 currentPage: page,
                 hasMore,
                 loading: false,
-                isFetchingMore: false
+                isFetchingMore: false,
+                isFetchingMovies: false
             });
 
             return { data: uniqueMovies };
@@ -97,7 +102,8 @@ const useMovieStore = create((set, get) => ({
             set({
                 error: error.message,
                 loading: false,
-                isFetchingMore: false
+                isFetchingMore: false,
+                isFetchingMovies: false
             });
             throw error;
         }

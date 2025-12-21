@@ -29,12 +29,13 @@ const useRatingStore = create((set, get) => ({
   },
 
   fetchReviewsByMovie: async (movieId) => {
+    if (get().isLoading) return;
     set({ isLoading: true, error: null });
     try {
       const response = await axiosInstance.get(`/reviews/${movieId}`);
-      const sortedReviews = response.data.sort((a, b) => 
+      const sortedReviews = response.data.sort((a, b) =>
         new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt)
-    );
+      );
       set((state) => ({
         reviewsByMovie: {
           ...state.reviewsByMovie,
@@ -66,7 +67,7 @@ const useRatingStore = create((set, get) => ({
     }
   },
 
-   addReview: async (movieId, { rating, review }) => {
+  addReview: async (movieId, { rating, review }) => {
     set({ isLoading: true, error: null });
     try {
       const response = await axiosInstance.post(
@@ -74,12 +75,12 @@ const useRatingStore = create((set, get) => ({
         { rating, review },
         { withCredentials: true }
       );
-      
+
       set((state) => {
         const updatedReviews = state.reviewsByMovie[movieId]
           ? [...state.reviewsByMovie[movieId], response.data.review]
           : [response.data.review];
-          
+
         return {
           reviewsByMovie: {
             ...state.reviewsByMovie,
@@ -88,11 +89,11 @@ const useRatingStore = create((set, get) => ({
           userReview: { ...state.userReview, [movieId]: response.data.review },
           moviesById: {
             ...state.moviesById,
-            [movieId]: response.data.movie 
+            [movieId]: response.data.movie
           }
         };
       });
-      
+
       return response.data;
     } catch (err) {
       console.error(`Failed to add review for movie ${movieId}:`, err);
@@ -111,22 +112,22 @@ const useRatingStore = create((set, get) => ({
         { rating, review },
         { withCredentials: true }
       );
-      
+
       set((state) => {
         const updatedList = state.reviewsByMovie[movieId]?.map((r) =>
           r.userId === useAuthStore.getState().authUser?.id ? response.data.review : r
         ) || [];
-        
+
         return {
           reviewsByMovie: { ...state.reviewsByMovie, [movieId]: updatedList },
           userReview: { ...state.userReview, [movieId]: response.data.review },
           moviesById: {
             ...state.moviesById,
-            [movieId]: response.data.movie 
+            [movieId]: response.data.movie
           }
         };
       });
-      
+
       return response.data;
     } catch (err) {
       console.error(`Failed to update review for movie ${movieId}:`, err);
