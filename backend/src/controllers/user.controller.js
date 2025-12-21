@@ -100,6 +100,36 @@ export const checkWatchlistStatus = async (req, res) => {
   }
 };
 
+export const bulkCheckWatchlistStatus = async (req, res) => {
+  try {
+    const { movieIds = [] } = req.body;
+    const userId = req.user._id;
+
+    const user = await User.findById(userId).select("watchlist");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (movieIds.length === 0) {
+      return res.status(200).json({ statuses: {} });
+    }
+
+    const watchlistSet = new Set(user.watchlist.map(id => id.toString()));
+    const statuses = {};
+
+    movieIds.forEach(movieId => {
+      statuses[movieId] = {
+        inWatchlist: watchlistSet.has(movieId),
+      };
+    });
+
+    res.status(200).json({ statuses });
+  } catch (error) {
+    console.error("Error checking watchlist status:", error.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 export const addToWatchlist = async (req, res) => {
   const userId = req.user?._id;
   const { movieId } = req.params;
