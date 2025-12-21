@@ -10,7 +10,7 @@ import likeRoutes from "./routes/like.route.js";
 import movieRoutes from "./routes/movie.route.js";
 import reviewRoutes from "./routes/review.route.js";
 import cors from "cors";
-import { updateAllMovies } from "./lib/movieUpdater.js";
+import { updateAllMovies } from "./lib/movieUpdaterConcurrent.js";
 
 dotenv.config();
 const app = express();
