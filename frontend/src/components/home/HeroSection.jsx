@@ -29,6 +29,7 @@ const HeroSection = ({ title, moviesType, items }) => {
   } = useMovieStore();
 
   const { genreMap } = useGenreStore();
+  const [newReleasedMovies, setNewReleasedMovies] = useState([]);
   const [cardPerRow, setCardPerRow] = useState(1);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const navigate = useNavigate();
@@ -43,13 +44,13 @@ const HeroSection = ({ title, moviesType, items }) => {
     }
   }, []);
 
-  // Get appropriate movie list based on type
-  const movieList = useMemo(() => {
+  useEffect(() => {
     if (moviesType === "newReleased") {
-      return storeMovies.slice(0, 20);
+      setNewReleasedMovies(storeMovies.slice(0, 20));
     }
-    return items;
-  }, [moviesType, storeMovies, items]);
+  }, [storeMovies]);
+
+  const movieList = moviesType === "newReleased" ? newReleasedMovies : items;
 
   // Handle recommendation reload
   const handleReload = () => {
@@ -75,6 +76,7 @@ const HeroSection = ({ title, moviesType, items }) => {
     if (!gridRef.current) return;
 
     const observer = new ResizeObserver(() => {
+      if (!gridRef.current) return;
       const style = getComputedStyle(gridRef.current);
       const columns = style.gridTemplateColumns.split(" ").length;
       setWindowWidth(window.innerWidth);

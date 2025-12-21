@@ -51,12 +51,14 @@ const RatingBarChart = ({ movieId, initialMovieData, initialReviews }) => {
 
     const breakdown = useMemo(() => {
         const breakdown = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-        currentReviews.forEach(review => {
-            const roundedRating = Math.round(review.rating);
-            if (breakdown[roundedRating] !== undefined) {
-                breakdown[roundedRating]++;
-            }
-        });
+        if (currentReviews && Array.isArray(currentReviews)) {
+            currentReviews.forEach(review => {
+                const roundedRating = Math.round(review.rating);
+                if (breakdown[roundedRating] !== undefined) {
+                    breakdown[roundedRating]++;
+                }
+            });
+        }
         return breakdown;
     }, [currentReviews]);
 
