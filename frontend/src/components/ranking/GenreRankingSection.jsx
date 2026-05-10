@@ -1,24 +1,16 @@
 // components/GenreRankingSection.jsx
 import { useState, useEffect, useMemo } from "react";
-import axios from "axios";
 import GenreCard from "./GenreCard";
 import Top1Card from "./Top1Card";
 import { useSearchParams, useLocation } from "react-router-dom";
-import { FaSpinner } from "react-icons/fa";
+import "../../styles/ranking.css";
+
 const GenreRankingSection = ({
   movies = [],
   allGenres = [],
-  allReviews = [],
 }) => {
   const [searchParams] = useSearchParams();
   const location = useLocation();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [data, setData] = useState({
-    movies: [],
-    reviews: [],
-    genres: [],
-  });
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   // Get genre from URL or default to "All"
@@ -38,54 +30,14 @@ const GenreRankingSection = ({
 
   // Update selectedGenre when URL changes
   useEffect(() => {
-    if (urlGenre && genreOptions.includes(urlGenre)) {
+    if (urlGenre && genreOptions.includes(urlGenre) && selectedGenre !== urlGenre) {
+      console.log("Setting selected genre from URL:", urlGenre);
       setSelectedGenre(urlGenre);
-    } else {
+    } else if (selectedGenre !== "All") {
+      console.log("Resetting selected genre to All");
       setSelectedGenre("All");
     }
   }, [urlGenre, genreOptions]);
-
-  // Fetch data from backend
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        console.log("Fetching data for genre:", selectedGenre); // Debug log
-
-        const response = await axios.get(
-          "http://localhost:5001/api/rankings/genres",
-          {
-            params: { genre: selectedGenre },
-          }
-        );
-
-        console.log("Received data:", response.data); // Debug log
-
-        if (!response.data) {
-          throw new Error("No data received from server");
-        }
-
-        setData({
-          movies: response.data.movies || [],
-          reviews: response.data.reviews || [],
-          genres: response.data.genres || [],
-        });
-        setError(null);
-      } catch (err) {
-        console.error("Error fetching rankings:", err);
-        setError(`Failed to load rankings: ${err.message}`);
-        setData({
-          movies: [],
-          reviews: [],
-          genres: [],
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [selectedGenre]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -141,14 +93,6 @@ const GenreRankingSection = ({
 
   const [top1, ...otherMovies] = sorted;
 
-  if (loading)
-    return (
-      <div className="loading" id="spinner">
-        Loading rankings...
-      </div>
-    );
-  if (error) return <div className="error">{error}</div>;
-
   // Update the genre mapping in the cards to use allGenres
   const getGenreName = (genreId) => {
     const genre = allGenres.find((g) => g.id === genreId);
@@ -170,7 +114,6 @@ const GenreRankingSection = ({
           </button>
         ))}
       </nav>
-
       <div className="genre-list">
         {!sorted.length ? (
           <div className="no-movies">No movies available for this genre</div>

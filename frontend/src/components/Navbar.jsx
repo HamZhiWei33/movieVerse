@@ -25,7 +25,7 @@ const Navbar = () => {
           aria-label="Go to homepage"
         >
           <NavLink to="/">
-            <img src="logo.gif" alt="App logo" width={300} height={50} />
+            <img src="/logo.gif" alt="App logo" width={300} height={50} />
           </NavLink>
         </div>
         <button

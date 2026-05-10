@@ -7,10 +7,10 @@ import { useNavigate } from "react-router-dom";
 
 import { FaAngleRight } from "react-icons/fa6";
 import { TfiReload } from "react-icons/tfi";
-import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 import RankingCard from "./RankingCard";
 import MovieCard from "../directory/MovieCard";
+import CatLoading from "../general/CatLoading";
 import ReviewStars from "../directory/ReviewStars";
 
 import { getTopMoviesByGenre } from "./ranking";
@@ -29,6 +29,7 @@ const HeroSection = ({ title, moviesType, items }) => {
   } = useMovieStore();
 
   const { genreMap } = useGenreStore();
+  const [newReleasedMovies, setNewReleasedMovies] = useState([]);
   const [cardPerRow, setCardPerRow] = useState(1);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const navigate = useNavigate();
@@ -43,13 +44,13 @@ const HeroSection = ({ title, moviesType, items }) => {
     }
   }, []);
 
-  // Get appropriate movie list based on type
-  const movieList = useMemo(() => {
+  useEffect(() => {
     if (moviesType === "newReleased") {
-      return storeMovies.slice(0, 20);
+      setNewReleasedMovies(storeMovies.slice(0, 20));
     }
-    return items;
-  }, [moviesType, storeMovies, items]);
+  }, [storeMovies]);
+
+  const movieList = moviesType === "newReleased" ? newReleasedMovies : items;
 
   // Handle recommendation reload
   const handleReload = () => {
@@ -75,6 +76,7 @@ const HeroSection = ({ title, moviesType, items }) => {
     if (!gridRef.current) return;
 
     const observer = new ResizeObserver(() => {
+      if (!gridRef.current) return;
       const style = getComputedStyle(gridRef.current);
       const columns = style.gridTemplateColumns.split(" ").length;
       setWindowWidth(window.innerWidth);
@@ -162,12 +164,7 @@ const HeroSection = ({ title, moviesType, items }) => {
         ((movieList.length === 0 || (moviesType === "watchlist" && updatingWatchlist)) ? (
           <div className="no-movies-message">
             {(moviesType === "watchlist" && updatingWatchlist) ? (
-              <DotLottieReact
-                src="https://lottie.host/6185175f-ee83-45a4-9244-03871961a1e9/yLmGLfSgYI.lottie"
-                loop
-                autoplay
-                className="loading-icon"
-              />
+              <CatLoading />
             ) : (
               <span>{`No movie in ${moviesType.charAt(0).toUpperCase() + moviesType.slice(1)}`}</span>
             )}

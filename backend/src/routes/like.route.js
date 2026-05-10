@@ -3,10 +3,14 @@ import { protectRoute } from "../middleware/auth.middleware.js";
 import {
   likeMovie,
   unlikeMovie,
-  getLikesForMovie
+  getLikesForMovie,
+  bulkGetLikesForMovies
 } from "../controllers/like.controller.js";
 
 const router = express.Router();
+
+// POST /api/likes/bulk
+router.post("/bulk", bulkGetLikesForMovies);
 
 // POST /api/likes/:movieId
 router.post("/:movieId", protectRoute, likeMovie); 

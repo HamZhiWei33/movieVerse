@@ -1,13 +1,13 @@
 import { create } from 'zustand';
 import { axiosInstance } from "../lib/axios.js";
 import { useAuthStore } from './useAuthStore.js';
+import useLikeStore from './useLikeStore.js';
 
 const useMovieStore = create((set, get) => ({
     // State
     movies: [],
     genres: [],
     filterOptions: {},
-    likes: {},
     watchlist: [],
     loading: false,
     error: null,
@@ -15,6 +15,8 @@ const useMovieStore = create((set, get) => ({
     hasMore: true,
     lastUsedFilters: {},
     isFetchingMore: false,
+    isFetchingMovies: false,
+    isFetchingWatchlist: false,
     watchlistStatuses: {},
     recommendedMovies: [],
     randomRecommendedMovies: [],
@@ -42,11 +44,14 @@ const useMovieStore = create((set, get) => ({
     },
 
     fetchMovies: async (page = 1, limit = 20, filters = {}, append = false) => {
-        if (get().isFetchingMore) return;
+        if (get().isFetchingMore || get().isFetchingMovies) {
+            return false
+        };
 
         set({
             loading: page === 1,
             isFetchingMore: page > 1,
+            isFetchingMovies: true,
             error: null,
             lastUsedFilters: filters
         });
@@ -77,12 +82,19 @@ const useMovieStore = create((set, get) => ({
 
             const hasMore = response.data.pagination?.hasMore ?? true; // Default to true for TMDB fallback
 
+            const likeStore = useLikeStore.getState();
+            await Promise.all([
+                get().bulkCheckWatchlistStatus(uniqueMovies.map(movie => movie._id)),
+                likeStore.fetchBulkMovieLikes(uniqueMovies.map(movie => movie._id).filter(id => !likeStore.likes[id]))
+            ]);
+
             set({
                 movies: uniqueMovies,
                 currentPage: page,
                 hasMore,
                 loading: false,
-                isFetchingMore: false
+                isFetchingMore: false,
+                isFetchingMovies: false
             });
 
             return { data: uniqueMovies };
@@ -90,7 +102,8 @@ const useMovieStore = create((set, get) => ({
             set({
                 error: error.message,
                 loading: false,
-                isFetchingMore: false
+                isFetchingMore: false,
+                isFetchingMovies: false
             });
             throw error;
         }
@@ -127,6 +140,8 @@ const useMovieStore = create((set, get) => ({
                     }
                     return acc;
                 }, [...state.movies]);
+
+                await get().bulkCheckWatchlistStatus(uniqueMovies.map(movie => movie._id))
 
                 set({
                     movies: uniqueMovies,
@@ -177,78 +192,33 @@ const useMovieStore = create((set, get) => ({
         }
     },
 
-    fetchMovieLikes: async (movieId) => {
-        set({ loading: true, error: null });
-        try {
-            const response = await axiosInstance.get(`/likes/${movieId}`);
-            const { count, likes } = response.data;
-
-            const currentUser = useAuthStore.getState().authUser;
-            const liked = currentUser ? likes.some(like => like.userId === currentUser._id) : false;
-
-            set(state => ({
-                likes: {
-                    ...state.likes,
-                    [movieId]: { liked, likeCount: count }
-                },
-                loading: false
-            }));
-            return response.data;
-        } catch (error) {
-            set({ error: error.message, loading: false });
-            console.log(error);
-            throw error;
-        }
-    },
-
-    toggleLike: async (movieId) => {
-        const state = get();
-        const previous = state.likes[movieId];
-        const liked = previous.liked;
-
-        set({
-            likes: {
-                ...state.likes,
-                [movieId]: {
-                    liked: !liked,
-                    likeCount: (previous?.likeCount || 0) + (liked ? -1 : 1),
-                }
-            }
-        });
-
-        try {
-            if (!liked) {
-                await axiosInstance.post(`/likes/${movieId}`);
-            } else {
-                await axiosInstance.delete(`/likes/${movieId}`);
-            }
-        } catch (error) {
-            // Rollback if error
-            console.error("Rollback!")
-            set({
-                likes: {
-                    ...state.likes,
-                    [movieId]: previous || { liked: false, likeCount: 0 },
-                },
-                error: error.message
-            });
-            throw error;
-        }
-    },
-
     fetchWatchlist: async () => {
-        set({ loading: true, error: null });
+        if (get().isFetchingWatchlist) return
+        set({
+            loading: true,
+            error: null,
+            isFetchingWatchlist: true
+        });
         try {
             const response = await axiosInstance.get("/users/watchlist");
             const watchlist = response.data;
+
+            await get().bulkCheckWatchlistStatus(watchlist.map(movie => movie._id))
+
             set({
                 watchlist,
-                loading: false
+                loading: false,
+                isFetchingWatchlist: false,
             });
             return watchlist;
         } catch (error) {
             set({ error: error.message, loading: false });
             throw error;
+        } finally {
+            set({
+                loading: false,
+                isFetchingWatchlist: false
+            });
         }
     },
 
@@ -296,17 +266,23 @@ const useMovieStore = create((set, get) => ({
 
         try {
             if (!inWatchlist) {
-                const response = await axiosInstance.get(`/movies/${movieId}`);
-                const movie = response.data.data || response.data;
+                // Prioritize cached movie data to avoid unnecessary fetch
+                let movieAdded;
+                if (state.movies[movieId]) {
+                    movieAdded = state.movies[movieId]
+                } else {
+                    const response = await axiosInstance.get(`/movies/${movieId}`);
+                    movieAdded = response.data.data || response.data;
+                }
+
                 set({
                     watchlist: [
-                        movie,
+                        movieAdded,
                         ...state.watchlist
                     ]
                 });
                 await axiosInstance.post(`/users/watchlist/${movieId}`);
             } else {
-
                 set({
                     watchlist: state.watchlist.filter((movie) => movie._id !== movieId)
                 });
@@ -324,6 +300,16 @@ const useMovieStore = create((set, get) => ({
 
     checkWatchlistStatus: async (movieId) => {
         try {
+            if (!get().watchlistStatuses[movieId]) {
+                set(state => ({
+                    watchlistStatuses: {
+                        ...state.watchlistStatuses,
+                        [movieId]: {
+                            inWatchlist: false
+                        }
+                    }
+                }));
+            }
             const response = await axiosInstance.get(`/users/watchlist/${movieId}/status`);
 
             set(state => ({
@@ -353,6 +339,58 @@ const useMovieStore = create((set, get) => ({
         }
     },
 
+    bulkCheckWatchlistStatus: async (movieIds) => {
+        if (!useAuthStore.getState().authUser) {
+            set({ watchlistStatuses: {} });
+            return {};
+        }
+
+        const CHUNK_SIZE = 2000;
+
+        const chunks = Array.from(
+            { length: Math.ceil(movieIds.length / CHUNK_SIZE) },
+            (_, i) => movieIds.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE)
+        );
+
+        try {
+            const [watchlistResponse, statusResponses] = await Promise.all([
+                axiosInstance.get("/users/watchlist"),
+                Promise.all(
+                    chunks.map(chunk => (
+                        axiosInstance.post("/users/watchlist/status/bulk", { movieIds: chunk })
+                    ))
+                ),
+            ]);
+
+            const mergedStatuses = Object.assign(
+                {},
+                ...statusResponses.map(res => res.data.statuses)
+            );
+
+            set(state => ({
+                watchlist: watchlistResponse.data,
+                watchlistStatuses: {
+                    ...state.watchlistStatuses,
+                    ...mergedStatuses
+                }
+            }));
+
+            return mergedStatuses;
+        } catch (error) {
+            console.error("Failed to fetch watchlist status:", error);
+
+            // Set default state
+            set(state => ({
+                watchlistStatuses: {
+                    ...state.watchlistStatuses,
+                    ...movieIds.map(movieId => ({ [movieId]: { inWatchlist: false } }))
+                }
+            }));
+
+            return false;
+        }
+    },
+
     isInWatchlist: (movieId) => {
         return get().watchlist.some((movie) => movie._id === movieId);
     },
@@ -360,6 +398,8 @@ const useMovieStore = create((set, get) => ({
     getRecommendedMovies: async () => {
         try {
             const response = await axiosInstance.get("/movies/recommended");
+            await get().bulkCheckWatchlistStatus(response.data.movies.map(movie => movie._id))
+
             set({ recommendedMovies: response.data.movies });
             return response.data;
         } catch (error) {
@@ -371,6 +411,14 @@ const useMovieStore = create((set, get) => ({
     // Utility functions
     clearError: () => set({ error: null }),
     clearMovies: () => set({ movies: [] }),
+    resetMovieStore: () => {
+        useLikeStore.getState().resetLikeStore();
+        set({
+            movies: [],
+            watchlist: [],
+            watchlistStatuses: {}
+        })
+    },
 }));
 
 export default useMovieStore;

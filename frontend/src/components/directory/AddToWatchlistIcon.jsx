@@ -22,7 +22,7 @@ const AddToWatchlistIcon = ({ movie = {} }) => {
 
   // Initialize status on mount
   useEffect(() => {
-    if (authUser) {
+    if (authUser && !watchlistStatuses[movieId]) {
       checkWatchlistStatus(movieId);
     }
   }, [movieId, authUser]);

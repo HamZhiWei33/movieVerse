@@ -1,8 +1,7 @@
-import { create } from "zustand"; //state management
+import { create } from "zustand";
 import { axiosInstance } from "../lib/axios.js";
 import toast from "react-hot-toast";
-
-const BASE_URL = import.meta.MODE === "development" ? "http://localhost:5001" : "/";
+import useMovieStore from './useMovieStore.js'
 
 export const useAuthStore = create((set, get) => ({
   authUser: null,
@@ -25,7 +24,11 @@ export const useAuthStore = create((set, get) => ({
       const res = await axiosInstance.get("/auth/check");
       set({ authUser: res.data, isCheckingAuth: false });
     } catch (error) {
-      console.error("Error in checking auth:", error);
+      if (error.status !== 401) {
+        console.error("Error in checking auth:", error);
+      } else {
+        console.warn("User not authenticated");
+      }
       localStorage.removeItem("token");
       delete axiosInstance.defaults.headers.common["Authorization"];
       set({ authUser: null, isCheckingAuth: false });
@@ -113,6 +116,8 @@ export const useAuthStore = create((set, get) => ({
       delete axiosInstance.defaults.headers.common["Authorization"];
 
       set({ authUser: null });
+      useMovieStore.getState().resetMovieStore();
+
       toast.success("Logged out successfully");
     } catch (error) {
       toast.error(error.response.data.message);

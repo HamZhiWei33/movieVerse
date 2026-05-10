@@ -25,7 +25,7 @@ const MovieCard = ({ movie, children }) => {
           </div>
           <div className="bottom-icons" onClick={(e) => e.stopPropagation()}>
             <LikeIcon movie={movie} />
-            <AddToWatchlistIcon movie={movie}/>
+            <AddToWatchlistIcon movie={movie} />
           </div>
         </div>
       </div>

@@ -78,11 +78,12 @@ export const getAllMovies = async (req, res) => {
 
     if (searchQuery) {
       const regex = new RegExp(decodeURIComponent(searchQuery), 'i');
-      dbQuery.$or = [ { title: regex }, { overview: regex } ];
+      dbQuery.$or = [{ title: regex }, { overview: regex }];
     }
 
-    const [movies, total] = await Promise.all([
+    const [movies, accumulatedMovies, total] = await Promise.all([
       Movie.find(dbQuery).sort({ releaseDate: -1 }).skip(skip).limit(Number(limit)).lean(),
+      Movie.find(dbQuery).sort({ releaseDate: -1 }).limit(Number(limit) * Number(page)).lean(),
       Movie.countDocuments(dbQuery)
     ]);
 
@@ -105,7 +106,7 @@ export const getAllMovies = async (req, res) => {
 
       // Apply TMDB-supported filters
       if (genreIds.length) tmdbParams.with_genres = genreIds.join(',');
-      
+
       if (years) {
         const yearNums = years.split(',').map(y => parseInt(y.trim())).filter(n => !isNaN(n));
         if (yearNums.length === 1) {
@@ -118,13 +119,13 @@ export const getAllMovies = async (req, res) => {
           tmdbParams['primary_release_date.lte'] = `${maxYear}-12-31`;
         }
       }
-      
+
       // Added region filtering for TMDB
       if (regions) {
         // TMDB uses 'with_origin_country' for origin countries
         tmdbParams.with_origin_country = regions.split(',').map(r => decodeURIComponent(r.trim())).join(',');
       }
-      
+
       if (searchQuery) tmdbParams.query = decodeURIComponent(searchQuery);
 
       let processedMovies = [];
@@ -135,30 +136,35 @@ export const getAllMovies = async (req, res) => {
 
         const { data } = await axios.get(tmdbUrl, { params: tmdbParams });
 
-        const existingTmdb = new Set(movies.map(m => m.tmdbId).filter(Boolean));
-        const toProcess = data.results.filter(m => !existingTmdb.has(m.id));
+        const existingTmdb = new Set(accumulatedMovies.map(m => m.tmdbId).filter(Boolean));
+        const toProcess = data.results.filter(m => !existingTmdb.has(m.id.toString()));
 
-        for (const tmdbMovie of toProcess) {
-          if (processedMovies.length >= needed) break;
+        processedMovies = await Promise.all(toProcess
+          .map(async (tmdbMovie) => {
+            const saved = await processTMDBMovie(tmdbMovie);
 
-          const saved = await processTMDBMovie(tmdbMovie);
-          if (!saved || !saved.trailerUrl) continue;
+            if (!saved || !saved.trailerUrl) {
+              return null;
+            }
 
-          // Re-apply region filter after processing, as TMDB's with_origin_country might be broad
-          if (regions) {
-            const allowedRegions = regions.split(',').map(r => decodeURIComponent(r.trim()));
-            if (!allowedRegions.includes(saved.region)) continue;
-          }
+            if (regions) {
+              const allowedRegions = regions.split(',').map(r => decodeURIComponent(r.trim()));
+              if (!allowedRegions.includes(saved.region)) {
+                return null;
+              }
+            }
 
-          processedMovies.push(saved);
-        }
+            return saved;
+          }));
+
+        processedMovies = processedMovies.filter(movie => movie !== null).slice(0, needed);
       } catch (err) {
         console.error("TMDB fetch failed:", err.message);
       }
 
       const combined = [...movies, ...processedMovies];
       const enriched = await enrichMovies(combined, req.user);
-      
+
       // For TMDB fallback, we can't know the exact total, so we assume there might be more
       const finalHasMore = processedMovies.length > 0 || hasMoreInDB;
 
@@ -431,7 +437,7 @@ async function processTMDBMovie(tmdbMovie) {
     }
 
     // Corrected trailer URL format for YouTube
-    const trailerUrl = `https://www.youtube.com/watch?v=${trailer.key}`; 
+    const trailerUrl = `https://www.youtube.com/watch?v=${trailer.key}`;
 
     // Now fetch other details in parallel
     const [detailResponse, releaseResponse, creditResponse] = await Promise.all([
@@ -454,15 +460,15 @@ async function processTMDBMovie(tmdbMovie) {
     const releaseDatesData = releaseResponse.data.results;
     let region = "US"; // Default to US if no specific region found
     if (releaseDatesData && releaseDatesData.length > 0) {
-        // Find the US release first, then any other country
-        const usRelease = releaseDatesData.find(r => r.iso_3166_1 === "US");
-        if (usRelease) {
-            region = "US";
-        } else if (detailData.production_countries && detailData.production_countries.length > 0) {
-            region = detailData.production_countries[0].iso_3166_1;
-        } else if (tmdbMovie.origin_country && tmdbMovie.origin_country.length > 0) {
-            region = tmdbMovie.origin_country[0];
-        }
+      // Find the US release first, then any other country
+      const usRelease = releaseDatesData.find(r => r.iso_3166_1 === "US");
+      if (usRelease) {
+        region = "US";
+      } else if (detailData.production_countries && detailData.production_countries.length > 0) {
+        region = detailData.production_countries[0].iso_3166_1;
+      } else if (tmdbMovie.origin_country && tmdbMovie.origin_country.length > 0) {
+        region = tmdbMovie.origin_country[0];
+      }
     }
 
     // Process credits

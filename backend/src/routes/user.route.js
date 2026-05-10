@@ -17,7 +17,8 @@ import {
   getUserLikedGenres,
   getUserReviewGenres,
   getUserWatchlistGenres,
-  checkWatchlistStatus
+  checkWatchlistStatus,
+  bulkCheckWatchlistStatus
 } from "../controllers/user.controller.js";
 
 const router = express.Router();
@@ -30,6 +31,7 @@ router.get("/review", protectRoute, getUserReviews);
 router.post("/review", protectRoute, addReview);
 
 router.get("/watchlist", protectRoute, getUserWatchlist);
+router.post("/watchlist/status/bulk", protectRoute, bulkCheckWatchlistStatus);
 router.post("/watchlist/:movieId", protectRoute, addToWatchlist);
 router.delete("/watchlist/:movieId", protectRoute, removeFromWatchlist);
 router.get('/watchlist/:movieId/status', protectRoute, checkWatchlistStatus);

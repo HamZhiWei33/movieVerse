@@ -37,7 +37,6 @@ cd movieVerse
 ```bash
 cd frontend
 npm install
-npm install --save-dev vite
 npm run dev
 ```
 
@@ -50,18 +49,13 @@ Frontend runs at: [http://localhost:5173](http://localhost:5173)
 ```bash
 cd backend
 npm install
-npm install --save-dev nodemon
-npm install cors
-npm install express-rate-limit
-npm install axios
-npm install mailgun.js form-data
 ```
 
 #### Create `.env` file in the `backend` folder
 
 ```env
 MONGODB_URI=your_mongodb_connection_string
-PORT=5000
+PORT=5001
 TMDB_API_KEY=your_tmdb_api_key
 JWT_SECRET=mysecretkey
 NODE_ENV=development
@@ -75,7 +69,7 @@ MAILGUN_DOMAIN=your_mailgun_domain
 npm run dev
 ```
 
-Backend runs at: [http://localhost:5000](http://localhost:5000)
+Backend runs at: [http://localhost:5001](http://localhost:5001)
 
 ---
 

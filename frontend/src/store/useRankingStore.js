@@ -1,5 +1,7 @@
 import { create } from "zustand";
 import { axiosInstance } from "../lib/axios.js";
+import useMovieStore from "./useMovieStore.js";
+import useLikeStore from "./useLikeStore.js";
 
 const useRankingStore = create((set, get) => ({
   // === RANKING PAGE STATE ===
@@ -11,10 +13,16 @@ const useRankingStore = create((set, get) => ({
   rankingError: null,
 
   fetchRankingData: async () => {
+    if (get().rankingLoading) return;
     set({ rankingLoading: true, rankingError: null });
     try {
       const response = await axiosInstance.get("/rankings");
       const { movies = [], reviews = [], genres = [] } = response.data || {};
+
+      await Promise.all([
+        useLikeStore.getState().fetchBulkMovieLikes(movies.map(movie => movie._id)),
+        useMovieStore.getState().bulkCheckWatchlistStatus(movies.map(movie => movie._id))
+      ]);
 
       set({
         rankingMovies: movies,

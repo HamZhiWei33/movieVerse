@@ -1,6 +1,6 @@
 import "../styles/general/general.css";
 import "../styles/general/genre-selection.css";
-import React, { useState } from "react";
+import { useState } from "react";
 import FormField from "../components/general/FormField";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
@@ -8,19 +8,19 @@ import toast from "react-hot-toast";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  
+
   const { login, isLoggingIn } = useAuthStore();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       await login({ email, password });
 
-      toast.success(`Welcome back, ${user.name}!`);
+      toast.success(`Welcome back, ${useAuthStore.getState().authUser.name}!`);
       navigate("/"); // Redirect to home page after successful login
     } catch (err) {
       console.warn("Login failed", err.message);
